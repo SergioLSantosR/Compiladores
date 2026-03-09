@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Entorno virtual
+.venv/
+
+# ANTLR generados (opcional, si prefieres regenerarlos en cada clon)
+gen/
+!gen/__init__.py
+
+# VSCode
+.vscode/
+
+# Otros
+.DS_Store
