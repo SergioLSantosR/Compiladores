@@ -41,6 +41,62 @@ program {
 
 ---
 
+```
+c
+program {
+  int n;
+  int factorial;
+  int i;
+  n = 5;
+  factorial = 1;
+  i = 1;
+  
+  while (i <= n) {
+    factorial = factorial * i;
+    i = i + 1;
+  }
+  
+  print(factorial);  // Debería imprimir 120
+}
+
+```
+
+---
+
+```
+program {
+  int num;
+  int i;
+  bool esPrimo;
+  
+  num = 17;
+  esPrimo = true;
+  i = 2;
+  
+  if (num <= 1) {
+    esPrimo = false;
+  } else {
+    while (i < num && esPrimo) {
+      if (num % i == 0) {
+        esPrimo = false;
+      }
+      i = i + 1;
+    }
+  }
+  
+  if (esPrimo) {
+    print(num);
+    print("es primo");
+  } else {
+    print(num);
+    print("no es primo");
+  }
+}
+
+```
+
+---
+
 ## 2. Gramática (ANTLR)
 
 La gramática está en **`grammar/MiniLang.g4`**.
