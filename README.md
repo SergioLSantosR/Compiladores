@@ -56,7 +56,7 @@ program {
     i = i + 1;
   }
   
-  print(factorial);  // Debería imprimir 120
+  print(factorial); 
 }
 
 ```
