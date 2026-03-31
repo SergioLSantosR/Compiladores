@@ -91,41 +91,41 @@ class MiniLangLexer(Lexer):
 
     decisionsToDFA = [ DFA(ds, i) for i, ds in enumerate(atn.decisionToState) ]
 
-    PROGRAM = 1
-    IF = 2
-    ELSE = 3
-    PRINT = 4
-    INT_T = 5
-    BOOL_T = 6
-    TRUE = 7
-    FALSE = 8
-    AND = 9
-    OR = 10
-    NOT = 11
-    EQ = 12
-    NEQ = 13
-    LE = 14
-    GE = 15
-    LT = 16
-    GT = 17
-    ASSIGN = 18
-    ADD = 19
-    SUB = 20
-    MUL = 21
-    DIV = 22
-    LPAREN = 23
-    RPAREN = 24
-    LBRACE = 25
-    RBRACE = 26
-    LBRACK = 27
-    RBRACK = 28
-    SEMI = 29
-    COMMA = 30
-    ID = 31
-    INT = 32
-    WS = 33
-    LINE_COMMENT = 34
-    BLOCK_COMMENT = 35
+    PROGRAMA = 1
+    SI = 2
+    SINO = 3
+    IMPRIMIR = 4
+    TIPO_ENTERO = 5
+    TIPO_BOOL = 6
+    VERDADERO = 7
+    FALSO = 8
+    Y_LOGICO = 9
+    O_LOGICO = 10
+    NEGACION = 11
+    IGUAL = 12
+    DIFERENTE = 13
+    MENOR_IGUAL = 14
+    MAYOR_IGUAL = 15
+    MENOR_QUE = 16
+    MAYOR_QUE = 17
+    ASIGNACION = 18
+    SUMA = 19
+    RESTA = 20
+    MULTIPLICACION = 21
+    DIVISION = 22
+    PAREN_IZQ = 23
+    PAREN_DER = 24
+    LLAVE_IZQ = 25
+    LLAVE_DER = 26
+    CORCHETE_IZQ = 27
+    CORCHETE_DER = 28
+    PUNTO_COMA = 29
+    COMA = 30
+    IDENTIFICADOR = 31
+    ENTERO = 32
+    ESPACIO = 33
+    COMENTARIO_LINEA = 34
+    COMENTARIO_BLOQUE = 35
 
     channelNames = [ u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN" ]
 
@@ -138,17 +138,22 @@ class MiniLangLexer(Lexer):
             "')'", "'{'", "'}'", "'['", "']'", "';'", "','" ]
 
     symbolicNames = [ "<INVALID>",
-            "PROGRAM", "IF", "ELSE", "PRINT", "INT_T", "BOOL_T", "TRUE", 
-            "FALSE", "AND", "OR", "NOT", "EQ", "NEQ", "LE", "GE", "LT", 
-            "GT", "ASSIGN", "ADD", "SUB", "MUL", "DIV", "LPAREN", "RPAREN", 
-            "LBRACE", "RBRACE", "LBRACK", "RBRACK", "SEMI", "COMMA", "ID", 
-            "INT", "WS", "LINE_COMMENT", "BLOCK_COMMENT" ]
+            "PROGRAMA", "SI", "SINO", "IMPRIMIR", "TIPO_ENTERO", "TIPO_BOOL", 
+            "VERDADERO", "FALSO", "Y_LOGICO", "O_LOGICO", "NEGACION", "IGUAL", 
+            "DIFERENTE", "MENOR_IGUAL", "MAYOR_IGUAL", "MENOR_QUE", "MAYOR_QUE", 
+            "ASIGNACION", "SUMA", "RESTA", "MULTIPLICACION", "DIVISION", 
+            "PAREN_IZQ", "PAREN_DER", "LLAVE_IZQ", "LLAVE_DER", "CORCHETE_IZQ", 
+            "CORCHETE_DER", "PUNTO_COMA", "COMA", "IDENTIFICADOR", "ENTERO", 
+            "ESPACIO", "COMENTARIO_LINEA", "COMENTARIO_BLOQUE" ]
 
-    ruleNames = [ "PROGRAM", "IF", "ELSE", "PRINT", "INT_T", "BOOL_T", "TRUE", 
-                  "FALSE", "AND", "OR", "NOT", "EQ", "NEQ", "LE", "GE", 
-                  "LT", "GT", "ASSIGN", "ADD", "SUB", "MUL", "DIV", "LPAREN", 
-                  "RPAREN", "LBRACE", "RBRACE", "LBRACK", "RBRACK", "SEMI", 
-                  "COMMA", "ID", "INT", "WS", "LINE_COMMENT", "BLOCK_COMMENT" ]
+    ruleNames = [ "PROGRAMA", "SI", "SINO", "IMPRIMIR", "TIPO_ENTERO", "TIPO_BOOL", 
+                  "VERDADERO", "FALSO", "Y_LOGICO", "O_LOGICO", "NEGACION", 
+                  "IGUAL", "DIFERENTE", "MENOR_IGUAL", "MAYOR_IGUAL", "MENOR_QUE", 
+                  "MAYOR_QUE", "ASIGNACION", "SUMA", "RESTA", "MULTIPLICACION", 
+                  "DIVISION", "PAREN_IZQ", "PAREN_DER", "LLAVE_IZQ", "LLAVE_DER", 
+                  "CORCHETE_IZQ", "CORCHETE_DER", "PUNTO_COMA", "COMA", 
+                  "IDENTIFICADOR", "ENTERO", "ESPACIO", "COMENTARIO_LINEA", 
+                  "COMENTARIO_BLOQUE" ]
 
     grammarFileName = "MiniLang.g4"
 

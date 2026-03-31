@@ -3,6 +3,7 @@ from antlr4 import *
 from gen.grammar.MiniLangParser import MiniLangParser
 from gen.grammar.MiniLangVisitor import MiniLangVisitor
 
+
 class EvalVisitor(MiniLangVisitor):
     """
     Visitor de evaluación:
@@ -16,155 +17,168 @@ class EvalVisitor(MiniLangVisitor):
 
     def __init__(self, stdout_print=True):
         super().__init__()
-        self.memory = {}  # nombre -> valor (int/bool)
-        self.types = {}   # nombre -> "int" | "bool"
+        self.memoria = {}       # nombre -> valor (int/bool)
+        self.tipos = {}         # nombre -> "int" | "bool"
         self.stdout_print = stdout_print
-        self.output = []  # Guarda textos impresos (para pruebas)
+        self.salida = []        # Guarda textos impresos (para pruebas)
 
     # ---- Utilidades ----
-    def _type_of(self, value):
-        if isinstance(value, bool):
+
+    def _tipo_de(self, valor):
+        if isinstance(valor, bool):
             return "bool"
-        elif isinstance(value, int):
+        elif isinstance(valor, int):
             return "int"
-        else:
-            return "desconocido"
+        return "desconocido"
 
-    def _ensure_declared(self, name, ctx):
-        if name not in self.types:
-            raise RuntimeError(f"Variable '{name}' no declarada (línea {ctx.start.line}).")
+    def _asegurar_declarada(self, nombre, ctx):
+        if nombre not in self.tipos:
+            raise RuntimeError(f"Variable '{nombre}' no declarada (línea {ctx.start.line}).")
 
-    def _ensure_type(self, expected, value, ctx, op_desc="operación"):
-        actual = self._type_of(value)
-        if expected != actual:
+    def _asegurar_tipo(self, esperado, valor, ctx, descripcion="operación"):
+        actual = self._tipo_de(valor)
+        if esperado != actual:
             raise RuntimeError(
-                f"Error de tipos en {op_desc} (línea {ctx.start.line}): se esperaba {expected}, obtuvo {actual}."
+                f"Error de tipos en {descripcion} (línea {ctx.start.line}): "
+                f"se esperaba {esperado}, obtuvo {actual}."
             )
 
-    def _println(self, text):
+    def _imprimir(self, texto):
         if self.stdout_print:
-            print(text)
-        self.output.append(str(text))
+            print(texto)
+        self.salida.append(str(texto))
 
-    # ---- program / block ----
-    def visitProgram(self, ctx: MiniLangParser.ProgramContext):
-        return self.visit(ctx.block())
+    # ---- programa / bloque ----
 
-    def visitBlock(self, ctx: MiniLangParser.BlockContext):
-        for s in ctx.stmt():
+    def visitPrograma(self, ctx: MiniLangParser.ProgramaContext):
+        return self.visit(ctx.bloque())
+
+    def visitBloque(self, ctx: MiniLangParser.BloqueContext):
+        for s in ctx.sentencia():
             self.visit(s)
         return None
 
     # ---- declaraciones ----
-    def visitVarDecl(self, ctx: MiniLangParser.VarDeclContext):
-        t = ctx.type_().getText() if hasattr(ctx, 'type_') else ctx.type().getText()
-        name = ctx.ID().getText()
-        if name in self.types:
-            raise RuntimeError(f"Redeclaración de variable '{name}' (línea {ctx.start.line}).")
-        self.types[name] = t
-        self.memory[name] = 0 if t == "int" else False
+
+    def visitDeclaracionVariable(self, ctx: MiniLangParser.DeclaracionVariableContext):
+        t = ctx.tipo().getText()
+        nombre = ctx.IDENTIFICADOR().getText()
+        if nombre in self.tipos:
+            raise RuntimeError(f"Redeclaración de variable '{nombre}' (línea {ctx.start.line}).")
+        self.tipos[nombre] = t
+        self.memoria[nombre] = 0 if t == "int" else False
         return None
 
     # ---- asignaciones ----
-    def visitAssignStmt(self, ctx: MiniLangParser.AssignStmtContext):
-        name = ctx.ID().getText()
-        self._ensure_declared(name, ctx)
-        value = self.visit(ctx.expr())
-        # Chequeo de tipos
-        expected = self.types[name]
-        self._ensure_type(expected, value, ctx, "asignación")
-        self.memory[name] = value
-        # Imprimir resultado de la asignación (útil para ver operaciones)
-        self._println(f"{name} = {value}")
+
+    def visitAsignacion(self, ctx: MiniLangParser.AsignacionContext):
+        nombre = ctx.IDENTIFICADOR().getText()
+        self._asegurar_declarada(nombre, ctx)
+        valor = self.visit(ctx.expresion())
+        esperado = self.tipos[nombre]
+        self._asegurar_tipo(esperado, valor, ctx, "asignación")
+        self.memoria[nombre] = valor
+        self._imprimir(f"{nombre} = {valor}")
         return None
 
     # ---- if/else ----
-    def visitIfStmt(self, ctx: MiniLangParser.IfStmtContext):
-        cond = self.visit(ctx.expr())
-        self._ensure_type("bool", cond, ctx, "condicional (if)")
-        if cond:
-            self.visit(ctx.block(0))
-        elif ctx.ELSE():
-            self.visit(ctx.block(1))
+
+    def visitCondicionalSi(self, ctx: MiniLangParser.CondicionalSiContext):
+        condicion = self.visit(ctx.expresion())
+        self._asegurar_tipo("bool", condicion, ctx, "condicional (if)")
+        if condicion:
+            self.visit(ctx.bloque(0))
+        elif ctx.SINO():
+            self.visit(ctx.bloque(1))
         return None
 
     # ---- print ----
-    def visitPrintStmt(self, ctx: MiniLangParser.PrintStmtContext):
-        value = self.visit(ctx.expr())
-        self._println(value)
+
+    def visitImprimir(self, ctx: MiniLangParser.ImprimirContext):
+        valor = self.visit(ctx.expresion())
+        self._imprimir(valor)
         return None
 
     # ---- expresiones ----
-    def visitUnaryNot(self, ctx: MiniLangParser.UnaryNotContext):
-        v = self.visit(ctx.expr())
-        self._ensure_type("bool", v, ctx, "negación lógica (!)")
-        return (not v)
 
-    def visitUnaryMinus(self, ctx: MiniLangParser.UnaryMinusContext):
-        v = self.visit(ctx.expr())
-        self._ensure_type("int", v, ctx, "negación aritmética (-)")
+    def visitNegacionLogica(self, ctx: MiniLangParser.NegacionLogicaContext):
+        v = self.visit(ctx.expresion())
+        self._asegurar_tipo("bool", v, ctx, "negación lógica (!)")
+        return not v
+
+    def visitMenosUnario(self, ctx: MiniLangParser.MenosUnarioContext):
+        v = self.visit(ctx.expresion())
+        self._asegurar_tipo("int", v, ctx, "negación aritmética (-)")
         return -v
 
-    def visitParen(self, ctx: MiniLangParser.ParenContext):
-        return self.visit(ctx.expr())
+    def visitParentesis(self, ctx: MiniLangParser.ParentesisContext):
+        return self.visit(ctx.expresion())
 
-    def visitMulDiv(self, ctx: MiniLangParser.MulDivContext):
-        l = self.visit(ctx.left)
-        r = self.visit(ctx.right)
-        self._ensure_type("int", l, ctx, "multiplicación/división")
-        self._ensure_type("int", r, ctx, "multiplicación/división")
-        if ctx.op.type == MiniLangParser.MUL:
-            return l * r
-        else:
-            if r == 0:
-                raise RuntimeError(f"División por cero (línea {ctx.start.line}).")
-            # División entera
-            return l // r
+    def visitMultiplicacionDivision(self, ctx: MiniLangParser.MultiplicacionDivisionContext):
+        izq = self.visit(ctx.izq)
+        der = self.visit(ctx.der)
+        self._asegurar_tipo("int", izq, ctx, "multiplicación/división")
+        self._asegurar_tipo("int", der, ctx, "multiplicación/división")
+        if ctx.op.type == MiniLangParser.MULTIPLICACION:
+            return izq * der
+        if der == 0:
+            raise RuntimeError(f"División por cero (línea {ctx.start.line}).")
+        return izq // der
 
-    def visitAddSub(self, ctx: MiniLangParser.AddSubContext):
-        l = self.visit(ctx.left)
-        r = self.visit(ctx.right)
-        self._ensure_type("int", l, ctx, "suma/resta")
-        self._ensure_type("int", r, ctx, "suma/resta")
-        return l + r if ctx.op.type == MiniLangParser.ADD else l - r
+    def visitSumaResta(self, ctx: MiniLangParser.SumaRestaContext):
+        izq = self.visit(ctx.izq)
+        der = self.visit(ctx.der)
+        self._asegurar_tipo("int", izq, ctx, "suma/resta")
+        self._asegurar_tipo("int", der, ctx, "suma/resta")
+        return izq + der if ctx.op.type == MiniLangParser.SUMA else izq - der
 
-    def visitRelational(self, ctx: MiniLangParser.RelationalContext):
-        l = self.visit(ctx.left)
-        r = self.visit(ctx.right)
-        # Permitimos comparaciones entre ints y entre bools (==/!=) y relacionales solo en ints
-        op_type = ctx.op.type
-        if op_type in (MiniLangParser.EQ, MiniLangParser.NEQ):
-            return (l == r) if op_type == MiniLangParser.EQ else (l != r)
-        # El resto requiere ints
-        self._ensure_type("int", l, ctx, "comparación relacional")
-        self._ensure_type("int", r, ctx, "comparación relacional")
-        if op_type == MiniLangParser.LT:
-            return l < r
-        if op_type == MiniLangParser.LE:
-            return l <= r
-        if op_type == MiniLangParser.GT:
-            return l > r
-        if op_type == MiniLangParser.GE:
-            return l >= r
+    def visitComparacion(self, ctx: MiniLangParser.ComparacionContext):
+        izq = self.visit(ctx.izq)
+        der = self.visit(ctx.der)
+        self._asegurar_tipo("int", izq, ctx, "comparación relacional")
+        self._asegurar_tipo("int", der, ctx, "comparación relacional")
+        tipo_op = ctx.op.type
+        if tipo_op == MiniLangParser.MENOR_QUE:
+            return izq < der
+        if tipo_op == MiniLangParser.MENOR_IGUAL:
+            return izq <= der
+        if tipo_op == MiniLangParser.MAYOR_QUE:
+            return izq > der
+        if tipo_op == MiniLangParser.MAYOR_IGUAL:
+            return izq >= der
         raise RuntimeError("Operador relacional no reconocido.")
 
-    def visitLogical(self, ctx: MiniLangParser.LogicalContext):
-        l = self.visit(ctx.left)
-        r = self.visit(ctx.right)
-        self._ensure_type("bool", l, ctx, "operación lógica")
-        self._ensure_type("bool", r, ctx, "operación lógica")
-        return (l and r) if ctx.op.type == MiniLangParser.AND else (l or r)
+    def visitIgualdad(self, ctx: MiniLangParser.IgualdadContext):
+        izq = self.visit(ctx.izq)
+        der = self.visit(ctx.der)
+        if ctx.op.type == MiniLangParser.IGUAL:
+            return izq == der
+        return izq != der
 
-    def visitIntLit(self, ctx: MiniLangParser.IntLitContext):
-        return int(ctx.INT().getText())
+    def visitYLogico(self, ctx: MiniLangParser.YLogicoContext):
+        izq = self.visit(ctx.izq)
+        der = self.visit(ctx.der)
+        self._asegurar_tipo("bool", izq, ctx, "operación lógica (&&)")
+        self._asegurar_tipo("bool", der, ctx, "operación lógica (&&)")
+        return izq and der
 
-    def visitTrueLit(self, ctx: MiniLangParser.TrueLitContext):
+    def visitOLogico(self, ctx: MiniLangParser.OLogicoContext):
+        izq = self.visit(ctx.izq)
+        der = self.visit(ctx.der)
+        self._asegurar_tipo("bool", izq, ctx, "operación lógica (||)")
+        self._asegurar_tipo("bool", der, ctx, "operación lógica (||)")
+        return izq or der
+
+    def visitLiteralEntero(self, ctx: MiniLangParser.LiteralEnteroContext):
+        return int(ctx.ENTERO().getText())
+
+    def visitLiteralVerdadero(self, ctx: MiniLangParser.LiteralVerdaderoContext):
         return True
 
-    def visitFalseLit(self, ctx: MiniLangParser.FalseLitContext):
+    def visitLiteralFalso(self, ctx: MiniLangParser.LiteralFalsoContext):
         return False
 
-    def visitIdRef(self, ctx: MiniLangParser.IdRefContext):
-        name = ctx.ID().getText()
-        self._ensure_declared(name, ctx)
-        return self.memory[name]
+    def visitReferenciaVariable(self, ctx: MiniLangParser.ReferenciaVariableContext):
+        nombre = ctx.IDENTIFICADOR().getText()
+        self._asegurar_declarada(nombre, ctx)
+        return self.memoria[nombre]
