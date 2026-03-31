@@ -99,10 +99,24 @@ program {
 
 ## 2. Gramática (ANTLR)
 
-La gramática está en **`grammar/MiniLang.g4`**.
+La gramática está en **`grammar/MiniLang.g4`**. Todos los nombres de reglas y tokens están en **español** para facilitar el aprendizaje.
 
 - **Reglas léxicas**: palabras clave (`program`, `if`, `else`, `print`, `int`, `bool`, `true`, `false`), operadores, identificadores, literales enteros, espacios y comentarios (`//`, `/* */`).
-- **Reglas sintácticas**: `program` → `block`; `block` → secuencia de sentencias; sentencias: declaraciones, asignaciones, `if`, `print`; expresiones con precedencia y asociatividad (unarios, `*`/`/`, `+`/`-`, relacionales, `&&`/`||`).
+- **Reglas sintácticas**: `programa` → `bloque`; `bloque` → secuencia de `sentencia`s; sentencias: `declaracionVariable`, `asignacion`, `condicionalSi`, `imprimir`; expresiones (`expresion`) con precedencia completa y asociatividad.
+
+### Niveles de precedencia de expresiones (de mayor a menor)
+
+| Prioridad | Regla | Operadores |
+|-----------|-------|------------|
+| 1 | `NegacionLogica` | `!` |
+| 2 | `MenosUnario` | `-` (unario) |
+| 3 | `Parentesis` | `( )` |
+| 4 | `MultiplicacionDivision` | `*`, `/` |
+| 5 | `SumaResta` | `+`, `-` |
+| 6 | `Comparacion` | `<`, `<=`, `>`, `>=` |
+| 7 | `Igualdad` | `==`, `!=` / `<>` |
+| 8 | `YLogico` | `&&` |
+| 9 | `OLogico` | `||` |
 
 Para regenerar el analizador (después de cambiar la gramática):
 
@@ -118,7 +132,7 @@ El código generado se integra con Python en `gen/grammar/` (lexer, parser, visi
 
 - Se usa **ANTLR4** para generar a partir de `MiniLang.g4` el lexer y el parser en Python.
 - El código generado vive en **`gen/grammar/`** y se integra con el resto del proyecto importando `MiniLangLexer`, `MiniLangParser` y `MiniLangVisitor` desde ahí.
-- El punto de entrada **`src/run.py`** construye el flujo: `FileStream` → `MiniLangLexer` → `CommonTokenStream` → `MiniLangParser` → árbol de parsing para la regla `program`.
+- El punto de entrada **`src/run.py`** construye el flujo: `FileStream` → `MiniLangLexer` → `CommonTokenStream` → `MiniLangParser` → árbol de parsing para la regla `programa`.
 
 ---
 
@@ -126,10 +140,10 @@ El código generado se integra con Python en `gen/grammar/` (lexer, parser, visi
 
 El **visitor de evaluación** está en **`src/EvalVisitorImpl.py`** (hereda de `MiniLangVisitor` generado por ANTLR).
 
-- **Tabla de símbolos**: `memory` (nombre → valor) y `types` (nombre → `"int"` o `"bool"`).
+- **Tabla de símbolos**: `memoria` (nombre → valor) y `tipos` (nombre → `"int"` o `"bool"`).
 - **Aritmética**: evaluación de `+`, `-`, `*`, `/` (división entera) con comprobación de tipos `int` y detección de división por cero.
 - **Lógicos y relacionales**: evaluación de `==`, `!=`, `<`, `<=`, `>`, `>=`, `&&`, `||`, `!` con comprobación de tipos.
-- **Condicionales**: en `visitIfStmt` se exige que la condición sea de tipo `bool` antes de elegir la rama then/else.
+- **Condicionales**: en `visitCondicionalSi` se exige que la condición sea de tipo `bool` antes de elegir la rama then/else.
 - **Declaraciones y asignaciones**: comprobación de no redeclaración, uso solo de variables declaradas y coincidencia de tipo en asignaciones.
 
 ---

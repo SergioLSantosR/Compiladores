@@ -1,102 +1,111 @@
 grammar MiniLang;
 
-// ---------- Reglas Parser ----------
+// ==================== Reglas del Parser ====================
 
-program
- : PROGRAM block EOF
+programa
+ : PROGRAMA bloque EOF
  ;
 
-block
- : LBRACE stmt* RBRACE
+bloque
+ : LLAVE_IZQ sentencia* LLAVE_DER
  ;
 
-stmt
- : varDecl
- | assignStmt
- | ifStmt
- | printStmt
+sentencia
+ : declaracionVariable
+ | asignacion
+ | condicionalSi
+ | imprimir
  ;
 
-varDecl
- : type ID SEMI
+declaracionVariable
+ : tipo IDENTIFICADOR PUNTO_COMA
  ;
 
-type
- : INT_T
- | BOOL_T
+tipo
+ : TIPO_ENTERO
+ | TIPO_BOOL
  ;
 
-assignStmt
- : ID ASSIGN expr SEMI
+asignacion
+ : IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
  ;
 
-ifStmt
- : IF LPAREN expr RPAREN block (ELSE block)?
+condicionalSi
+ : SI PAREN_IZQ expresion PAREN_DER bloque (SINO bloque)?
  ;
 
-printStmt
- : PRINT LPAREN expr RPAREN SEMI
+imprimir
+ : IMPRIMIR PAREN_IZQ expresion PAREN_DER PUNTO_COMA
  ;
 
-expr
- : NOT expr                                           #UnaryNot
- | SUB expr                                           #UnaryMinus
- | LPAREN expr RPAREN                                 #Paren
- | left=expr op=(MUL|DIV) right=expr                  #MulDiv
- | left=expr op=(ADD|SUB) right=expr                  #AddSub
- | left=expr op=(EQ|NEQ|LT|LE|GT|GE) right=expr       #Relational
- | left=expr op=(AND|OR) right=expr                   #Logical
- | INT                                                #IntLit
- | TRUE                                               #TrueLit
- | FALSE                                              #FalseLit
- | ID                                                 #IdRef
+// ==================== Expresiones  ====================
+
+
+expresion
+ : NEGACION expresion                                                            #NegacionLogica
+ | RESTA expresion                                                               #MenosUnario
+ | PAREN_IZQ expresion PAREN_DER                                                 #Parentesis
+ | izq=expresion op=(MULTIPLICACION|DIVISION) der=expresion                      #MultiplicacionDivision
+ | izq=expresion op=(SUMA|RESTA) der=expresion                                   #SumaResta
+ | izq=expresion op=(MENOR_QUE|MENOR_IGUAL|MAYOR_QUE|MAYOR_IGUAL) der=expresion #Comparacion
+ | izq=expresion op=(IGUAL|DIFERENTE) der=expresion                              #Igualdad
+ | izq=expresion Y_LOGICO der=expresion                                          #YLogico
+ | izq=expresion O_LOGICO der=expresion                                          #OLogico
+ | ENTERO                                                                        #LiteralEntero
+ | VERDADERO                                                                     #LiteralVerdadero
+ | FALSO                                                                         #LiteralFalso
+ | IDENTIFICADOR                                                                 #ReferenciaVariable
  ;
 
-// ---------- Reglas Lexer ----------
+// ==================== Reglas del Lexer ====================
 
 // Palabras clave
-PROGRAM : 'program';
-IF      : 'if';
-ELSE    : 'else';
-PRINT   : 'print';
-INT_T   : 'int';
-BOOL_T  : 'bool';
-TRUE    : 'true';
-FALSE   : 'false';
+PROGRAMA : 'program';
+SI       : 'if';
+SINO     : 'else';
+IMPRIMIR : 'print';
+TIPO_ENTERO : 'int';
+TIPO_BOOL   : 'bool';
+VERDADERO   : 'true';
+FALSO       : 'false';
 
-// Operadores lógicos y relacionales
-AND : '&&';
-OR  : '||';
-NOT : '!';
-EQ  : '==';
-NEQ : '!=' | '<>';
-LE  : '<=';
-GE  : '>=';
-LT  : '<';
-GT  : '>';
+// Operadores lógicos
+Y_LOGICO  : '&&';
+O_LOGICO  : '||';
+NEGACION  : '!';
+
+// Operadores de igualdad
+IGUAL     : '==';
+DIFERENTE : '!=' | '<>';
+
+// Operadores relacionales
+MENOR_IGUAL : '<=';
+MAYOR_IGUAL : '>=';
+MENOR_QUE   : '<';
+MAYOR_QUE   : '>';
 
 // Asignación y aritméticos
-ASSIGN : '=';
-ADD    : '+';
-SUB    : '-';
-MUL    : '*';
-DIV    : '/';
+ASIGNACION    : '=';
+SUMA          : '+';
+RESTA         : '-';
+MULTIPLICACION: '*';
+DIVISION      : '/';
 
-// Símbolos de agrupación y otros
-LPAREN : '(';
-RPAREN : ')';
-LBRACE : '{';
-RBRACE : '}';
-LBRACK : '[';
-RBRACK : ']';
-SEMI   : ';';
-COMMA  : ',';
+// Símbolos de agrupación y puntuación
+PAREN_IZQ    : '(';
+PAREN_DER    : ')';
+LLAVE_IZQ    : '{';
+LLAVE_DER    : '}';
+CORCHETE_IZQ : '[';
+CORCHETE_DER : ']';
+PUNTO_COMA   : ';';
+COMA         : ',';
 
-// Identificadores y literales
-ID  : [a-zA-Z_][a-zA-Z_0-9]*;
-INT : [0-9]+;
+// Identificadores y literales numéricos
+IDENTIFICADOR : [a-zA-Z_][a-zA-Z_0-9]*;
+ENTERO        : [0-9]+;
 
-// Espacios y comentarios
-WS            : [ \t\r\n]+ -> skip;
-LINE_COMMENT  : '//' ~[\r\n]* -> skip;
-BLOCK_COMMENT : '/*' .*? '*/' -> skip;
+// Espacios en blanco y comentarios (se ignoran)
+ESPACIO           : [ \t\r\n]+ -> skip;
+COMENTARIO_LINEA  : '//' ~[\r\n]* -> skip;
+COMENTARIO_BLOQUE : '/*' .*? '*/' -> skip;

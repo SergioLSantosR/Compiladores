@@ -28,7 +28,7 @@ def main():
     parser.removeErrorListeners()
     parser.addErrorListener(err_listener)
 
-    tree = parser.program()
+    tree = parser.programa()
 
     # Si hubo errores de sintaxis, reportarlos
     if err_listener.has_errors():
@@ -41,8 +41,8 @@ def main():
         visitor.visit(tree)
         print("\nPrograma válido ✔️")
         # Mostrar memoria final
-        if visitor.memory:
-            print("Estado final de variables:", visitor.memory)
+        if visitor.memoria:
+            print("Estado final de variables:", visitor.memoria)
     except RuntimeError as ex:
         print(f"[Error en evaluación] {ex}", file=sys.stderr)
         sys.exit(2)
