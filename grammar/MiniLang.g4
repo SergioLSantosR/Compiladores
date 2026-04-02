@@ -7,7 +7,7 @@ program
  ;
 
 grupo
- : LBRACE sentencia* RBRACE
+ : llave_izq sentencia* llave_der
  ;
 
 sentencia
@@ -18,7 +18,7 @@ sentencia
  ;
 
 declaraVariable
- : tipo ID SEMI
+ : tipo ID punto_coma
  ;
 
 tipo
@@ -27,21 +27,21 @@ tipo
  ;
 
 sentenciaAsigna
- : ID ASSIGN expr SEMI
+ : ID asigna expr punto_coma
  ;
 
-sentenciaIf
- : IF LPAREN expr RPAREN grupo (ELSE grupo)?
+sentenciaSi
+ : SI parentesis_izq expr parentesis_der  grupo (ENTONCES grupo)?
  ;
 
-sentenciaPrint
- : PRINT LPAREN expr RPAREN SEMI
+sentenciaImprime
+ : IMPRIME parentesis_izq expr parentesis_der punto_coma
  ;
 
 expr
  : NOT expr                                           #UnaryNot
  | SUB expr                                           #UnaryMinus
- | LPAREN expr RPAREN                                 #Paren
+ | parentesis_izq expr parentesis_der                 #Paren
  | left=expr op=(MUL|DIV) right=expr                  #MulDiv
  | left=expr op=(ADD|SUB) right=expr                  #AddSub
  | left=expr op=(EQ|NEQ|LT|LE|GT|GE) right=expr       #Relational
@@ -56,9 +56,9 @@ expr
 
 // Palabras clave
 PROGRAM : 'program';
-IF      : 'if';
-ELSE    : 'else';
-PRINT   : 'print';
+SI      : 'si';
+ENTONCES    : 'entonces';
+IMPRIME   : 'imprime';
 INT_T   : 'int';
 BOOL_T  : 'bool';
 TRUE    : 'true';
@@ -76,21 +76,21 @@ LT  : '<';
 GT  : '>';
 
 // Asignación y aritméticos
-ASSIGN : '=';
-ADD    : '+';
-SUB    : '-';
-MUL    : '*';
-DIV    : '/';
+asigna : '=';
+suma    : '+';
+resta    : '-';
+multi    : '*';
+divide    : '/';
 
 // Símbolos de agrupación y otros
-LPAREN : '(';
-RPAREN : ')';
-LBRACE : '{';
-RBRACE : '}';
-LBRACK : '[';
-RBRACK : ']';
-SEMI   : ';';
-COMMA  : ',';
+parentesis_izq : '(';
+parentesis_der : ')';
+llave_izq : '{';
+llave_der : '}';
+corchete_izq : '[';
+corchete_der : ']';
+punto_coma   : ';';
+coma  : ',';
 
 // Identificadores y literales
 ID  : [a-zA-Z_][a-zA-Z_0-9]*;
