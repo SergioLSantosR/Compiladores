@@ -8,10 +8,10 @@ program {
   y = 20;
   z = x + y * 2;  // 10 + 20*2 = 50
 
-  if (z > 30) {
-    w = z / 2;    // división entera -> 25
+  if (x > 10 || y <20) {
+    w = x / 2;    // división entera -> 25
   } else {
-    w = z - 5;
+    w = y - 5;
   }
 
   print(z);       // imprime 50
