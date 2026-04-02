@@ -3,38 +3,38 @@ grammar MiniLang;
 // ---------- Reglas Parser ----------
 
 program
- : PROGRAM block EOF
+ : PROGRAM grupo EOF
  ;
 
-block
- : LBRACE stmt* RBRACE
+grupo
+ : LBRACE sentencia* RBRACE
  ;
 
-stmt
- : varDecl
- | assignStmt
- | ifStmt
- | printStmt
+sentencia
+ : declaraVariable
+ | sentenciaAsigna
+ | sentenciaIf
+ | sentenciaPrint
  ;
 
-varDecl
- : type ID SEMI
+declaraVariable
+ : tipo ID SEMI
  ;
 
-type
+tipo
  : INT_T
  | BOOL_T
  ;
 
-assignStmt
+sentenciaAsigna
  : ID ASSIGN expr SEMI
  ;
 
-ifStmt
- : IF LPAREN expr RPAREN block (ELSE block)?
+sentenciaIf
+ : IF LPAREN expr RPAREN grupo (ELSE grupo)?
  ;
 
-printStmt
+sentenciaPrint
  : PRINT LPAREN expr RPAREN SEMI
  ;
 
@@ -98,5 +98,5 @@ INT : [0-9]+;
 
 // Espacios y comentarios
 WS            : [ \t\r\n]+ -> skip;
-LINE_COMMENT  : '//' ~[\r\n]* -> skip;
-BLOCK_COMMENT : '/*' .*? '*/' -> skip;
+LINEA_COMENTARIO  : '//' ~[\r\n]* -> skip;
+GRUPO_COMENTARIO : '/*' .*? '*/' -> skip;
