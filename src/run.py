@@ -23,14 +23,12 @@ def main():
 
     # Parser
     parser = MiniLangParser(token_stream)
-    # Quitar oyente por defecto y agregar el nuestro
     err_listener = VerboseErrorListener()
     parser.removeErrorListeners()
     parser.addErrorListener(err_listener)
 
     tree = parser.program()
 
-    # Si hubo errores de sintaxis, reportarlos
     if err_listener.has_errors():
         print(err_listener.report(), file=sys.stderr)
         sys.exit(1)
@@ -40,9 +38,11 @@ def main():
     try:
         visitor.visit(tree)
         print("\nPrograma válido ✔️")
-        # Mostrar memoria final
-        if visitor.memory:
-            print("Estado final de variables:", visitor.memory)
+        # Opcional: si el visitor guarda el estado final de variables, se puede mostrar
+        # Por ahora no se muestra porque el visitor actual no lo conserva.
+        # Si más adelante se añade un método, se puede descomentar:
+        # if hasattr(visitor, 'get_final_memory'):
+        #     print("Estado final de variables:", visitor.get_final_memory())
     except RuntimeError as ex:
         print(f"[Error en evaluación] {ex}", file=sys.stderr)
         sys.exit(2)

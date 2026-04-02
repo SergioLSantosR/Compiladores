@@ -107,6 +107,15 @@ class MiniLangListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by MiniLangParser#sentenciaLlamada.
+    def enterSentenciaLlamada(self, ctx:MiniLangParser.SentenciaLlamadaContext):
+        pass
+
+    # Exit a parse tree produced by MiniLangParser#sentenciaLlamada.
+    def exitSentenciaLlamada(self, ctx:MiniLangParser.SentenciaLlamadaContext):
+        pass
+
+
     # Enter a parse tree produced by MiniLangParser#inicializacionPara.
     def enterInicializacionPara(self, ctx:MiniLangParser.InicializacionParaContext):
         pass
