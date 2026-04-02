@@ -5,13 +5,14 @@ from gen.grammar.MiniLangVisitor import MiniLangVisitor
 
 class EvalVisitor(MiniLangVisitor):
     """
-    Visitor de evaluación:
-    - Soporta tipos int y bool.
-    - Aritmética: +, -, *, / (DIVISIÓN ENTERA)
+    Visitor de evaluación adaptado a la gramática en español con tokens en mayúsculas.
+    Soporta:
+    - Tipos int y bool.
+    - Aritmética: +, -, *, / (división entera)
     - Relacionales: ==, !=/<> , <, <=, >, >=
     - Lógicos: &&, ||, !
-    - if/else, print
-    - Maneja tabla de símbolos y chequeo de tipos.
+    - si / sino, imprime
+    - Tabla de símbolos y chequeo de tipos.
     """
 
     def __init__(self, stdout_print=True):
@@ -27,8 +28,7 @@ class EvalVisitor(MiniLangVisitor):
             return "bool"
         elif isinstance(value, int):
             return "int"
-        else:
-            return "desconocido"
+        return "desconocido"
 
     def _ensure_declared(self, name, ctx):
         if name not in self.types:
@@ -46,18 +46,18 @@ class EvalVisitor(MiniLangVisitor):
             print(text)
         self.output.append(str(text))
 
-    # ---- program / block ----
+    # ---- program / grupo ----
     def visitProgram(self, ctx: MiniLangParser.ProgramContext):
-        return self.visit(ctx.block())
+        return self.visit(ctx.grupo())
 
-    def visitBlock(self, ctx: MiniLangParser.BlockContext):
-        for s in ctx.stmt():
+    def visitGrupo(self, ctx: MiniLangParser.GrupoContext):
+        for s in ctx.sentencia():
             self.visit(s)
         return None
 
     # ---- declaraciones ----
-    def visitVarDecl(self, ctx: MiniLangParser.VarDeclContext):
-        t = ctx.type_().getText() if hasattr(ctx, 'type_') else ctx.type().getText()
+    def visitDeclaraVariable(self, ctx: MiniLangParser.DeclaraVariableContext):
+        t = ctx.tipo().getText()  # "int" o "bool"
         name = ctx.ID().getText()
         if name in self.types:
             raise RuntimeError(f"Redeclaración de variable '{name}' (línea {ctx.start.line}).")
@@ -66,30 +66,28 @@ class EvalVisitor(MiniLangVisitor):
         return None
 
     # ---- asignaciones ----
-    def visitAssignStmt(self, ctx: MiniLangParser.AssignStmtContext):
+    def visitSentenciaAsigna(self, ctx: MiniLangParser.SentenciaAsignaContext):
         name = ctx.ID().getText()
         self._ensure_declared(name, ctx)
         value = self.visit(ctx.expr())
-        # Chequeo de tipos
         expected = self.types[name]
         self._ensure_type(expected, value, ctx, "asignación")
         self.memory[name] = value
-        # Imprimir resultado de la asignación (útil para ver operaciones)
         self._println(f"{name} = {value}")
         return None
 
-    # ---- if/else ----
-    def visitIfStmt(self, ctx: MiniLangParser.IfStmtContext):
+    # ---- si / sino ----
+    def visitSentenciaSI(self, ctx: MiniLangParser.SentenciaSIContext):
         cond = self.visit(ctx.expr())
-        self._ensure_type("bool", cond, ctx, "condicional (if)")
+        self._ensure_type("bool", cond, ctx, "condicional (si)")
         if cond:
-            self.visit(ctx.block(0))
-        elif ctx.ELSE():
-            self.visit(ctx.block(1))
+            self.visit(ctx.grupo(0))          # bloque del 'si'
+        elif ctx.SINO():                      # cláusula 'sino'
+            self.visit(ctx.grupo(1))
         return None
 
-    # ---- print ----
-    def visitPrintStmt(self, ctx: MiniLangParser.PrintStmtContext):
+    # ---- imprime ----
+    def visitSentenciaImprime(self, ctx: MiniLangParser.SentenciaImprimeContext):
         value = self.visit(ctx.expr())
         self._println(value)
         return None
@@ -98,7 +96,7 @@ class EvalVisitor(MiniLangVisitor):
     def visitUnaryNot(self, ctx: MiniLangParser.UnaryNotContext):
         v = self.visit(ctx.expr())
         self._ensure_type("bool", v, ctx, "negación lógica (!)")
-        return (not v)
+        return not v
 
     def visitUnaryMinus(self, ctx: MiniLangParser.UnaryMinusContext):
         v = self.visit(ctx.expr())
@@ -113,12 +111,11 @@ class EvalVisitor(MiniLangVisitor):
         r = self.visit(ctx.right)
         self._ensure_type("int", l, ctx, "multiplicación/división")
         self._ensure_type("int", r, ctx, "multiplicación/división")
-        if ctx.op.type == MiniLangParser.MUL:
+        if ctx.op.type == MiniLangParser.MULTI:
             return l * r
-        else:
+        else:  # DIVIDE
             if r == 0:
                 raise RuntimeError(f"División por cero (línea {ctx.start.line}).")
-            # División entera
             return l // r
 
     def visitAddSub(self, ctx: MiniLangParser.AddSubContext):
@@ -126,16 +123,18 @@ class EvalVisitor(MiniLangVisitor):
         r = self.visit(ctx.right)
         self._ensure_type("int", l, ctx, "suma/resta")
         self._ensure_type("int", r, ctx, "suma/resta")
-        return l + r if ctx.op.type == MiniLangParser.ADD else l - r
+        if ctx.op.type == MiniLangParser.SUMA:
+            return l + r
+        else:  # RESTA
+            return l - r
 
     def visitRelational(self, ctx: MiniLangParser.RelationalContext):
         l = self.visit(ctx.left)
         r = self.visit(ctx.right)
-        # Permitimos comparaciones entre ints y entre bools (==/!=) y relacionales solo en ints
         op_type = ctx.op.type
         if op_type in (MiniLangParser.EQ, MiniLangParser.NEQ):
             return (l == r) if op_type == MiniLangParser.EQ else (l != r)
-        # El resto requiere ints
+        # Los relacionales restantes requieren ints
         self._ensure_type("int", l, ctx, "comparación relacional")
         self._ensure_type("int", r, ctx, "comparación relacional")
         if op_type == MiniLangParser.LT:
@@ -153,7 +152,10 @@ class EvalVisitor(MiniLangVisitor):
         r = self.visit(ctx.right)
         self._ensure_type("bool", l, ctx, "operación lógica")
         self._ensure_type("bool", r, ctx, "operación lógica")
-        return (l and r) if ctx.op.type == MiniLangParser.AND else (l or r)
+        if ctx.op.type == MiniLangParser.AND:
+            return l and r
+        else:  # OR
+            return l or r
 
     def visitIntLit(self, ctx: MiniLangParser.IntLitContext):
         return int(ctx.INT().getText())

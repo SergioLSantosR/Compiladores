@@ -2,5 +2,5 @@
 program {
   int x
   x = 5;
-  print(x
+  imprime(x
 }
