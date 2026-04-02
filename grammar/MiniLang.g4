@@ -3,11 +3,11 @@ grammar MiniLang;
 // ---------- Reglas Parser ----------
 
 program
- : PROGRAM (funcionDecl)* grupo (funcionDecl)* EOF   // permite funciones antes y después
+ : (funcionDecl)* PROGRAM grupo (funcionDecl)* EOF   // permite funciones antes y después
  ;
 
 funcionDecl
- : FUNCION tipo? ID PARENTESIS_IZQ parametros? PARENTESIS_DER grupo
+ : FUNCION (tipo | VOID) ID PARENTESIS_IZQ parametros? PARENTESIS_DER grupo
  ;
 
 parametros
@@ -30,6 +30,7 @@ sentencia
  | sentenciaMientras
  | sentenciaPara
  | sentenciaRetorna
+ | sentenciaLlamada
  ;
 
 declaraVariable
@@ -54,6 +55,9 @@ sentenciaSI
 sentenciaImprime
  : IMPRIME PARENTESIS_IZQ expr PARENTESIS_DER PUNTO_COMA
  ;
+
+sentenciaLlamada
+ : ID PARENTESIS_IZQ (expr (COMA expr)*)? PARENTESIS_DER PUNTO_COMA;
 
 // Nuevas reglas para el bucle for (sin punto y coma)
 inicializacionPara : tipo ID ASIGNA expr;   // ej: int i = 0
@@ -100,12 +104,14 @@ MIENTRAS : 'mientras';
 PARA     : 'para';
 FUNCION  : 'funcion';
 RETORNA  : 'retorna';
+VOID     : 'void';
 INT_T    : 'int';
 BOOL_T   : 'bool';
 FLOAT_T  : 'float';
 STRING_T : 'string';
 TRUE     : 'true';
 FALSE    : 'false';
+
 
 // Operadores lógicos y relacionales
 AND : '&&';
