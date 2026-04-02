@@ -1,19 +1,41 @@
 program {
   int x;
-  int y;
-  int w;
-  int z;
+  float y;
+  string s;
+  bool valor;
 
   x = 10;
-  y = 20;
-  z = x + y * 2;  // 10 + 20*2 = 50
+  y = 3.14;
+  s = "Hola";
+  valor = true;
 
-  si (x > 10 || y < 20) {
-    w = x / 2;    // división entera -> 25
-  } sino {
-    w = y - 5;
+  imprime("Inicio");
+
+  mientras (x > 0) {
+    imprime(x);
+    x = x - 1;
   }
 
-  imprime(z);       // imprime 50
-  imprime(w);       // imprime 25
+  para (int i = 0; i < 5; i = i + 1) {
+    imprime(i);
+  }
+
+  si (valor) {
+    imprime("valor es verdadero");
+  } sino {
+    imprime("valor es falso");
+  }
+
+  imprime(s + " mundo");
+  imprime(y * 2);
+}
+
+funcion int suma(int a, int b) {
+  retorna a + b;
+}
+
+imprime(suma(5, 3));
+
+funcion void saludo(string nombre) {
+  imprime("Hola " + nombre);
 }
