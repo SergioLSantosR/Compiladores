@@ -9,13 +9,13 @@ else:
 
 class MiniLangVisitor(ParseTreeVisitor):
 
-    # Visit a parse tree produced by MiniLangParser#program.
-    def visitProgram(self, ctx:MiniLangParser.ProgramContext):
+    # Visit a parse tree produced by MiniLangParser#programa.
+    def visitPrograma(self, ctx:MiniLangParser.ProgramaContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#funcionDecl.
-    def visitFuncionDecl(self, ctx:MiniLangParser.FuncionDeclContext):
+    # Visit a parse tree produced by MiniLangParser#funcionDeclaracion.
+    def visitFuncionDeclaracion(self, ctx:MiniLangParser.FuncionDeclaracionContext):
         return self.visitChildren(ctx)
 
 
@@ -29,8 +29,8 @@ class MiniLangVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#grupo.
-    def visitGrupo(self, ctx:MiniLangParser.GrupoContext):
+    # Visit a parse tree produced by MiniLangParser#bloque.
+    def visitBloque(self, ctx:MiniLangParser.BloqueContext):
         return self.visitChildren(ctx)
 
 
@@ -39,8 +39,8 @@ class MiniLangVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#declaraVariable.
-    def visitDeclaraVariable(self, ctx:MiniLangParser.DeclaraVariableContext):
+    # Visit a parse tree produced by MiniLangParser#declaracionVariable.
+    def visitDeclaracionVariable(self, ctx:MiniLangParser.DeclaracionVariableContext):
         return self.visitChildren(ctx)
 
 
@@ -49,23 +49,23 @@ class MiniLangVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#sentenciaAsigna.
-    def visitSentenciaAsigna(self, ctx:MiniLangParser.SentenciaAsignaContext):
+    # Visit a parse tree produced by MiniLangParser#asignacion.
+    def visitAsignacion(self, ctx:MiniLangParser.AsignacionContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#sentenciaSI.
-    def visitSentenciaSI(self, ctx:MiniLangParser.SentenciaSIContext):
+    # Visit a parse tree produced by MiniLangParser#condicionalSi.
+    def visitCondicionalSi(self, ctx:MiniLangParser.CondicionalSiContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#sentenciaImprime.
-    def visitSentenciaImprime(self, ctx:MiniLangParser.SentenciaImprimeContext):
+    # Visit a parse tree produced by MiniLangParser#impresion.
+    def visitImpresion(self, ctx:MiniLangParser.ImpresionContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#sentenciaLlamada.
-    def visitSentenciaLlamada(self, ctx:MiniLangParser.SentenciaLlamadaContext):
+    # Visit a parse tree produced by MiniLangParser#llamadaFuncion.
+    def visitLlamadaFuncion(self, ctx:MiniLangParser.LlamadaFuncionContext):
         return self.visitChildren(ctx)
 
 
@@ -84,13 +84,13 @@ class MiniLangVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#sentenciaMientras.
-    def visitSentenciaMientras(self, ctx:MiniLangParser.SentenciaMientrasContext):
+    # Visit a parse tree produced by MiniLangParser#cicloMientras.
+    def visitCicloMientras(self, ctx:MiniLangParser.CicloMientrasContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#sentenciaPara.
-    def visitSentenciaPara(self, ctx:MiniLangParser.SentenciaParaContext):
+    # Visit a parse tree produced by MiniLangParser#cicloPara.
+    def visitCicloPara(self, ctx:MiniLangParser.CicloParaContext):
         return self.visitChildren(ctx)
 
 
@@ -99,73 +99,73 @@ class MiniLangVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#MulDiv.
-    def visitMulDiv(self, ctx:MiniLangParser.MulDivContext):
+    # Visit a parse tree produced by MiniLangParser#LiteralCadena.
+    def visitLiteralCadena(self, ctx:MiniLangParser.LiteralCadenaContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#AddSub.
-    def visitAddSub(self, ctx:MiniLangParser.AddSubContext):
+    # Visit a parse tree produced by MiniLangParser#Parentesis.
+    def visitParentesis(self, ctx:MiniLangParser.ParentesisContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#Relational.
-    def visitRelational(self, ctx:MiniLangParser.RelationalContext):
+    # Visit a parse tree produced by MiniLangParser#MenosUnario.
+    def visitMenosUnario(self, ctx:MiniLangParser.MenosUnarioContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#FalseLit.
-    def visitFalseLit(self, ctx:MiniLangParser.FalseLitContext):
+    # Visit a parse tree produced by MiniLangParser#LlamadaFuncionExpr.
+    def visitLlamadaFuncionExpr(self, ctx:MiniLangParser.LlamadaFuncionExprContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#Logical.
-    def visitLogical(self, ctx:MiniLangParser.LogicalContext):
+    # Visit a parse tree produced by MiniLangParser#MultiplicacionDivision.
+    def visitMultiplicacionDivision(self, ctx:MiniLangParser.MultiplicacionDivisionContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#UnaryMinus.
-    def visitUnaryMinus(self, ctx:MiniLangParser.UnaryMinusContext):
+    # Visit a parse tree produced by MiniLangParser#LiteralEntero.
+    def visitLiteralEntero(self, ctx:MiniLangParser.LiteralEnteroContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#IdRef.
-    def visitIdRef(self, ctx:MiniLangParser.IdRefContext):
+    # Visit a parse tree produced by MiniLangParser#LiteralVerdadero.
+    def visitLiteralVerdadero(self, ctx:MiniLangParser.LiteralVerdaderoContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#StringLit.
-    def visitStringLit(self, ctx:MiniLangParser.StringLitContext):
+    # Visit a parse tree produced by MiniLangParser#SumaResta.
+    def visitSumaResta(self, ctx:MiniLangParser.SumaRestaContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#FuncCall.
-    def visitFuncCall(self, ctx:MiniLangParser.FuncCallContext):
+    # Visit a parse tree produced by MiniLangParser#LiteralFlotante.
+    def visitLiteralFlotante(self, ctx:MiniLangParser.LiteralFlotanteContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#UnaryNot.
-    def visitUnaryNot(self, ctx:MiniLangParser.UnaryNotContext):
+    # Visit a parse tree produced by MiniLangParser#NegacionLogica.
+    def visitNegacionLogica(self, ctx:MiniLangParser.NegacionLogicaContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#FloatLit.
-    def visitFloatLit(self, ctx:MiniLangParser.FloatLitContext):
+    # Visit a parse tree produced by MiniLangParser#Relacional.
+    def visitRelacional(self, ctx:MiniLangParser.RelacionalContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#TrueLit.
-    def visitTrueLit(self, ctx:MiniLangParser.TrueLitContext):
+    # Visit a parse tree produced by MiniLangParser#ReferenciaVariable.
+    def visitReferenciaVariable(self, ctx:MiniLangParser.ReferenciaVariableContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#IntLit.
-    def visitIntLit(self, ctx:MiniLangParser.IntLitContext):
+    # Visit a parse tree produced by MiniLangParser#LiteralFalso.
+    def visitLiteralFalso(self, ctx:MiniLangParser.LiteralFalsoContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#Paren.
-    def visitParen(self, ctx:MiniLangParser.ParenContext):
+    # Visit a parse tree produced by MiniLangParser#Logica.
+    def visitLogica(self, ctx:MiniLangParser.LogicaContext):
         return self.visitChildren(ctx)
 
 

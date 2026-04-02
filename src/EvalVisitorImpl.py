@@ -3,406 +3,384 @@ from antlr4 import *
 from gen.grammar.MiniLangParser import MiniLangParser
 from gen.grammar.MiniLangVisitor import MiniLangVisitor
 
-class ReturnException(Exception):
-    def __init__(self, value):
-        self.value = value
+
+class ExcepcionRetorno(Exception):
+    def __init__(self, valor):
+        self.valor = valor
+
 
 class EvalVisitor(MiniLangVisitor):
     def __init__(self, stdout_print=True):
         super().__init__()
-        self.global_memory = {}
-        self.global_types = {}
-        self.scope_stack = []
-        self.functions = {}
-        self.current_function = None
-        self.return_value = None
+        self.memoria_global = {}
+        self.tipos_global = {}
+        self.pila_ambitos = []
+        self.funciones = {}
+        self.funcion_actual = None
+        self.valor_retorno = None
         self.stdout_print = stdout_print
-        self.output = []
+        self.salida = []
 
     # ---- Manejo de ámbitos ----
-    def push_scope(self):
-        self.scope_stack.append(({}, {}))
+    def entrar_ambito(self):
+        self.pila_ambitos.append(({}, {}))
 
-    def pop_scope(self):
-        self.scope_stack.pop()
+    def salir_ambito(self):
+        self.pila_ambitos.pop()
 
-    def current_memory(self):
-        if self.scope_stack:
-            return self.scope_stack[-1][0]
-        return self.global_memory
+    def memoria_actual(self):
+        if self.pila_ambitos:
+            return self.pila_ambitos[-1][0]
+        return self.memoria_global
 
-    def current_types(self):
-        if self.scope_stack:
-            return self.scope_stack[-1][1]
-        return self.global_types
+    def tipos_actual(self):
+        if self.pila_ambitos:
+            return self.pila_ambitos[-1][1]
+        return self.tipos_global
 
-    def declare_variable(self, name, typ, ctx):
-        types = self.current_types()
-        if name in types:
-            raise RuntimeError(f"Variable '{name}' ya declarada en este ámbito (línea {ctx.start.line})")
-        types[name] = typ
-        if typ == 'int':
-            self.current_memory()[name] = 0
-        elif typ == 'float':
-            self.current_memory()[name] = 0.0
-        elif typ == 'bool':
-            self.current_memory()[name] = False
-        elif typ == 'string':
-            self.current_memory()[name] = ""
+    def declarar_variable(self, nombre, tipo, ctx):
+        tipos = self.tipos_actual()
+        if nombre in tipos:
+            raise RuntimeError(f"Variable '{nombre}' ya declarada en este ámbito (línea {ctx.start.line})")
+        tipos[nombre] = tipo
+        if tipo == 'entero':
+            self.memoria_actual()[nombre] = 0
+        elif tipo == 'flotante':
+            self.memoria_actual()[nombre] = 0.0
+        elif tipo == 'booleano':
+            self.memoria_actual()[nombre] = False
+        elif tipo == 'cadena':
+            self.memoria_actual()[nombre] = ""
 
-    def get_variable(self, name, ctx):
-        for memory, _ in reversed(self.scope_stack):
-            if name in memory:
-                return memory[name]
-        if name in self.global_memory:
-            return self.global_memory[name]
-        raise RuntimeError(f"Variable '{name}' no definida (línea {ctx.start.line})")
+    def obtener_variable(self, nombre, ctx):
+        for memoria, _ in reversed(self.pila_ambitos):
+            if nombre in memoria:
+                return memoria[nombre]
+        if nombre in self.memoria_global:
+            return self.memoria_global[nombre]
+        raise RuntimeError(f"Variable '{nombre}' no definida (línea {ctx.start.line})")
 
-    def set_variable(self, name, value, ctx):
-        for i in range(len(self.scope_stack)-1, -1, -1):
-            if name in self.scope_stack[i][0]:
-                self.scope_stack[i][0][name] = value
+    def asignar_variable(self, nombre, valor, ctx):
+        for i in range(len(self.pila_ambitos) - 1, -1, -1):
+            if nombre in self.pila_ambitos[i][0]:
+                self.pila_ambitos[i][0][nombre] = valor
                 return
-        if name in self.global_memory:
-            self.global_memory[name] = value
+        if nombre in self.memoria_global:
+            self.memoria_global[nombre] = valor
             return
-        raise RuntimeError(f"Variable '{name}' no definida (línea {ctx.start.line})")
+        raise RuntimeError(f"Variable '{nombre}' no definida (línea {ctx.start.line})")
 
-    def get_type(self, name):
-        for _, types in reversed(self.scope_stack):
-            if name in types:
-                return types[name]
-        return self.global_types.get(name)
+    def obtener_tipo(self, nombre):
+        for _, tipos in reversed(self.pila_ambitos):
+            if nombre in tipos:
+                return tipos[nombre]
+        return self.tipos_global.get(nombre)
 
     # ---- Utilidades ----
-    def _type_of(self, value):
-        if isinstance(value, bool):
-            return "bool"
-        elif isinstance(value, int):
-            return "int"
-        elif isinstance(value, float):
-            return "float"
-        elif isinstance(value, str):
-            return "string"
+    def _tipo_de(self, valor):
+        if isinstance(valor, bool):
+            return "booleano"
+        elif isinstance(valor, int):
+            return "entero"
+        elif isinstance(valor, float):
+            return "flotante"
+        elif isinstance(valor, str):
+            return "cadena"
         return "desconocido"
 
-    def _ensure_type(self, expected, value, ctx, op_desc=""):
-        actual = self._type_of(value)
-        if expected != actual:
-            raise RuntimeError(f"Error de tipos en {op_desc} (línea {ctx.start.line}): se esperaba {expected}, obtuvo {actual}")
+    def _verificar_tipo(self, esperado, valor, ctx, descripcion=""):
+        actual = self._tipo_de(valor)
+        if esperado != actual:
+            raise RuntimeError(
+                f"Error de tipos en {descripcion} (línea {ctx.start.line}): "
+                f"se esperaba {esperado}, obtuvo {actual}"
+            )
 
-    def _println(self, text):
+    def _imprimir(self, texto):
         if self.stdout_print:
-            print(text)
-        self.output.append(str(text))
+            print(texto)
+        self.salida.append(str(texto))
 
-    # ---- Program y funciones ----
-    def visitProgram(self, ctx: MiniLangParser.ProgramContext):
-        # Registrar funciones (todas, antes y después del grupo)
-        for func_ctx in ctx.funcionDecl():
+    # ---- Programa y funciones ----
+    def visitPrograma(self, ctx: MiniLangParser.ProgramaContext):
+        for func_ctx in ctx.funcionDeclaracion():
             self.visit(func_ctx)
-        # Ejecutar bloque principal
-        self.push_scope()
-        self.visit(ctx.grupo())
-        self.pop_scope()
+        self.entrar_ambito()
+        self.visit(ctx.bloque())
+        self.salir_ambito()
         return None
 
-    def visitFuncionDecl(self, ctx: MiniLangParser.FuncionDeclContext):
-        name = ctx.ID().getText()
-        # Determinar tipo de retorno (void si no hay tipo)
-        tipo_retorno = "void"
+    def visitFuncionDeclaracion(self, ctx: MiniLangParser.FuncionDeclaracionContext):
+        nombre = ctx.IDENTIFICADOR().getText()
+        tipo_retorno = "vacio"
         if ctx.tipo():
             tipo_retorno = ctx.tipo().getText()
         elif ctx.VOID():
-            tipo_retorno = "void"
+            tipo_retorno = "vacio"
         params = []
         if ctx.parametros():
             for p in ctx.parametros().parametro():
-                param_name = p.ID().getText()
-                param_type = p.tipo().getText()
-                params.append((param_name, param_type))
-        self.functions[name] = (params, ctx.grupo(), tipo_retorno)
+                nombre_param = p.IDENTIFICADOR().getText()
+                tipo_param = p.tipo().getText()
+                params.append((nombre_param, tipo_param))
+        self.funciones[nombre] = (params, ctx.bloque(), tipo_retorno)
         return None
 
-    def visitFuncCall(self, ctx: MiniLangParser.FuncCallContext):
-        name = ctx.ID().getText()
-        if name not in self.functions:
-            raise RuntimeError(f"Función '{name}' no definida (línea {ctx.start.line})")
-        params, body, ret_type = self.functions[name]
-        # Evaluar argumentos
-        args = []
-        if ctx.expr():
-            for arg_ctx in ctx.expr():
-                args.append(self.visit(arg_ctx))
+    def visitLlamadaFuncionExpr(self, ctx: MiniLangParser.LlamadaFuncionExprContext):
+        nombre = ctx.IDENTIFICADOR().getText()
+        if nombre not in self.funciones:
+            raise RuntimeError(f"Función '{nombre}' no definida (línea {ctx.start.line})")
+        params, cuerpo, tipo_ret = self.funciones[nombre]
+        args = [self.visit(arg) for arg in ctx.expresion()] if ctx.expresion() else []
         if len(args) != len(params):
-            raise RuntimeError(f"Número incorrecto de argumentos para función '{name}' (línea {ctx.start.line})")
-        # Verificar tipos de argumentos
-        for (pname, ptype), arg_val in zip(params, args):
-            self._ensure_type(ptype, arg_val, ctx, f"parámetro '{pname}'")
-        # Nuevo ámbito
-        self.push_scope()
-        for (pname, ptype), arg_val in zip(params, args):
-            self.declare_variable(pname, ptype, ctx)
-            self.set_variable(pname, arg_val, ctx)
-        old_func = self.current_function
-        self.current_function = name
-        self.return_value = None
+            raise RuntimeError(f"Número incorrecto de argumentos para función '{nombre}' (línea {ctx.start.line})")
+        for (pnombre, ptipo), arg_val in zip(params, args):
+            self._verificar_tipo(ptipo, arg_val, ctx, f"parámetro '{pnombre}'")
+        self.entrar_ambito()
+        for (pnombre, ptipo), arg_val in zip(params, args):
+            self.declarar_variable(pnombre, ptipo, ctx)
+            self.asignar_variable(pnombre, arg_val, ctx)
+        func_anterior = self.funcion_actual
+        self.funcion_actual = nombre
+        self.valor_retorno = None
         try:
-            self.visit(body)
-        except ReturnException as e:
-            self.return_value = e.value
-        self.current_function = old_func
-        self.pop_scope()
-        if ret_type != "void":
-            if self.return_value is None:
-                raise RuntimeError(f"Función '{name}' debe retornar un valor")
-            self._ensure_type(ret_type, self.return_value, ctx, f"retorno de '{name}'")
-            return self.return_value
+            self.visit(cuerpo)
+        except ExcepcionRetorno as e:
+            self.valor_retorno = e.valor
+        self.funcion_actual = func_anterior
+        self.salir_ambito()
+        if tipo_ret != "vacio":
+            if self.valor_retorno is None:
+                raise RuntimeError(f"Función '{nombre}' debe retornar un valor")
+            self._verificar_tipo(tipo_ret, self.valor_retorno, ctx, f"retorno de '{nombre}'")
+            return self.valor_retorno
         return None
 
     def visitSentenciaRetorna(self, ctx: MiniLangParser.SentenciaRetornaContext):
-        if self.current_function is None:
-            raise RuntimeError(f"return fuera de función (línea {ctx.start.line})")
-        value = None
-        if ctx.expr():
-            value = self.visit(ctx.expr())
-        raise ReturnException(value)
+        if self.funcion_actual is None:
+            raise RuntimeError(f"retorna fuera de función (línea {ctx.start.line})")
+        valor = None
+        if ctx.expresion():
+            valor = self.visit(ctx.expresion())
+        raise ExcepcionRetorno(valor)
 
-    # ---- Grupo y sentencias ----
-    def visitGrupo(self, ctx: MiniLangParser.GrupoContext):
-        self.push_scope()
+    # ---- Bloque y sentencias ----
+    def visitBloque(self, ctx: MiniLangParser.BloqueContext):
+        self.entrar_ambito()
         for s in ctx.sentencia():
             self.visit(s)
-        self.pop_scope()
+        self.salir_ambito()
         return None
 
-    def visitDeclaraVariable(self, ctx: MiniLangParser.DeclaraVariableContext):
-        typ = ctx.tipo().getText()
-        name = ctx.ID().getText()
-        self.declare_variable(name, typ, ctx)
+    def visitDeclaracionVariable(self, ctx: MiniLangParser.DeclaracionVariableContext):
+        tipo = ctx.tipo().getText()
+        nombre = ctx.IDENTIFICADOR().getText()
+        self.declarar_variable(nombre, tipo, ctx)
+        if ctx.expresion():
+            valor = self.visit(ctx.expresion())
+            self._verificar_tipo(tipo, valor, ctx, "inicialización")
+            self.asignar_variable(nombre, valor, ctx)
         return None
 
-    def visitSentenciaAsigna(self, ctx: MiniLangParser.SentenciaAsignaContext):
-        name = ctx.ID().getText()
-        value = self.visit(ctx.expr())
-        var_type = self.get_type(name)
-        if var_type is None:
-            raise RuntimeError(f"Variable '{name}' no declarada (línea {ctx.start.line})")
-        self._ensure_type(var_type, value, ctx, "asignación")
-        self.set_variable(name, value, ctx)
-        self._println(f"{name} = {value}")
+    def visitAsignacion(self, ctx: MiniLangParser.AsignacionContext):
+        nombre = ctx.IDENTIFICADOR().getText()
+        valor = self.visit(ctx.expresion())
+        tipo_var = self.obtener_tipo(nombre)
+        if tipo_var is None:
+            raise RuntimeError(f"Variable '{nombre}' no declarada (línea {ctx.start.line})")
+        self._verificar_tipo(tipo_var, valor, ctx, "asignación")
+        self.asignar_variable(nombre, valor, ctx)
+        self._imprimir(f"{nombre} = {valor}")
         return None
 
-    def visitSentenciaSI(self, ctx: MiniLangParser.SentenciaSIContext):
-        cond = self.visit(ctx.expr())
-        self._ensure_type("bool", cond, ctx, "condición if")
-        if cond:
-            self.visit(ctx.grupo(0))
+    def visitCondicionalSi(self, ctx: MiniLangParser.CondicionalSiContext):
+        condicion = self.visit(ctx.expresion())
+        self._verificar_tipo("booleano", condicion, ctx, "condición si")
+        if condicion:
+            self.visit(ctx.bloque(0))
         elif ctx.SINO():
-            self.visit(ctx.grupo(1))
+            self.visit(ctx.bloque(1))
         return None
 
-    def visitSentenciaImprime(self, ctx: MiniLangParser.SentenciaImprimeContext):
-        value = self.visit(ctx.expr())
-        self._println(value)
+    def visitImpresion(self, ctx: MiniLangParser.ImpresionContext):
+        valor = self.visit(ctx.expresion())
+        self._imprimir(valor)
         return None
 
-    def visitSentenciaMientras(self, ctx: MiniLangParser.SentenciaMientrasContext):
+    def visitCicloMientras(self, ctx: MiniLangParser.CicloMientrasContext):
         while True:
-            cond = self.visit(ctx.expr())
-            self._ensure_type("bool", cond, ctx, "condición while")
-            if not cond:
+            condicion = self.visit(ctx.expresion())
+            self._verificar_tipo("booleano", condicion, ctx, "condición mientras")
+            if not condicion:
                 break
-            self.visit(ctx.grupo())
+            self.visit(ctx.bloque())
         return None
 
-    # ---- Nuevos métodos para el bucle for ----
+    # ---- Bucle para ----
     def visitInicializacionPara(self, ctx: MiniLangParser.InicializacionParaContext):
-        typ = ctx.tipo().getText()
-        name = ctx.ID().getText()
-        value = self.visit(ctx.expr())
-        self.declare_variable(name, typ, ctx)
-        self.set_variable(name, value, ctx)
+        tipo = ctx.tipo().getText()
+        nombre = ctx.IDENTIFICADOR().getText()
+        valor = self.visit(ctx.expresion())
+        self.declarar_variable(nombre, tipo, ctx)
+        self.asignar_variable(nombre, valor, ctx)
         return None
 
     def visitAsignacionPara(self, ctx: MiniLangParser.AsignacionParaContext):
-        name = ctx.ID().getText()
-        value = self.visit(ctx.expr())
-        var_type = self.get_type(name)
-        if var_type is None:
-            raise RuntimeError(f"Variable '{name}' no declarada (línea {ctx.start.line})")
-        self._ensure_type(var_type, value, ctx, "asignación en for")
-        self.set_variable(name, value, ctx)
+        nombre = ctx.IDENTIFICADOR().getText()
+        valor = self.visit(ctx.expresion())
+        tipo_var = self.obtener_tipo(nombre)
+        if tipo_var is None:
+            raise RuntimeError(f"Variable '{nombre}' no declarada (línea {ctx.start.line})")
+        self._verificar_tipo(tipo_var, valor, ctx, "asignación en para")
+        self.asignar_variable(nombre, valor, ctx)
         return None
 
     def visitActualizacionPara(self, ctx: MiniLangParser.ActualizacionParaContext):
-        name = ctx.ID().getText()
-        value = self.visit(ctx.expr())
-        var_type = self.get_type(name)
-        if var_type is None:
-            raise RuntimeError(f"Variable '{name}' no declarada (línea {ctx.start.line})")
-        self._ensure_type(var_type, value, ctx, "actualización en for")
-        self.set_variable(name, value, ctx)
+        nombre = ctx.IDENTIFICADOR().getText()
+        valor = self.visit(ctx.expresion())
+        tipo_var = self.obtener_tipo(nombre)
+        if tipo_var is None:
+            raise RuntimeError(f"Variable '{nombre}' no declarada (línea {ctx.start.line})")
+        self._verificar_tipo(tipo_var, valor, ctx, "actualización en para")
+        self.asignar_variable(nombre, valor, ctx)
         return None
 
-    def visitSentenciaPara(self, ctx: MiniLangParser.SentenciaParaContext):
-        # Inicialización
+    def visitCicloPara(self, ctx: MiniLangParser.CicloParaContext):
         if ctx.inicializacionPara():
             self.visit(ctx.inicializacionPara())
         elif ctx.asignacionPara():
             self.visit(ctx.asignacionPara())
-        # Bucle
         while True:
             if ctx.cond:
-                cond = self.visit(ctx.cond)
-                self._ensure_type("bool", cond, ctx, "condición for")
-                if not cond:
+                condicion = self.visit(ctx.cond)
+                self._verificar_tipo("booleano", condicion, ctx, "condición para")
+                if not condicion:
                     break
-            self.visit(ctx.grupo())
+            self.visit(ctx.bloque())
             if ctx.actualizacionPara():
                 self.visit(ctx.actualizacionPara())
         return None
 
-    # ---- Llamada a funciones void como sentencia ----
-    def visitSentenciaLlamada(self, ctx: MiniLangParser.SentenciaLlamadaContext):
-        name = ctx.ID().getText()
-        if name not in self.functions:
-            raise RuntimeError(f"Función '{name}' no definida (línea {ctx.start.line})")
-        params, body, ret_type = self.functions[name]
-        args = []
-        if ctx.expr():
-            for arg_ctx in ctx.expr():
-                args.append(self.visit(arg_ctx))
+    # ---- Llamada a funciones vacio como sentencia ----
+    def visitLlamadaFuncion(self, ctx: MiniLangParser.LlamadaFuncionContext):
+        nombre = ctx.IDENTIFICADOR().getText()
+        if nombre not in self.funciones:
+            raise RuntimeError(f"Función '{nombre}' no definida (línea {ctx.start.line})")
+        params, cuerpo, tipo_ret = self.funciones[nombre]
+        args = [self.visit(arg) for arg in ctx.expresion()] if ctx.expresion() else []
         if len(args) != len(params):
-            raise RuntimeError(f"Número incorrecto de argumentos para función '{name}' (línea {ctx.start.line})")
-        for (pname, ptype), arg_val in zip(params, args):
-            self._ensure_type(ptype, arg_val, ctx, f"parámetro '{pname}'")
-        # Nuevo ámbito
-        self.push_scope()
-        for (pname, ptype), arg_val in zip(params, args):
-            self.declare_variable(pname, ptype, ctx)
-            self.set_variable(pname, arg_val, ctx)
-        old_func = self.current_function
-        self.current_function = name
-        self.return_value = None
+            raise RuntimeError(f"Número incorrecto de argumentos para función '{nombre}' (línea {ctx.start.line})")
+        for (pnombre, ptipo), arg_val in zip(params, args):
+            self._verificar_tipo(ptipo, arg_val, ctx, f"parámetro '{pnombre}'")
+        self.entrar_ambito()
+        for (pnombre, ptipo), arg_val in zip(params, args):
+            self.declarar_variable(pnombre, ptipo, ctx)
+            self.asignar_variable(pnombre, arg_val, ctx)
+        func_anterior = self.funcion_actual
+        self.funcion_actual = nombre
+        self.valor_retorno = None
         try:
-            self.visit(body)
-        except ReturnException as e:
-            self.return_value = e.value
-        self.current_function = old_func
-        self.pop_scope()
-        # No se retorna nada (void)
+            self.visit(cuerpo)
+        except ExcepcionRetorno as e:
+            self.valor_retorno = e.valor
+        self.funcion_actual = func_anterior
+        self.salir_ambito()
         return None
 
     # ---- Expresiones ----
-    def visitUnaryNot(self, ctx):
-        v = self.visit(ctx.expr())
-        self._ensure_type("bool", v, ctx, "not")
+    def visitNegacionLogica(self, ctx):
+        v = self.visit(ctx.expresion())
+        self._verificar_tipo("booleano", v, ctx, "negación lógica")
         return not v
 
-    def visitUnaryMinus(self, ctx):
-        v = self.visit(ctx.expr())
-        t = self._type_of(v)
-        if t == "int":
+    def visitMenosUnario(self, ctx):
+        v = self.visit(ctx.expresion())
+        t = self._tipo_de(v)
+        if t in ("entero", "flotante"):
             return -v
-        elif t == "float":
-            return -v
-        else:
-            raise RuntimeError(f"No se puede negar tipo {t}")
+        raise RuntimeError(f"No se puede negar tipo {t}")
 
-    def visitParen(self, ctx):
-        return self.visit(ctx.expr())
+    def visitParentesis(self, ctx):
+        return self.visit(ctx.expresion())
 
-    def visitMulDiv(self, ctx):
-        l = self.visit(ctx.left)
-        r = self.visit(ctx.right)
-        t1 = self._type_of(l)
-        t2 = self._type_of(r)
-        if t1 == "int" and t2 == "int":
-            if ctx.op.type == MiniLangParser.MULTI:
-                return l * r
-            else:
-                if r == 0:
-                    raise RuntimeError("División por cero")
-                return l // r
-        elif (t1 == "int" and t2 == "float") or (t1 == "float" and t2 == "int") or (t1 == "float" and t2 == "float"):
-            lf = float(l) if t1 == "int" else l
-            rf = float(r) if t2 == "int" else r
-            if ctx.op.type == MiniLangParser.MULTI:
+    def visitMultiplicacionDivision(self, ctx):
+        izq = self.visit(ctx.izq)
+        der = self.visit(ctx.der)
+        t1 = self._tipo_de(izq)
+        t2 = self._tipo_de(der)
+        if t1 == "entero" and t2 == "entero":
+            if ctx.op.type == MiniLangParser.MULTIPLICACION:
+                return izq * der
+            if der == 0:
+                raise RuntimeError("División por cero")
+            return izq // der
+        if {t1, t2} <= {"entero", "flotante"}:
+            lf = float(izq)
+            rf = float(der)
+            if ctx.op.type == MiniLangParser.MULTIPLICACION:
                 return lf * rf
-            else:
-                if rf == 0.0:
-                    raise RuntimeError("División por cero")
-                return lf / rf
-        else:
-            raise RuntimeError(f"Tipos incompatibles para * o /: {t1} y {t2}")
+            if rf == 0.0:
+                raise RuntimeError("División por cero")
+            return lf / rf
+        raise RuntimeError(f"Tipos incompatibles para * o /: {t1} y {t2}")
 
-    def visitAddSub(self, ctx):
-        l = self.visit(ctx.left)
-        r = self.visit(ctx.right)
-        t1 = self._type_of(l)
-        t2 = self._type_of(r)
-        if t1 == "int" and t2 == "int":
-            if ctx.op.type == MiniLangParser.SUMA:
-                return l + r
-            else:
-                return l - r
-        elif (t1 == "int" and t2 == "float") or (t1 == "float" and t2 == "int") or (t1 == "float" and t2 == "float"):
-            lf = float(l) if t1 == "int" else l
-            rf = float(r) if t2 == "int" else r
-            if ctx.op.type == MiniLangParser.SUMA:
-                return lf + rf
-            else:
-                return lf - rf
-        elif t1 == "string" and t2 == "string" and ctx.op.type == MiniLangParser.SUMA:
-            return l + r
-        else:
-            raise RuntimeError(f"Tipos incompatibles para + o -: {t1} y {t2}")
+    def visitSumaResta(self, ctx):
+        izq = self.visit(ctx.izq)
+        der = self.visit(ctx.der)
+        t1 = self._tipo_de(izq)
+        t2 = self._tipo_de(der)
+        if t1 == "entero" and t2 == "entero":
+            return izq + der if ctx.op.type == MiniLangParser.SUMA else izq - der
+        if {t1, t2} <= {"entero", "flotante"}:
+            lf = float(izq)
+            rf = float(der)
+            return lf + rf if ctx.op.type == MiniLangParser.SUMA else lf - rf
+        if t1 == "cadena" and t2 == "cadena" and ctx.op.type == MiniLangParser.SUMA:
+            return izq + der
+        raise RuntimeError(f"Tipos incompatibles para + o -: {t1} y {t2}")
 
-    def visitRelational(self, ctx):
-        l = self.visit(ctx.left)
-        r = self.visit(ctx.right)
-        t1 = self._type_of(l)
-        t2 = self._type_of(r)
+    def visitRelacional(self, ctx):
+        izq = self.visit(ctx.izq)
+        der = self.visit(ctx.der)
+        t1 = self._tipo_de(izq)
+        t2 = self._tipo_de(der)
         op = ctx.op.type
-        if op in (MiniLangParser.EQ, MiniLangParser.NEQ):
-            return (l == r) if op == MiniLangParser.EQ else (l != r)
-        # Relacionales (<, <=, >, >=) solo con números
-        if (t1 in ("int","float")) and (t2 in ("int","float")):
-            lf = float(l) if t1 == "int" else l
-            rf = float(r) if t2 == "int" else r
-            if op == MiniLangParser.LT: return lf < rf
-            if op == MiniLangParser.LE: return lf <= rf
-            if op == MiniLangParser.GT: return lf > rf
-            if op == MiniLangParser.GE: return lf >= rf
+        if op in (MiniLangParser.IGUAL, MiniLangParser.DIFERENTE):
+            return (izq == der) if op == MiniLangParser.IGUAL else (izq != der)
+        if {t1, t2} <= {"entero", "flotante"}:
+            lf = float(izq)
+            rf = float(der)
+            if op == MiniLangParser.MENOR_QUE: return lf < rf
+            if op == MiniLangParser.MENOR_IGUAL: return lf <= rf
+            if op == MiniLangParser.MAYOR_QUE: return lf > rf
+            if op == MiniLangParser.MAYOR_IGUAL: return lf >= rf
         raise RuntimeError(f"Operadores relacionales solo para números: {t1} y {t2}")
 
-    def visitLogical(self, ctx):
-        l = self.visit(ctx.left)
-        r = self.visit(ctx.right)
-        self._ensure_type("bool", l, ctx, "operación lógica")
-        self._ensure_type("bool", r, ctx, "operación lógica")
-        if ctx.op.type == MiniLangParser.AND:
-            return l and r
-        else:
-            return l or r
+    def visitLogica(self, ctx):
+        izq = self.visit(ctx.izq)
+        der = self.visit(ctx.der)
+        self._verificar_tipo("booleano", izq, ctx, "operación lógica")
+        self._verificar_tipo("booleano", der, ctx, "operación lógica")
+        if ctx.op.type == MiniLangParser.Y_LOGICO:
+            return izq and der
+        return izq or der
 
-    def visitIntLit(self, ctx):
-        return int(ctx.INT().getText())
+    def visitLiteralEntero(self, ctx):
+        return int(ctx.ENTERO().getText())
 
-    def visitFloatLit(self, ctx):
-        return float(ctx.FLOAT().getText())
+    def visitLiteralFlotante(self, ctx):
+        return float(ctx.FLOTANTE().getText())
 
-    def visitStringLit(self, ctx):
-        s = ctx.STRING().getText()
+    def visitLiteralCadena(self, ctx):
+        s = ctx.CADENA().getText()
         return s[1:-1]
 
-    def visitTrueLit(self, ctx):
+    def visitLiteralVerdadero(self, ctx):
         return True
 
-    def visitFalseLit(self, ctx):
+    def visitLiteralFalso(self, ctx):
         return False
 
-    def visitIdRef(self, ctx):
-        name = ctx.ID().getText()
-        return self.get_variable(name, ctx)
+    def visitReferenciaVariable(self, ctx):
+        nombre = ctx.IDENTIFICADOR().getText()
+        return self.obtener_variable(nombre, ctx)
