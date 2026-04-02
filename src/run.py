@@ -27,7 +27,7 @@ def main():
     parser.removeErrorListeners()
     parser.addErrorListener(err_listener)
 
-    tree = parser.program()
+    tree = parser.programa()
 
     if err_listener.has_errors():
         print(err_listener.report(), file=sys.stderr)

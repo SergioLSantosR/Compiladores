@@ -1,40 +1,40 @@
-funcion void saludo(string nombre) {
-  imprime("Hola " + nombre);
+funcion vacio saludo(cadena nombre) {
+  imprimir("Hola " + nombre);
 }
-funcion int suma(int a, int b) {
+funcion entero suma(entero a, entero b) {
   retorna a + b;
 }
 
-program {
-  int x;
-  float y;
-  string s;
-  bool valor;
+programa {
+  entero x;
+  flotante y;
+  cadena s;
+  booleano valor;
 
   x = 10;
   y = 3.14;
   s = "Hola";
-  valor = true;
+  valor = verdadero;
 
-  imprime("Inicio");
+  imprimir("Inicio");
 
   mientras (x > 0) {
-    imprime(x);
+    imprimir(x);
     x = x - 1;
   }
 
-  para (int i = 0; i < 5; i = i + 1) {
-    imprime(i);
+  para (entero i = 0; i < 5; i = i + 1) {
+    imprimir(i);
   }
 
   si (valor) {
-    imprime("valor es verdadero");
+    imprimir("valor es verdadero");
   } sino {
-    imprime("valor es falso");
+    imprimir("valor es falso");
   }
 
-  imprime(s + " mundo");
-  imprime(y * 2);
-  imprime(suma(5, 3));   // llamada dentro del programa
-  saludo("Salomón");
+  imprimir(s + " mundo");
+  imprimir(y * 2);
+  imprimir(suma(5, 3));
+  saludo("Mundo");
 }
