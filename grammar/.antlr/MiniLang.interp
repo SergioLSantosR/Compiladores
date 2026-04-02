@@ -1,9 +1,9 @@
 token literal names:
 null
 'program'
-'if'
-'else'
-'print'
+'si'
+'sino'
+'imprime'
 'int'
 'bool'
 'true'
@@ -39,9 +39,9 @@ null
 token symbolic names:
 null
 PROGRAM
-IF
-ELSE
-PRINT
+SI
+SINO
+IMPRIME
 INT_T
 BOOL_T
 TRUE
@@ -55,34 +55,34 @@ LE
 GE
 LT
 GT
-ASSIGN
-ADD
-SUB
-MUL
-DIV
-LPAREN
-RPAREN
-LBRACE
-RBRACE
-LBRACK
-RBRACK
-SEMI
-COMMA
+ASIGNA
+SUMA
+RESTA
+MULTI
+DIVIDE
+PARENTESIS_IZQ
+PARENTESIS_DER
+LLAVE_IZQ
+LLAVE_DER
+CORCHETE_IZQ
+CORCHETE_DER
+PUNTO_COMA
+COMA
 ID
 INT
 WS
-LINE_COMMENT
-BLOCK_COMMENT
+LINEA_COMENTARIO
+GRUPO_COMENTARIO
 
 rule names:
 program
-block
-stmt
-varDecl
-type
-assignStmt
-ifStmt
-printStmt
+grupo
+sentencia
+declaraVariable
+tipo
+sentenciaAsigna
+sentenciaSI
+sentenciaImprime
 expr
 
 

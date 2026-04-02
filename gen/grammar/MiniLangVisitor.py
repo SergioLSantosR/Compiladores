@@ -14,38 +14,38 @@ class MiniLangVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#block.
-    def visitBlock(self, ctx:MiniLangParser.BlockContext):
+    # Visit a parse tree produced by MiniLangParser#grupo.
+    def visitGrupo(self, ctx:MiniLangParser.GrupoContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#stmt.
-    def visitStmt(self, ctx:MiniLangParser.StmtContext):
+    # Visit a parse tree produced by MiniLangParser#sentencia.
+    def visitSentencia(self, ctx:MiniLangParser.SentenciaContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#varDecl.
-    def visitVarDecl(self, ctx:MiniLangParser.VarDeclContext):
+    # Visit a parse tree produced by MiniLangParser#declaraVariable.
+    def visitDeclaraVariable(self, ctx:MiniLangParser.DeclaraVariableContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#type.
-    def visitType(self, ctx:MiniLangParser.TypeContext):
+    # Visit a parse tree produced by MiniLangParser#tipo.
+    def visitTipo(self, ctx:MiniLangParser.TipoContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#assignStmt.
-    def visitAssignStmt(self, ctx:MiniLangParser.AssignStmtContext):
+    # Visit a parse tree produced by MiniLangParser#sentenciaAsigna.
+    def visitSentenciaAsigna(self, ctx:MiniLangParser.SentenciaAsignaContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#ifStmt.
-    def visitIfStmt(self, ctx:MiniLangParser.IfStmtContext):
+    # Visit a parse tree produced by MiniLangParser#sentenciaSI.
+    def visitSentenciaSI(self, ctx:MiniLangParser.SentenciaSIContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#printStmt.
-    def visitPrintStmt(self, ctx:MiniLangParser.PrintStmtContext):
+    # Visit a parse tree produced by MiniLangParser#sentenciaImprime.
+    def visitSentenciaImprime(self, ctx:MiniLangParser.SentenciaImprimeContext):
         return self.visitChildren(ctx)
 
 

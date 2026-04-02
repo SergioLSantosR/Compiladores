@@ -7,18 +7,18 @@ program
  ;
 
 grupo
- : llave_izq sentencia* llave_der
+ : LLAVE_IZQ sentencia* LLAVE_DER
  ;
 
 sentencia
  : declaraVariable
  | sentenciaAsigna
- | sentenciaIf
- | sentenciaPrint
+ | sentenciaSI
+ | sentenciaImprime
  ;
 
 declaraVariable
- : tipo ID punto_coma
+ : tipo ID PUNTO_COMA
  ;
 
 tipo
@@ -27,23 +27,23 @@ tipo
  ;
 
 sentenciaAsigna
- : ID asigna expr punto_coma
+ : ID ASIGNA expr PUNTO_COMA
  ;
 
-sentenciaSi
- : SI parentesis_izq expr parentesis_der  grupo (ENTONCES grupo)?
+sentenciaSI
+ : SI PARENTESIS_IZQ expr PARENTESIS_DER  grupo (SINO grupo)?
  ;
 
 sentenciaImprime
- : IMPRIME parentesis_izq expr parentesis_der punto_coma
+ : IMPRIME PARENTESIS_IZQ expr PARENTESIS_DER PUNTO_COMA
  ;
 
 expr
  : NOT expr                                           #UnaryNot
- | SUB expr                                           #UnaryMinus
- | parentesis_izq expr parentesis_der                 #Paren
- | left=expr op=(MUL|DIV) right=expr                  #MulDiv
- | left=expr op=(ADD|SUB) right=expr                  #AddSub
+ | RESTA expr                                         #UnaryMinus
+ | PARENTESIS_IZQ expr PARENTESIS_DER                 #Paren
+ | left=expr op=(MULTI|DIVIDE) right=expr             #MulDiv
+ | left=expr op=(SUMA|RESTA) right=expr               #AddSub
  | left=expr op=(EQ|NEQ|LT|LE|GT|GE) right=expr       #Relational
  | left=expr op=(AND|OR) right=expr                   #Logical
  | INT                                                #IntLit
@@ -57,8 +57,8 @@ expr
 // Palabras clave
 PROGRAM : 'program';
 SI      : 'si';
-ENTONCES    : 'entonces';
-IMPRIME   : 'imprime';
+SINO    : 'sino';
+IMPRIME : 'imprime';
 INT_T   : 'int';
 BOOL_T  : 'bool';
 TRUE    : 'true';
@@ -76,21 +76,21 @@ LT  : '<';
 GT  : '>';
 
 // Asignación y aritméticos
-asigna : '=';
-suma    : '+';
-resta    : '-';
-multi    : '*';
-divide    : '/';
+ASIGNA   : '=';
+SUMA     : '+';
+RESTA    : '-';
+MULTI    : '*';
+DIVIDE   : '/';
 
 // Símbolos de agrupación y otros
-parentesis_izq : '(';
-parentesis_der : ')';
-llave_izq : '{';
-llave_der : '}';
-corchete_izq : '[';
-corchete_der : ']';
-punto_coma   : ';';
-coma  : ',';
+PARENTESIS_IZQ : '(';
+PARENTESIS_DER : ')';
+LLAVE_IZQ : '{';
+LLAVE_DER : '}';
+CORCHETE_IZQ : '[';
+CORCHETE_DER : ']';
+PUNTO_COMA   : ';';
+COMA  : ',';
 
 // Identificadores y literales
 ID  : [a-zA-Z_][a-zA-Z_0-9]*;
