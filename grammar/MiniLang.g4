@@ -3,7 +3,19 @@ grammar MiniLang;
 // ---------- Reglas Parser ----------
 
 program
- : PROGRAM grupo EOF
+ : PROGRAM (funcionDecl)* grupo EOF
+ ;
+
+funcionDecl
+ : FUNCION tipo? ID PARENTESIS_IZQ parametros? PARENTESIS_DER grupo
+ ;
+
+parametros
+ : parametro (COMA parametro)*
+ ;
+
+parametro
+ : tipo ID
  ;
 
 grupo
@@ -15,6 +27,9 @@ sentencia
  | sentenciaAsigna
  | sentenciaSI
  | sentenciaImprime
+ | sentenciaMientras
+ | sentenciaPara
+ | sentenciaRetorna
  ;
 
 declaraVariable
@@ -22,8 +37,7 @@ declaraVariable
  ;
 
 tipo
- : INT_T
- | BOOL_T
+ : INT_T | BOOL_T | FLOAT_T | STRING_T
  ;
 
 sentenciaAsigna
@@ -31,11 +45,22 @@ sentenciaAsigna
  ;
 
 sentenciaSI
- : SI PARENTESIS_IZQ expr PARENTESIS_DER  grupo (SINO grupo)?
+ : SI PARENTESIS_IZQ expr PARENTESIS_DER grupo (SINO grupo)?
  ;
 
 sentenciaImprime
  : IMPRIME PARENTESIS_IZQ expr PARENTESIS_DER PUNTO_COMA
+ ;
+
+sentenciaMientras
+ : MIENTRAS PARENTESIS_IZQ expr PARENTESIS_DER grupo
+ ;
+
+sentenciaPara 
+ : PARA PARENTESIS_IZQ init=(declaraVariable|sentenciaAsigna)? PUNTO_COMA cond=expr? PUNTO_COMA update=sentenciaAsigna? PARENTESIS_DER grupo;
+
+sentenciaRetorna
+ : RETORNA expr? PUNTO_COMA
  ;
 
 expr
@@ -47,22 +72,31 @@ expr
  | left=expr op=(EQ|NEQ|LT|LE|GT|GE) right=expr       #Relational
  | left=expr op=(AND|OR) right=expr                   #Logical
  | INT                                                #IntLit
+ | FLOAT                                              #FloatLit
+ | STRING                                             #StringLit
  | TRUE                                               #TrueLit
  | FALSE                                              #FalseLit
  | ID                                                 #IdRef
+ | ID PARENTESIS_IZQ (expr (COMA expr)*)? PARENTESIS_DER   #FuncCall
  ;
 
 // ---------- Reglas Lexer ----------
 
 // Palabras clave
-PROGRAM : 'program';
-SI      : 'si';
-SINO    : 'sino';
-IMPRIME : 'imprime';
-INT_T   : 'int';
-BOOL_T  : 'bool';
-TRUE    : 'true';
-FALSE   : 'false';
+PROGRAM  : 'program';
+SI       : 'si';
+SINO     : 'sino';
+IMPRIME  : 'imprime';
+MIENTRAS : 'mientras';
+PARA     : 'para';
+FUNCION  : 'funcion';
+RETORNA  : 'retorna';
+INT_T    : 'int';
+BOOL_T   : 'bool';
+FLOAT_T  : 'float';
+STRING_T : 'string';
+TRUE     : 'true';
+FALSE    : 'false';
 
 // Operadores lógicos y relacionales
 AND : '&&';
@@ -92,9 +126,11 @@ CORCHETE_DER : ']';
 PUNTO_COMA   : ';';
 COMA  : ',';
 
-// Identificadores y literales
-ID  : [a-zA-Z_][a-zA-Z_0-9]*;
-INT : [0-9]+;
+// Literales
+INT    : [0-9]+;
+FLOAT  : [0-9]+ '.' [0-9]+;
+STRING : '"' (~["\r\n])* '"';
+ID     : [a-zA-Z_][a-zA-Z_0-9]*;
 
 // Espacios y comentarios
 WS            : [ \t\r\n]+ -> skip;
