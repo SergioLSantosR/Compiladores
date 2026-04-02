@@ -218,8 +218,8 @@ class EvalVisitor(MiniLangVisitor):
 
     def visitSentenciaPara(self, ctx: MiniLangParser.SentenciaParaContext):
         # Inicialización
-        if ctx.init:
-            self.visit(ctx.init)  # puede ser declaraVariable o sentenciaAsigna
+        if ctx.inicializacion():
+            self.visit(ctx.inicializacion())  # puede ser declaraVariable o sentenciaAsigna
         # Condición (por defecto true)
         cond = True
         if ctx.cond:

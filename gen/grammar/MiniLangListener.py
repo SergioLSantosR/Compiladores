@@ -17,6 +17,33 @@ class MiniLangListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by MiniLangParser#funcionDecl.
+    def enterFuncionDecl(self, ctx:MiniLangParser.FuncionDeclContext):
+        pass
+
+    # Exit a parse tree produced by MiniLangParser#funcionDecl.
+    def exitFuncionDecl(self, ctx:MiniLangParser.FuncionDeclContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniLangParser#parametros.
+    def enterParametros(self, ctx:MiniLangParser.ParametrosContext):
+        pass
+
+    # Exit a parse tree produced by MiniLangParser#parametros.
+    def exitParametros(self, ctx:MiniLangParser.ParametrosContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniLangParser#parametro.
+    def enterParametro(self, ctx:MiniLangParser.ParametroContext):
+        pass
+
+    # Exit a parse tree produced by MiniLangParser#parametro.
+    def exitParametro(self, ctx:MiniLangParser.ParametroContext):
+        pass
+
+
     # Enter a parse tree produced by MiniLangParser#grupo.
     def enterGrupo(self, ctx:MiniLangParser.GrupoContext):
         pass
@@ -80,12 +107,39 @@ class MiniLangListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by MiniLangParser#UnaryNot.
-    def enterUnaryNot(self, ctx:MiniLangParser.UnaryNotContext):
+    # Enter a parse tree produced by MiniLangParser#inicializacion.
+    def enterInicializacion(self, ctx:MiniLangParser.InicializacionContext):
         pass
 
-    # Exit a parse tree produced by MiniLangParser#UnaryNot.
-    def exitUnaryNot(self, ctx:MiniLangParser.UnaryNotContext):
+    # Exit a parse tree produced by MiniLangParser#inicializacion.
+    def exitInicializacion(self, ctx:MiniLangParser.InicializacionContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniLangParser#sentenciaMientras.
+    def enterSentenciaMientras(self, ctx:MiniLangParser.SentenciaMientrasContext):
+        pass
+
+    # Exit a parse tree produced by MiniLangParser#sentenciaMientras.
+    def exitSentenciaMientras(self, ctx:MiniLangParser.SentenciaMientrasContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniLangParser#sentenciaPara.
+    def enterSentenciaPara(self, ctx:MiniLangParser.SentenciaParaContext):
+        pass
+
+    # Exit a parse tree produced by MiniLangParser#sentenciaPara.
+    def exitSentenciaPara(self, ctx:MiniLangParser.SentenciaParaContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniLangParser#sentenciaRetorna.
+    def enterSentenciaRetorna(self, ctx:MiniLangParser.SentenciaRetornaContext):
+        pass
+
+    # Exit a parse tree produced by MiniLangParser#sentenciaRetorna.
+    def exitSentenciaRetorna(self, ctx:MiniLangParser.SentenciaRetornaContext):
         pass
 
 
@@ -143,21 +197,57 @@ class MiniLangListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by MiniLangParser#TrueLit.
-    def enterTrueLit(self, ctx:MiniLangParser.TrueLitContext):
-        pass
-
-    # Exit a parse tree produced by MiniLangParser#TrueLit.
-    def exitTrueLit(self, ctx:MiniLangParser.TrueLitContext):
-        pass
-
-
     # Enter a parse tree produced by MiniLangParser#IdRef.
     def enterIdRef(self, ctx:MiniLangParser.IdRefContext):
         pass
 
     # Exit a parse tree produced by MiniLangParser#IdRef.
     def exitIdRef(self, ctx:MiniLangParser.IdRefContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniLangParser#StringLit.
+    def enterStringLit(self, ctx:MiniLangParser.StringLitContext):
+        pass
+
+    # Exit a parse tree produced by MiniLangParser#StringLit.
+    def exitStringLit(self, ctx:MiniLangParser.StringLitContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniLangParser#FuncCall.
+    def enterFuncCall(self, ctx:MiniLangParser.FuncCallContext):
+        pass
+
+    # Exit a parse tree produced by MiniLangParser#FuncCall.
+    def exitFuncCall(self, ctx:MiniLangParser.FuncCallContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniLangParser#UnaryNot.
+    def enterUnaryNot(self, ctx:MiniLangParser.UnaryNotContext):
+        pass
+
+    # Exit a parse tree produced by MiniLangParser#UnaryNot.
+    def exitUnaryNot(self, ctx:MiniLangParser.UnaryNotContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniLangParser#FloatLit.
+    def enterFloatLit(self, ctx:MiniLangParser.FloatLitContext):
+        pass
+
+    # Exit a parse tree produced by MiniLangParser#FloatLit.
+    def exitFloatLit(self, ctx:MiniLangParser.FloatLitContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniLangParser#TrueLit.
+    def enterTrueLit(self, ctx:MiniLangParser.TrueLitContext):
+        pass
+
+    # Exit a parse tree produced by MiniLangParser#TrueLit.
+    def exitTrueLit(self, ctx:MiniLangParser.TrueLitContext):
         pass
 
 

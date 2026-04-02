@@ -52,12 +52,17 @@ sentenciaImprime
  : IMPRIME PARENTESIS_IZQ expr PARENTESIS_DER PUNTO_COMA
  ;
 
+ inicializacion
+ : declaraVariable | sentenciaAsigna;
+
+
 sentenciaMientras
  : MIENTRAS PARENTESIS_IZQ expr PARENTESIS_DER grupo
  ;
 
 sentenciaPara 
- : PARA PARENTESIS_IZQ init=(declaraVariable|sentenciaAsigna)? PUNTO_COMA cond=expr? PUNTO_COMA update=sentenciaAsigna? PARENTESIS_DER grupo;
+ : PARA PARENTESIS_IZQ inicializacion? PUNTO_COMA cond=expr? PUNTO_COMA update=sentenciaAsigna? PARENTESIS_DER grupo
+ ;
 
 sentenciaRetorna
  : RETORNA expr? PUNTO_COMA
