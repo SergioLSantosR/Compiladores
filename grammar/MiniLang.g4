@@ -3,7 +3,7 @@ grammar MiniLang;
 // ---------- Reglas Parser ----------
 
 program
- : PROGRAM (funcionDecl)* grupo EOF
+ : PROGRAM (funcionDecl)* grupo (funcionDecl)* EOF   // permite funciones antes y después
  ;
 
 funcionDecl
@@ -37,7 +37,10 @@ declaraVariable
  ;
 
 tipo
- : INT_T | BOOL_T | FLOAT_T | STRING_T
+ : INT_T 
+ | BOOL_T
+ | FLOAT_T 
+ | STRING_T
  ;
 
 sentenciaAsigna
@@ -52,16 +55,17 @@ sentenciaImprime
  : IMPRIME PARENTESIS_IZQ expr PARENTESIS_DER PUNTO_COMA
  ;
 
- inicializacion
- : declaraVariable | sentenciaAsigna;
-
+// Nuevas reglas para el bucle for (sin punto y coma)
+inicializacionPara : tipo ID ASIGNA expr;   // ej: int i = 0
+asignacionPara     : ID ASIGNA expr;       // ej: i = j + 1 (sin punto y coma)
+actualizacionPara  : ID ASIGNA expr;       // ej: i = i + 1 (sin punto y coma)
 
 sentenciaMientras
  : MIENTRAS PARENTESIS_IZQ expr PARENTESIS_DER grupo
  ;
 
 sentenciaPara 
- : PARA PARENTESIS_IZQ inicializacion? PUNTO_COMA cond=expr? PUNTO_COMA update=sentenciaAsigna? PARENTESIS_DER grupo
+ : PARA PARENTESIS_IZQ (inicializacionPara | asignacionPara)? PUNTO_COMA cond=expr? PUNTO_COMA (actualizacionPara)? PARENTESIS_DER grupo
  ;
 
 sentenciaRetorna

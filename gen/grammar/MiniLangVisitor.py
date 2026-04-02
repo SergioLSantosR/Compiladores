@@ -64,8 +64,18 @@ class MiniLangVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniLangParser#inicializacion.
-    def visitInicializacion(self, ctx:MiniLangParser.InicializacionContext):
+    # Visit a parse tree produced by MiniLangParser#inicializacionPara.
+    def visitInicializacionPara(self, ctx:MiniLangParser.InicializacionParaContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniLangParser#asignacionPara.
+    def visitAsignacionPara(self, ctx:MiniLangParser.AsignacionParaContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniLangParser#actualizacionPara.
+    def visitActualizacionPara(self, ctx:MiniLangParser.ActualizacionParaContext):
         return self.visitChildren(ctx)
 
 

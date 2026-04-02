@@ -1,3 +1,7 @@
+funcion int suma(int a, int b) {
+  retorna a + b;
+}
+
 program {
   int x;
   float y;
@@ -28,13 +32,8 @@ program {
 
   imprime(s + " mundo");
   imprime(y * 2);
+  imprime(suma(5, 3));   // llamada dentro del programa
 }
-
-funcion int suma(int a, int b) {
-  retorna a + b;
-}
-
-imprime(suma(5, 3));
 
 funcion void saludo(string nombre) {
   imprime("Hola " + nombre);

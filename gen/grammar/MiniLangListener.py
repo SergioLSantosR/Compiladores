@@ -107,12 +107,30 @@ class MiniLangListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by MiniLangParser#inicializacion.
-    def enterInicializacion(self, ctx:MiniLangParser.InicializacionContext):
+    # Enter a parse tree produced by MiniLangParser#inicializacionPara.
+    def enterInicializacionPara(self, ctx:MiniLangParser.InicializacionParaContext):
         pass
 
-    # Exit a parse tree produced by MiniLangParser#inicializacion.
-    def exitInicializacion(self, ctx:MiniLangParser.InicializacionContext):
+    # Exit a parse tree produced by MiniLangParser#inicializacionPara.
+    def exitInicializacionPara(self, ctx:MiniLangParser.InicializacionParaContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniLangParser#asignacionPara.
+    def enterAsignacionPara(self, ctx:MiniLangParser.AsignacionParaContext):
+        pass
+
+    # Exit a parse tree produced by MiniLangParser#asignacionPara.
+    def exitAsignacionPara(self, ctx:MiniLangParser.AsignacionParaContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniLangParser#actualizacionPara.
+    def enterActualizacionPara(self, ctx:MiniLangParser.ActualizacionParaContext):
+        pass
+
+    # Exit a parse tree produced by MiniLangParser#actualizacionPara.
+    def exitActualizacionPara(self, ctx:MiniLangParser.ActualizacionParaContext):
         pass
 
 
