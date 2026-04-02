@@ -17,66 +17,66 @@ class MiniLangListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by MiniLangParser#block.
-    def enterBlock(self, ctx:MiniLangParser.BlockContext):
+    # Enter a parse tree produced by MiniLangParser#grupo.
+    def enterGrupo(self, ctx:MiniLangParser.GrupoContext):
         pass
 
-    # Exit a parse tree produced by MiniLangParser#block.
-    def exitBlock(self, ctx:MiniLangParser.BlockContext):
-        pass
-
-
-    # Enter a parse tree produced by MiniLangParser#stmt.
-    def enterStmt(self, ctx:MiniLangParser.StmtContext):
-        pass
-
-    # Exit a parse tree produced by MiniLangParser#stmt.
-    def exitStmt(self, ctx:MiniLangParser.StmtContext):
+    # Exit a parse tree produced by MiniLangParser#grupo.
+    def exitGrupo(self, ctx:MiniLangParser.GrupoContext):
         pass
 
 
-    # Enter a parse tree produced by MiniLangParser#varDecl.
-    def enterVarDecl(self, ctx:MiniLangParser.VarDeclContext):
+    # Enter a parse tree produced by MiniLangParser#sentencia.
+    def enterSentencia(self, ctx:MiniLangParser.SentenciaContext):
         pass
 
-    # Exit a parse tree produced by MiniLangParser#varDecl.
-    def exitVarDecl(self, ctx:MiniLangParser.VarDeclContext):
-        pass
-
-
-    # Enter a parse tree produced by MiniLangParser#type.
-    def enterType(self, ctx:MiniLangParser.TypeContext):
-        pass
-
-    # Exit a parse tree produced by MiniLangParser#type.
-    def exitType(self, ctx:MiniLangParser.TypeContext):
+    # Exit a parse tree produced by MiniLangParser#sentencia.
+    def exitSentencia(self, ctx:MiniLangParser.SentenciaContext):
         pass
 
 
-    # Enter a parse tree produced by MiniLangParser#assignStmt.
-    def enterAssignStmt(self, ctx:MiniLangParser.AssignStmtContext):
+    # Enter a parse tree produced by MiniLangParser#declaraVariable.
+    def enterDeclaraVariable(self, ctx:MiniLangParser.DeclaraVariableContext):
         pass
 
-    # Exit a parse tree produced by MiniLangParser#assignStmt.
-    def exitAssignStmt(self, ctx:MiniLangParser.AssignStmtContext):
-        pass
-
-
-    # Enter a parse tree produced by MiniLangParser#ifStmt.
-    def enterIfStmt(self, ctx:MiniLangParser.IfStmtContext):
-        pass
-
-    # Exit a parse tree produced by MiniLangParser#ifStmt.
-    def exitIfStmt(self, ctx:MiniLangParser.IfStmtContext):
+    # Exit a parse tree produced by MiniLangParser#declaraVariable.
+    def exitDeclaraVariable(self, ctx:MiniLangParser.DeclaraVariableContext):
         pass
 
 
-    # Enter a parse tree produced by MiniLangParser#printStmt.
-    def enterPrintStmt(self, ctx:MiniLangParser.PrintStmtContext):
+    # Enter a parse tree produced by MiniLangParser#tipo.
+    def enterTipo(self, ctx:MiniLangParser.TipoContext):
         pass
 
-    # Exit a parse tree produced by MiniLangParser#printStmt.
-    def exitPrintStmt(self, ctx:MiniLangParser.PrintStmtContext):
+    # Exit a parse tree produced by MiniLangParser#tipo.
+    def exitTipo(self, ctx:MiniLangParser.TipoContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniLangParser#sentenciaAsigna.
+    def enterSentenciaAsigna(self, ctx:MiniLangParser.SentenciaAsignaContext):
+        pass
+
+    # Exit a parse tree produced by MiniLangParser#sentenciaAsigna.
+    def exitSentenciaAsigna(self, ctx:MiniLangParser.SentenciaAsignaContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniLangParser#sentenciaSI.
+    def enterSentenciaSI(self, ctx:MiniLangParser.SentenciaSIContext):
+        pass
+
+    # Exit a parse tree produced by MiniLangParser#sentenciaSI.
+    def exitSentenciaSI(self, ctx:MiniLangParser.SentenciaSIContext):
+        pass
+
+
+    # Enter a parse tree produced by MiniLangParser#sentenciaImprime.
+    def enterSentenciaImprime(self, ctx:MiniLangParser.SentenciaImprimeContext):
+        pass
+
+    # Exit a parse tree produced by MiniLangParser#sentenciaImprime.
+    def exitSentenciaImprime(self, ctx:MiniLangParser.SentenciaImprimeContext):
         pass
 
 

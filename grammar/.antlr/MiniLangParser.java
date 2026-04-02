@@ -16,37 +16,39 @@ public class MiniLangParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		PROGRAM=1, IF=2, ELSE=3, PRINT=4, INT_T=5, BOOL_T=6, TRUE=7, FALSE=8, 
-		AND=9, OR=10, NOT=11, EQ=12, NEQ=13, LE=14, GE=15, LT=16, GT=17, ASSIGN=18, 
-		ADD=19, SUB=20, MUL=21, DIV=22, LPAREN=23, RPAREN=24, LBRACE=25, RBRACE=26, 
-		LBRACK=27, RBRACK=28, SEMI=29, COMMA=30, ID=31, INT=32, WS=33, LINE_COMMENT=34, 
-		BLOCK_COMMENT=35;
+		PROGRAM=1, SI=2, SINO=3, IMPRIME=4, INT_T=5, BOOL_T=6, TRUE=7, FALSE=8, 
+		AND=9, OR=10, NOT=11, EQ=12, NEQ=13, LE=14, GE=15, LT=16, GT=17, ASIGNA=18, 
+		SUMA=19, RESTA=20, MULTI=21, DIVIDE=22, PARENTESIS_IZQ=23, PARENTESIS_DER=24, 
+		LLAVE_IZQ=25, LLAVE_DER=26, CORCHETE_IZQ=27, CORCHETE_DER=28, PUNTO_COMA=29, 
+		COMA=30, ID=31, INT=32, WS=33, LINEA_COMENTARIO=34, GRUPO_COMENTARIO=35;
 	public static final int
-		RULE_program = 0, RULE_block = 1, RULE_stmt = 2, RULE_varDecl = 3, RULE_type = 4, 
-		RULE_assignStmt = 5, RULE_ifStmt = 6, RULE_printStmt = 7, RULE_expr = 8;
+		RULE_program = 0, RULE_grupo = 1, RULE_sentencia = 2, RULE_declaraVariable = 3, 
+		RULE_tipo = 4, RULE_sentenciaAsigna = 5, RULE_sentenciaSI = 6, RULE_sentenciaImprime = 7, 
+		RULE_expr = 8;
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"program", "block", "stmt", "varDecl", "type", "assignStmt", "ifStmt", 
-			"printStmt", "expr"
+			"program", "grupo", "sentencia", "declaraVariable", "tipo", "sentenciaAsigna", 
+			"sentenciaSI", "sentenciaImprime", "expr"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'program'", "'if'", "'else'", "'print'", "'int'", "'bool'", "'true'", 
-			"'false'", "'&&'", "'||'", "'!'", "'=='", null, "'<='", "'>='", "'<'", 
-			"'>'", "'='", "'+'", "'-'", "'*'", "'/'", "'('", "')'", "'{'", "'}'", 
-			"'['", "']'", "';'", "','"
+			null, "'program'", "'si'", "'sino'", "'imprime'", "'int'", "'bool'", 
+			"'true'", "'false'", "'&&'", "'||'", "'!'", "'=='", null, "'<='", "'>='", 
+			"'<'", "'>'", "'='", "'+'", "'-'", "'*'", "'/'", "'('", "')'", "'{'", 
+			"'}'", "'['", "']'", "';'", "','"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, "PROGRAM", "IF", "ELSE", "PRINT", "INT_T", "BOOL_T", "TRUE", "FALSE", 
-			"AND", "OR", "NOT", "EQ", "NEQ", "LE", "GE", "LT", "GT", "ASSIGN", "ADD", 
-			"SUB", "MUL", "DIV", "LPAREN", "RPAREN", "LBRACE", "RBRACE", "LBRACK", 
-			"RBRACK", "SEMI", "COMMA", "ID", "INT", "WS", "LINE_COMMENT", "BLOCK_COMMENT"
+			null, "PROGRAM", "SI", "SINO", "IMPRIME", "INT_T", "BOOL_T", "TRUE", 
+			"FALSE", "AND", "OR", "NOT", "EQ", "NEQ", "LE", "GE", "LT", "GT", "ASIGNA", 
+			"SUMA", "RESTA", "MULTI", "DIVIDE", "PARENTESIS_IZQ", "PARENTESIS_DER", 
+			"LLAVE_IZQ", "LLAVE_DER", "CORCHETE_IZQ", "CORCHETE_DER", "PUNTO_COMA", 
+			"COMA", "ID", "INT", "WS", "LINEA_COMENTARIO", "GRUPO_COMENTARIO"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -103,8 +105,8 @@ public class MiniLangParser extends Parser {
 	@SuppressWarnings("CheckReturnValue")
 	public static class ProgramContext extends ParserRuleContext {
 		public TerminalNode PROGRAM() { return getToken(MiniLangParser.PROGRAM, 0); }
-		public BlockContext block() {
-			return getRuleContext(BlockContext.class,0);
+		public GrupoContext grupo() {
+			return getRuleContext(GrupoContext.class,0);
 		}
 		public TerminalNode EOF() { return getToken(MiniLangParser.EOF, 0); }
 		public ProgramContext(ParserRuleContext parent, int invokingState) {
@@ -122,7 +124,7 @@ public class MiniLangParser extends Parser {
 			setState(18);
 			match(PROGRAM);
 			setState(19);
-			block();
+			grupo();
 			setState(20);
 			match(EOF);
 			}
@@ -139,30 +141,30 @@ public class MiniLangParser extends Parser {
 	}
 
 	@SuppressWarnings("CheckReturnValue")
-	public static class BlockContext extends ParserRuleContext {
-		public TerminalNode LBRACE() { return getToken(MiniLangParser.LBRACE, 0); }
-		public TerminalNode RBRACE() { return getToken(MiniLangParser.RBRACE, 0); }
-		public List<StmtContext> stmt() {
-			return getRuleContexts(StmtContext.class);
+	public static class GrupoContext extends ParserRuleContext {
+		public TerminalNode LLAVE_IZQ() { return getToken(MiniLangParser.LLAVE_IZQ, 0); }
+		public TerminalNode LLAVE_DER() { return getToken(MiniLangParser.LLAVE_DER, 0); }
+		public List<SentenciaContext> sentencia() {
+			return getRuleContexts(SentenciaContext.class);
 		}
-		public StmtContext stmt(int i) {
-			return getRuleContext(StmtContext.class,i);
+		public SentenciaContext sentencia(int i) {
+			return getRuleContext(SentenciaContext.class,i);
 		}
-		public BlockContext(ParserRuleContext parent, int invokingState) {
+		public GrupoContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_block; }
+		@Override public int getRuleIndex() { return RULE_grupo; }
 	}
 
-	public final BlockContext block() throws RecognitionException {
-		BlockContext _localctx = new BlockContext(_ctx, getState());
-		enterRule(_localctx, 2, RULE_block);
+	public final GrupoContext grupo() throws RecognitionException {
+		GrupoContext _localctx = new GrupoContext(_ctx, getState());
+		enterRule(_localctx, 2, RULE_grupo);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(22);
-			match(LBRACE);
+			match(LLAVE_IZQ);
 			setState(26);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
@@ -170,7 +172,7 @@ public class MiniLangParser extends Parser {
 				{
 				{
 				setState(23);
-				stmt();
+				sentencia();
 				}
 				}
 				setState(28);
@@ -178,7 +180,7 @@ public class MiniLangParser extends Parser {
 				_la = _input.LA(1);
 			}
 			setState(29);
-			match(RBRACE);
+			match(LLAVE_DER);
 			}
 		}
 		catch (RecognitionException re) {
@@ -193,28 +195,28 @@ public class MiniLangParser extends Parser {
 	}
 
 	@SuppressWarnings("CheckReturnValue")
-	public static class StmtContext extends ParserRuleContext {
-		public VarDeclContext varDecl() {
-			return getRuleContext(VarDeclContext.class,0);
+	public static class SentenciaContext extends ParserRuleContext {
+		public DeclaraVariableContext declaraVariable() {
+			return getRuleContext(DeclaraVariableContext.class,0);
 		}
-		public AssignStmtContext assignStmt() {
-			return getRuleContext(AssignStmtContext.class,0);
+		public SentenciaAsignaContext sentenciaAsigna() {
+			return getRuleContext(SentenciaAsignaContext.class,0);
 		}
-		public IfStmtContext ifStmt() {
-			return getRuleContext(IfStmtContext.class,0);
+		public SentenciaSIContext sentenciaSI() {
+			return getRuleContext(SentenciaSIContext.class,0);
 		}
-		public PrintStmtContext printStmt() {
-			return getRuleContext(PrintStmtContext.class,0);
+		public SentenciaImprimeContext sentenciaImprime() {
+			return getRuleContext(SentenciaImprimeContext.class,0);
 		}
-		public StmtContext(ParserRuleContext parent, int invokingState) {
+		public SentenciaContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_stmt; }
+		@Override public int getRuleIndex() { return RULE_sentencia; }
 	}
 
-	public final StmtContext stmt() throws RecognitionException {
-		StmtContext _localctx = new StmtContext(_ctx, getState());
-		enterRule(_localctx, 4, RULE_stmt);
+	public final SentenciaContext sentencia() throws RecognitionException {
+		SentenciaContext _localctx = new SentenciaContext(_ctx, getState());
+		enterRule(_localctx, 4, RULE_sentencia);
 		try {
 			setState(35);
 			_errHandler.sync(this);
@@ -224,28 +226,28 @@ public class MiniLangParser extends Parser {
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(31);
-				varDecl();
+				declaraVariable();
 				}
 				break;
 			case ID:
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(32);
-				assignStmt();
+				sentenciaAsigna();
 				}
 				break;
-			case IF:
+			case SI:
 				enterOuterAlt(_localctx, 3);
 				{
 				setState(33);
-				ifStmt();
+				sentenciaSI();
 				}
 				break;
-			case PRINT:
+			case IMPRIME:
 				enterOuterAlt(_localctx, 4);
 				{
 				setState(34);
-				printStmt();
+				sentenciaImprime();
 				}
 				break;
 			default:
@@ -264,30 +266,30 @@ public class MiniLangParser extends Parser {
 	}
 
 	@SuppressWarnings("CheckReturnValue")
-	public static class VarDeclContext extends ParserRuleContext {
-		public TypeContext type() {
-			return getRuleContext(TypeContext.class,0);
+	public static class DeclaraVariableContext extends ParserRuleContext {
+		public TipoContext tipo() {
+			return getRuleContext(TipoContext.class,0);
 		}
 		public TerminalNode ID() { return getToken(MiniLangParser.ID, 0); }
-		public TerminalNode SEMI() { return getToken(MiniLangParser.SEMI, 0); }
-		public VarDeclContext(ParserRuleContext parent, int invokingState) {
+		public TerminalNode PUNTO_COMA() { return getToken(MiniLangParser.PUNTO_COMA, 0); }
+		public DeclaraVariableContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_varDecl; }
+		@Override public int getRuleIndex() { return RULE_declaraVariable; }
 	}
 
-	public final VarDeclContext varDecl() throws RecognitionException {
-		VarDeclContext _localctx = new VarDeclContext(_ctx, getState());
-		enterRule(_localctx, 6, RULE_varDecl);
+	public final DeclaraVariableContext declaraVariable() throws RecognitionException {
+		DeclaraVariableContext _localctx = new DeclaraVariableContext(_ctx, getState());
+		enterRule(_localctx, 6, RULE_declaraVariable);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(37);
-			type();
+			tipo();
 			setState(38);
 			match(ID);
 			setState(39);
-			match(SEMI);
+			match(PUNTO_COMA);
 			}
 		}
 		catch (RecognitionException re) {
@@ -302,18 +304,18 @@ public class MiniLangParser extends Parser {
 	}
 
 	@SuppressWarnings("CheckReturnValue")
-	public static class TypeContext extends ParserRuleContext {
+	public static class TipoContext extends ParserRuleContext {
 		public TerminalNode INT_T() { return getToken(MiniLangParser.INT_T, 0); }
 		public TerminalNode BOOL_T() { return getToken(MiniLangParser.BOOL_T, 0); }
-		public TypeContext(ParserRuleContext parent, int invokingState) {
+		public TipoContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_type; }
+		@Override public int getRuleIndex() { return RULE_tipo; }
 	}
 
-	public final TypeContext type() throws RecognitionException {
-		TypeContext _localctx = new TypeContext(_ctx, getState());
-		enterRule(_localctx, 8, RULE_type);
+	public final TipoContext tipo() throws RecognitionException {
+		TipoContext _localctx = new TipoContext(_ctx, getState());
+		enterRule(_localctx, 8, RULE_tipo);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -342,33 +344,33 @@ public class MiniLangParser extends Parser {
 	}
 
 	@SuppressWarnings("CheckReturnValue")
-	public static class AssignStmtContext extends ParserRuleContext {
+	public static class SentenciaAsignaContext extends ParserRuleContext {
 		public TerminalNode ID() { return getToken(MiniLangParser.ID, 0); }
-		public TerminalNode ASSIGN() { return getToken(MiniLangParser.ASSIGN, 0); }
+		public TerminalNode ASIGNA() { return getToken(MiniLangParser.ASIGNA, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
-		public TerminalNode SEMI() { return getToken(MiniLangParser.SEMI, 0); }
-		public AssignStmtContext(ParserRuleContext parent, int invokingState) {
+		public TerminalNode PUNTO_COMA() { return getToken(MiniLangParser.PUNTO_COMA, 0); }
+		public SentenciaAsignaContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_assignStmt; }
+		@Override public int getRuleIndex() { return RULE_sentenciaAsigna; }
 	}
 
-	public final AssignStmtContext assignStmt() throws RecognitionException {
-		AssignStmtContext _localctx = new AssignStmtContext(_ctx, getState());
-		enterRule(_localctx, 10, RULE_assignStmt);
+	public final SentenciaAsignaContext sentenciaAsigna() throws RecognitionException {
+		SentenciaAsignaContext _localctx = new SentenciaAsignaContext(_ctx, getState());
+		enterRule(_localctx, 10, RULE_sentenciaAsigna);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(43);
 			match(ID);
 			setState(44);
-			match(ASSIGN);
+			match(ASIGNA);
 			setState(45);
 			expr(0);
 			setState(46);
-			match(SEMI);
+			match(PUNTO_COMA);
 			}
 		}
 		catch (RecognitionException re) {
@@ -383,52 +385,52 @@ public class MiniLangParser extends Parser {
 	}
 
 	@SuppressWarnings("CheckReturnValue")
-	public static class IfStmtContext extends ParserRuleContext {
-		public TerminalNode IF() { return getToken(MiniLangParser.IF, 0); }
-		public TerminalNode LPAREN() { return getToken(MiniLangParser.LPAREN, 0); }
+	public static class SentenciaSIContext extends ParserRuleContext {
+		public TerminalNode SI() { return getToken(MiniLangParser.SI, 0); }
+		public TerminalNode PARENTESIS_IZQ() { return getToken(MiniLangParser.PARENTESIS_IZQ, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
-		public TerminalNode RPAREN() { return getToken(MiniLangParser.RPAREN, 0); }
-		public List<BlockContext> block() {
-			return getRuleContexts(BlockContext.class);
+		public TerminalNode PARENTESIS_DER() { return getToken(MiniLangParser.PARENTESIS_DER, 0); }
+		public List<GrupoContext> grupo() {
+			return getRuleContexts(GrupoContext.class);
 		}
-		public BlockContext block(int i) {
-			return getRuleContext(BlockContext.class,i);
+		public GrupoContext grupo(int i) {
+			return getRuleContext(GrupoContext.class,i);
 		}
-		public TerminalNode ELSE() { return getToken(MiniLangParser.ELSE, 0); }
-		public IfStmtContext(ParserRuleContext parent, int invokingState) {
+		public TerminalNode SINO() { return getToken(MiniLangParser.SINO, 0); }
+		public SentenciaSIContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_ifStmt; }
+		@Override public int getRuleIndex() { return RULE_sentenciaSI; }
 	}
 
-	public final IfStmtContext ifStmt() throws RecognitionException {
-		IfStmtContext _localctx = new IfStmtContext(_ctx, getState());
-		enterRule(_localctx, 12, RULE_ifStmt);
+	public final SentenciaSIContext sentenciaSI() throws RecognitionException {
+		SentenciaSIContext _localctx = new SentenciaSIContext(_ctx, getState());
+		enterRule(_localctx, 12, RULE_sentenciaSI);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(48);
-			match(IF);
+			match(SI);
 			setState(49);
-			match(LPAREN);
+			match(PARENTESIS_IZQ);
 			setState(50);
 			expr(0);
 			setState(51);
-			match(RPAREN);
+			match(PARENTESIS_DER);
 			setState(52);
-			block();
+			grupo();
 			setState(55);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==ELSE) {
+			if (_la==SINO) {
 				{
 				setState(53);
-				match(ELSE);
+				match(SINO);
 				setState(54);
-				block();
+				grupo();
 				}
 			}
 
@@ -446,36 +448,36 @@ public class MiniLangParser extends Parser {
 	}
 
 	@SuppressWarnings("CheckReturnValue")
-	public static class PrintStmtContext extends ParserRuleContext {
-		public TerminalNode PRINT() { return getToken(MiniLangParser.PRINT, 0); }
-		public TerminalNode LPAREN() { return getToken(MiniLangParser.LPAREN, 0); }
+	public static class SentenciaImprimeContext extends ParserRuleContext {
+		public TerminalNode IMPRIME() { return getToken(MiniLangParser.IMPRIME, 0); }
+		public TerminalNode PARENTESIS_IZQ() { return getToken(MiniLangParser.PARENTESIS_IZQ, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
-		public TerminalNode RPAREN() { return getToken(MiniLangParser.RPAREN, 0); }
-		public TerminalNode SEMI() { return getToken(MiniLangParser.SEMI, 0); }
-		public PrintStmtContext(ParserRuleContext parent, int invokingState) {
+		public TerminalNode PARENTESIS_DER() { return getToken(MiniLangParser.PARENTESIS_DER, 0); }
+		public TerminalNode PUNTO_COMA() { return getToken(MiniLangParser.PUNTO_COMA, 0); }
+		public SentenciaImprimeContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_printStmt; }
+		@Override public int getRuleIndex() { return RULE_sentenciaImprime; }
 	}
 
-	public final PrintStmtContext printStmt() throws RecognitionException {
-		PrintStmtContext _localctx = new PrintStmtContext(_ctx, getState());
-		enterRule(_localctx, 14, RULE_printStmt);
+	public final SentenciaImprimeContext sentenciaImprime() throws RecognitionException {
+		SentenciaImprimeContext _localctx = new SentenciaImprimeContext(_ctx, getState());
+		enterRule(_localctx, 14, RULE_sentenciaImprime);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(57);
-			match(PRINT);
+			match(IMPRIME);
 			setState(58);
-			match(LPAREN);
+			match(PARENTESIS_IZQ);
 			setState(59);
 			expr(0);
 			setState(60);
-			match(RPAREN);
+			match(PARENTESIS_DER);
 			setState(61);
-			match(SEMI);
+			match(PUNTO_COMA);
 			}
 		}
 		catch (RecognitionException re) {
@@ -520,8 +522,8 @@ public class MiniLangParser extends Parser {
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode MUL() { return getToken(MiniLangParser.MUL, 0); }
-		public TerminalNode DIV() { return getToken(MiniLangParser.DIV, 0); }
+		public TerminalNode MULTI() { return getToken(MiniLangParser.MULTI, 0); }
+		public TerminalNode DIVIDE() { return getToken(MiniLangParser.DIVIDE, 0); }
 		public MulDivContext(ExprContext ctx) { copyFrom(ctx); }
 	}
 	@SuppressWarnings("CheckReturnValue")
@@ -535,8 +537,8 @@ public class MiniLangParser extends Parser {
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode ADD() { return getToken(MiniLangParser.ADD, 0); }
-		public TerminalNode SUB() { return getToken(MiniLangParser.SUB, 0); }
+		public TerminalNode SUMA() { return getToken(MiniLangParser.SUMA, 0); }
+		public TerminalNode RESTA() { return getToken(MiniLangParser.RESTA, 0); }
 		public AddSubContext(ExprContext ctx) { copyFrom(ctx); }
 	}
 	@SuppressWarnings("CheckReturnValue")
@@ -580,7 +582,7 @@ public class MiniLangParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class UnaryMinusContext extends ExprContext {
-		public TerminalNode SUB() { return getToken(MiniLangParser.SUB, 0); }
+		public TerminalNode RESTA() { return getToken(MiniLangParser.RESTA, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
@@ -603,11 +605,11 @@ public class MiniLangParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ParenContext extends ExprContext {
-		public TerminalNode LPAREN() { return getToken(MiniLangParser.LPAREN, 0); }
+		public TerminalNode PARENTESIS_IZQ() { return getToken(MiniLangParser.PARENTESIS_IZQ, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
-		public TerminalNode RPAREN() { return getToken(MiniLangParser.RPAREN, 0); }
+		public TerminalNode PARENTESIS_DER() { return getToken(MiniLangParser.PARENTESIS_DER, 0); }
 		public ParenContext(ExprContext ctx) { copyFrom(ctx); }
 	}
 
@@ -642,28 +644,28 @@ public class MiniLangParser extends Parser {
 				expr(11);
 				}
 				break;
-			case SUB:
+			case RESTA:
 				{
 				_localctx = new UnaryMinusContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
 				setState(66);
-				match(SUB);
+				match(RESTA);
 				setState(67);
 				expr(10);
 				}
 				break;
-			case LPAREN:
+			case PARENTESIS_IZQ:
 				{
 				_localctx = new ParenContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
 				setState(68);
-				match(LPAREN);
+				match(PARENTESIS_IZQ);
 				setState(69);
 				expr(0);
 				setState(70);
-				match(RPAREN);
+				match(PARENTESIS_DER);
 				}
 				break;
 			case INT:
@@ -727,7 +729,7 @@ public class MiniLangParser extends Parser {
 						setState(79);
 						((MulDivContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
-						if ( !(_la==MUL || _la==DIV) ) {
+						if ( !(_la==MULTI || _la==DIVIDE) ) {
 							((MulDivContext)_localctx).op = (Token)_errHandler.recoverInline(this);
 						}
 						else {
@@ -749,7 +751,7 @@ public class MiniLangParser extends Parser {
 						setState(82);
 						((AddSubContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
-						if ( !(_la==ADD || _la==SUB) ) {
+						if ( !(_la==SUMA || _la==RESTA) ) {
 							((AddSubContext)_localctx).op = (Token)_errHandler.recoverInline(this);
 						}
 						else {

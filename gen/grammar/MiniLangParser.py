@@ -53,37 +53,39 @@ class MiniLangParser ( Parser ):
 
     sharedContextCache = PredictionContextCache()
 
-    literalNames = [ "<INVALID>", "'program'", "'if'", "'else'", "'print'", 
+    literalNames = [ "<INVALID>", "'program'", "'si'", "'sino'", "'imprime'", 
                      "'int'", "'bool'", "'true'", "'false'", "'&&'", "'||'", 
                      "'!'", "'=='", "<INVALID>", "'<='", "'>='", "'<'", 
                      "'>'", "'='", "'+'", "'-'", "'*'", "'/'", "'('", "')'", 
                      "'{'", "'}'", "'['", "']'", "';'", "','" ]
 
-    symbolicNames = [ "<INVALID>", "PROGRAM", "IF", "ELSE", "PRINT", "INT_T", 
+    symbolicNames = [ "<INVALID>", "PROGRAM", "SI", "SINO", "IMPRIME", "INT_T", 
                       "BOOL_T", "TRUE", "FALSE", "AND", "OR", "NOT", "EQ", 
-                      "NEQ", "LE", "GE", "LT", "GT", "ASSIGN", "ADD", "SUB", 
-                      "MUL", "DIV", "LPAREN", "RPAREN", "LBRACE", "RBRACE", 
-                      "LBRACK", "RBRACK", "SEMI", "COMMA", "ID", "INT", 
-                      "WS", "LINE_COMMENT", "BLOCK_COMMENT" ]
+                      "NEQ", "LE", "GE", "LT", "GT", "ASIGNA", "SUMA", "RESTA", 
+                      "MULTI", "DIVIDE", "PARENTESIS_IZQ", "PARENTESIS_DER", 
+                      "LLAVE_IZQ", "LLAVE_DER", "CORCHETE_IZQ", "CORCHETE_DER", 
+                      "PUNTO_COMA", "COMA", "ID", "INT", "WS", "LINEA_COMENTARIO", 
+                      "GRUPO_COMENTARIO" ]
 
     RULE_program = 0
-    RULE_block = 1
-    RULE_stmt = 2
-    RULE_varDecl = 3
-    RULE_type = 4
-    RULE_assignStmt = 5
-    RULE_ifStmt = 6
-    RULE_printStmt = 7
+    RULE_grupo = 1
+    RULE_sentencia = 2
+    RULE_declaraVariable = 3
+    RULE_tipo = 4
+    RULE_sentenciaAsigna = 5
+    RULE_sentenciaSI = 6
+    RULE_sentenciaImprime = 7
     RULE_expr = 8
 
-    ruleNames =  [ "program", "block", "stmt", "varDecl", "type", "assignStmt", 
-                   "ifStmt", "printStmt", "expr" ]
+    ruleNames =  [ "program", "grupo", "sentencia", "declaraVariable", "tipo", 
+                   "sentenciaAsigna", "sentenciaSI", "sentenciaImprime", 
+                   "expr" ]
 
     EOF = Token.EOF
     PROGRAM=1
-    IF=2
-    ELSE=3
-    PRINT=4
+    SI=2
+    SINO=3
+    IMPRIME=4
     INT_T=5
     BOOL_T=6
     TRUE=7
@@ -97,24 +99,24 @@ class MiniLangParser ( Parser ):
     GE=15
     LT=16
     GT=17
-    ASSIGN=18
-    ADD=19
-    SUB=20
-    MUL=21
-    DIV=22
-    LPAREN=23
-    RPAREN=24
-    LBRACE=25
-    RBRACE=26
-    LBRACK=27
-    RBRACK=28
-    SEMI=29
-    COMMA=30
+    ASIGNA=18
+    SUMA=19
+    RESTA=20
+    MULTI=21
+    DIVIDE=22
+    PARENTESIS_IZQ=23
+    PARENTESIS_DER=24
+    LLAVE_IZQ=25
+    LLAVE_DER=26
+    CORCHETE_IZQ=27
+    CORCHETE_DER=28
+    PUNTO_COMA=29
+    COMA=30
     ID=31
     INT=32
     WS=33
-    LINE_COMMENT=34
-    BLOCK_COMMENT=35
+    LINEA_COMENTARIO=34
+    GRUPO_COMENTARIO=35
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -135,8 +137,8 @@ class MiniLangParser ( Parser ):
         def PROGRAM(self):
             return self.getToken(MiniLangParser.PROGRAM, 0)
 
-        def block(self):
-            return self.getTypedRuleContext(MiniLangParser.BlockContext,0)
+        def grupo(self):
+            return self.getTypedRuleContext(MiniLangParser.GrupoContext,0)
 
 
         def EOF(self):
@@ -171,7 +173,7 @@ class MiniLangParser ( Parser ):
             self.state = 18
             self.match(MiniLangParser.PROGRAM)
             self.state = 19
-            self.block()
+            self.grupo()
             self.state = 20
             self.match(MiniLangParser.EOF)
         except RecognitionException as re:
@@ -183,67 +185,67 @@ class MiniLangParser ( Parser ):
         return localctx
 
 
-    class BlockContext(ParserRuleContext):
+    class GrupoContext(ParserRuleContext):
         __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def LBRACE(self):
-            return self.getToken(MiniLangParser.LBRACE, 0)
+        def LLAVE_IZQ(self):
+            return self.getToken(MiniLangParser.LLAVE_IZQ, 0)
 
-        def RBRACE(self):
-            return self.getToken(MiniLangParser.RBRACE, 0)
+        def LLAVE_DER(self):
+            return self.getToken(MiniLangParser.LLAVE_DER, 0)
 
-        def stmt(self, i:int=None):
+        def sentencia(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(MiniLangParser.StmtContext)
+                return self.getTypedRuleContexts(MiniLangParser.SentenciaContext)
             else:
-                return self.getTypedRuleContext(MiniLangParser.StmtContext,i)
+                return self.getTypedRuleContext(MiniLangParser.SentenciaContext,i)
 
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_block
+            return MiniLangParser.RULE_grupo
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterBlock" ):
-                listener.enterBlock(self)
+            if hasattr( listener, "enterGrupo" ):
+                listener.enterGrupo(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitBlock" ):
-                listener.exitBlock(self)
+            if hasattr( listener, "exitGrupo" ):
+                listener.exitGrupo(self)
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitBlock" ):
-                return visitor.visitBlock(self)
+            if hasattr( visitor, "visitGrupo" ):
+                return visitor.visitGrupo(self)
             else:
                 return visitor.visitChildren(self)
 
 
 
 
-    def block(self):
+    def grupo(self):
 
-        localctx = MiniLangParser.BlockContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 2, self.RULE_block)
+        localctx = MiniLangParser.GrupoContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 2, self.RULE_grupo)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 22
-            self.match(MiniLangParser.LBRACE)
+            self.match(MiniLangParser.LLAVE_IZQ)
             self.state = 26
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while (((_la) & ~0x3f) == 0 and ((1 << _la) & 2147483764) != 0):
                 self.state = 23
-                self.stmt()
+                self.sentencia()
                 self.state = 28
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
 
             self.state = 29
-            self.match(MiniLangParser.RBRACE)
+            self.match(MiniLangParser.LLAVE_DER)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -253,53 +255,53 @@ class MiniLangParser ( Parser ):
         return localctx
 
 
-    class StmtContext(ParserRuleContext):
+    class SentenciaContext(ParserRuleContext):
         __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def varDecl(self):
-            return self.getTypedRuleContext(MiniLangParser.VarDeclContext,0)
+        def declaraVariable(self):
+            return self.getTypedRuleContext(MiniLangParser.DeclaraVariableContext,0)
 
 
-        def assignStmt(self):
-            return self.getTypedRuleContext(MiniLangParser.AssignStmtContext,0)
+        def sentenciaAsigna(self):
+            return self.getTypedRuleContext(MiniLangParser.SentenciaAsignaContext,0)
 
 
-        def ifStmt(self):
-            return self.getTypedRuleContext(MiniLangParser.IfStmtContext,0)
+        def sentenciaSI(self):
+            return self.getTypedRuleContext(MiniLangParser.SentenciaSIContext,0)
 
 
-        def printStmt(self):
-            return self.getTypedRuleContext(MiniLangParser.PrintStmtContext,0)
+        def sentenciaImprime(self):
+            return self.getTypedRuleContext(MiniLangParser.SentenciaImprimeContext,0)
 
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_stmt
+            return MiniLangParser.RULE_sentencia
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterStmt" ):
-                listener.enterStmt(self)
+            if hasattr( listener, "enterSentencia" ):
+                listener.enterSentencia(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitStmt" ):
-                listener.exitStmt(self)
+            if hasattr( listener, "exitSentencia" ):
+                listener.exitSentencia(self)
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitStmt" ):
-                return visitor.visitStmt(self)
+            if hasattr( visitor, "visitSentencia" ):
+                return visitor.visitSentencia(self)
             else:
                 return visitor.visitChildren(self)
 
 
 
 
-    def stmt(self):
+    def sentencia(self):
 
-        localctx = MiniLangParser.StmtContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 4, self.RULE_stmt)
+        localctx = MiniLangParser.SentenciaContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 4, self.RULE_sentencia)
         try:
             self.state = 35
             self._errHandler.sync(self)
@@ -307,22 +309,22 @@ class MiniLangParser ( Parser ):
             if token in [5, 6]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 31
-                self.varDecl()
+                self.declaraVariable()
                 pass
             elif token in [31]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 32
-                self.assignStmt()
+                self.sentenciaAsigna()
                 pass
             elif token in [2]:
                 self.enterOuterAlt(localctx, 3)
                 self.state = 33
-                self.ifStmt()
+                self.sentenciaSI()
                 pass
             elif token in [4]:
                 self.enterOuterAlt(localctx, 4)
                 self.state = 34
-                self.printStmt()
+                self.sentenciaImprime()
                 pass
             else:
                 raise NoViableAltException(self)
@@ -336,55 +338,55 @@ class MiniLangParser ( Parser ):
         return localctx
 
 
-    class VarDeclContext(ParserRuleContext):
+    class DeclaraVariableContext(ParserRuleContext):
         __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def type_(self):
-            return self.getTypedRuleContext(MiniLangParser.TypeContext,0)
+        def tipo(self):
+            return self.getTypedRuleContext(MiniLangParser.TipoContext,0)
 
 
         def ID(self):
             return self.getToken(MiniLangParser.ID, 0)
 
-        def SEMI(self):
-            return self.getToken(MiniLangParser.SEMI, 0)
+        def PUNTO_COMA(self):
+            return self.getToken(MiniLangParser.PUNTO_COMA, 0)
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_varDecl
+            return MiniLangParser.RULE_declaraVariable
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterVarDecl" ):
-                listener.enterVarDecl(self)
+            if hasattr( listener, "enterDeclaraVariable" ):
+                listener.enterDeclaraVariable(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitVarDecl" ):
-                listener.exitVarDecl(self)
+            if hasattr( listener, "exitDeclaraVariable" ):
+                listener.exitDeclaraVariable(self)
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitVarDecl" ):
-                return visitor.visitVarDecl(self)
+            if hasattr( visitor, "visitDeclaraVariable" ):
+                return visitor.visitDeclaraVariable(self)
             else:
                 return visitor.visitChildren(self)
 
 
 
 
-    def varDecl(self):
+    def declaraVariable(self):
 
-        localctx = MiniLangParser.VarDeclContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 6, self.RULE_varDecl)
+        localctx = MiniLangParser.DeclaraVariableContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 6, self.RULE_declaraVariable)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 37
-            self.type_()
+            self.tipo()
             self.state = 38
             self.match(MiniLangParser.ID)
             self.state = 39
-            self.match(MiniLangParser.SEMI)
+            self.match(MiniLangParser.PUNTO_COMA)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -394,7 +396,7 @@ class MiniLangParser ( Parser ):
         return localctx
 
 
-    class TypeContext(ParserRuleContext):
+    class TipoContext(ParserRuleContext):
         __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -408,29 +410,29 @@ class MiniLangParser ( Parser ):
             return self.getToken(MiniLangParser.BOOL_T, 0)
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_type
+            return MiniLangParser.RULE_tipo
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterType" ):
-                listener.enterType(self)
+            if hasattr( listener, "enterTipo" ):
+                listener.enterTipo(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitType" ):
-                listener.exitType(self)
+            if hasattr( listener, "exitTipo" ):
+                listener.exitTipo(self)
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitType" ):
-                return visitor.visitType(self)
+            if hasattr( visitor, "visitTipo" ):
+                return visitor.visitTipo(self)
             else:
                 return visitor.visitChildren(self)
 
 
 
 
-    def type_(self):
+    def tipo(self):
 
-        localctx = MiniLangParser.TypeContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 8, self.RULE_type)
+        localctx = MiniLangParser.TipoContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 8, self.RULE_tipo)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
@@ -450,7 +452,7 @@ class MiniLangParser ( Parser ):
         return localctx
 
 
-    class AssignStmtContext(ParserRuleContext):
+    class SentenciaAsignaContext(ParserRuleContext):
         __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
@@ -460,50 +462,50 @@ class MiniLangParser ( Parser ):
         def ID(self):
             return self.getToken(MiniLangParser.ID, 0)
 
-        def ASSIGN(self):
-            return self.getToken(MiniLangParser.ASSIGN, 0)
+        def ASIGNA(self):
+            return self.getToken(MiniLangParser.ASIGNA, 0)
 
         def expr(self):
             return self.getTypedRuleContext(MiniLangParser.ExprContext,0)
 
 
-        def SEMI(self):
-            return self.getToken(MiniLangParser.SEMI, 0)
+        def PUNTO_COMA(self):
+            return self.getToken(MiniLangParser.PUNTO_COMA, 0)
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_assignStmt
+            return MiniLangParser.RULE_sentenciaAsigna
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterAssignStmt" ):
-                listener.enterAssignStmt(self)
+            if hasattr( listener, "enterSentenciaAsigna" ):
+                listener.enterSentenciaAsigna(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitAssignStmt" ):
-                listener.exitAssignStmt(self)
+            if hasattr( listener, "exitSentenciaAsigna" ):
+                listener.exitSentenciaAsigna(self)
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitAssignStmt" ):
-                return visitor.visitAssignStmt(self)
+            if hasattr( visitor, "visitSentenciaAsigna" ):
+                return visitor.visitSentenciaAsigna(self)
             else:
                 return visitor.visitChildren(self)
 
 
 
 
-    def assignStmt(self):
+    def sentenciaAsigna(self):
 
-        localctx = MiniLangParser.AssignStmtContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 10, self.RULE_assignStmt)
+        localctx = MiniLangParser.SentenciaAsignaContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 10, self.RULE_sentenciaAsigna)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 43
             self.match(MiniLangParser.ID)
             self.state = 44
-            self.match(MiniLangParser.ASSIGN)
+            self.match(MiniLangParser.ASIGNA)
             self.state = 45
             self.expr(0)
             self.state = 46
-            self.match(MiniLangParser.SEMI)
+            self.match(MiniLangParser.PUNTO_COMA)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -513,81 +515,81 @@ class MiniLangParser ( Parser ):
         return localctx
 
 
-    class IfStmtContext(ParserRuleContext):
+    class SentenciaSIContext(ParserRuleContext):
         __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def IF(self):
-            return self.getToken(MiniLangParser.IF, 0)
+        def SI(self):
+            return self.getToken(MiniLangParser.SI, 0)
 
-        def LPAREN(self):
-            return self.getToken(MiniLangParser.LPAREN, 0)
+        def PARENTESIS_IZQ(self):
+            return self.getToken(MiniLangParser.PARENTESIS_IZQ, 0)
 
         def expr(self):
             return self.getTypedRuleContext(MiniLangParser.ExprContext,0)
 
 
-        def RPAREN(self):
-            return self.getToken(MiniLangParser.RPAREN, 0)
+        def PARENTESIS_DER(self):
+            return self.getToken(MiniLangParser.PARENTESIS_DER, 0)
 
-        def block(self, i:int=None):
+        def grupo(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(MiniLangParser.BlockContext)
+                return self.getTypedRuleContexts(MiniLangParser.GrupoContext)
             else:
-                return self.getTypedRuleContext(MiniLangParser.BlockContext,i)
+                return self.getTypedRuleContext(MiniLangParser.GrupoContext,i)
 
 
-        def ELSE(self):
-            return self.getToken(MiniLangParser.ELSE, 0)
+        def SINO(self):
+            return self.getToken(MiniLangParser.SINO, 0)
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_ifStmt
+            return MiniLangParser.RULE_sentenciaSI
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterIfStmt" ):
-                listener.enterIfStmt(self)
+            if hasattr( listener, "enterSentenciaSI" ):
+                listener.enterSentenciaSI(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitIfStmt" ):
-                listener.exitIfStmt(self)
+            if hasattr( listener, "exitSentenciaSI" ):
+                listener.exitSentenciaSI(self)
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitIfStmt" ):
-                return visitor.visitIfStmt(self)
+            if hasattr( visitor, "visitSentenciaSI" ):
+                return visitor.visitSentenciaSI(self)
             else:
                 return visitor.visitChildren(self)
 
 
 
 
-    def ifStmt(self):
+    def sentenciaSI(self):
 
-        localctx = MiniLangParser.IfStmtContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 12, self.RULE_ifStmt)
+        localctx = MiniLangParser.SentenciaSIContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 12, self.RULE_sentenciaSI)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 48
-            self.match(MiniLangParser.IF)
+            self.match(MiniLangParser.SI)
             self.state = 49
-            self.match(MiniLangParser.LPAREN)
+            self.match(MiniLangParser.PARENTESIS_IZQ)
             self.state = 50
             self.expr(0)
             self.state = 51
-            self.match(MiniLangParser.RPAREN)
+            self.match(MiniLangParser.PARENTESIS_DER)
             self.state = 52
-            self.block()
+            self.grupo()
             self.state = 55
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             if _la==3:
                 self.state = 53
-                self.match(MiniLangParser.ELSE)
+                self.match(MiniLangParser.SINO)
                 self.state = 54
-                self.block()
+                self.grupo()
 
 
         except RecognitionException as re:
@@ -599,65 +601,65 @@ class MiniLangParser ( Parser ):
         return localctx
 
 
-    class PrintStmtContext(ParserRuleContext):
+    class SentenciaImprimeContext(ParserRuleContext):
         __slots__ = 'parser'
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def PRINT(self):
-            return self.getToken(MiniLangParser.PRINT, 0)
+        def IMPRIME(self):
+            return self.getToken(MiniLangParser.IMPRIME, 0)
 
-        def LPAREN(self):
-            return self.getToken(MiniLangParser.LPAREN, 0)
+        def PARENTESIS_IZQ(self):
+            return self.getToken(MiniLangParser.PARENTESIS_IZQ, 0)
 
         def expr(self):
             return self.getTypedRuleContext(MiniLangParser.ExprContext,0)
 
 
-        def RPAREN(self):
-            return self.getToken(MiniLangParser.RPAREN, 0)
+        def PARENTESIS_DER(self):
+            return self.getToken(MiniLangParser.PARENTESIS_DER, 0)
 
-        def SEMI(self):
-            return self.getToken(MiniLangParser.SEMI, 0)
+        def PUNTO_COMA(self):
+            return self.getToken(MiniLangParser.PUNTO_COMA, 0)
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_printStmt
+            return MiniLangParser.RULE_sentenciaImprime
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterPrintStmt" ):
-                listener.enterPrintStmt(self)
+            if hasattr( listener, "enterSentenciaImprime" ):
+                listener.enterSentenciaImprime(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitPrintStmt" ):
-                listener.exitPrintStmt(self)
+            if hasattr( listener, "exitSentenciaImprime" ):
+                listener.exitSentenciaImprime(self)
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitPrintStmt" ):
-                return visitor.visitPrintStmt(self)
+            if hasattr( visitor, "visitSentenciaImprime" ):
+                return visitor.visitSentenciaImprime(self)
             else:
                 return visitor.visitChildren(self)
 
 
 
 
-    def printStmt(self):
+    def sentenciaImprime(self):
 
-        localctx = MiniLangParser.PrintStmtContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 14, self.RULE_printStmt)
+        localctx = MiniLangParser.SentenciaImprimeContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 14, self.RULE_sentenciaImprime)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 57
-            self.match(MiniLangParser.PRINT)
+            self.match(MiniLangParser.IMPRIME)
             self.state = 58
-            self.match(MiniLangParser.LPAREN)
+            self.match(MiniLangParser.PARENTESIS_IZQ)
             self.state = 59
             self.expr(0)
             self.state = 60
-            self.match(MiniLangParser.RPAREN)
+            self.match(MiniLangParser.PARENTESIS_DER)
             self.state = 61
-            self.match(MiniLangParser.SEMI)
+            self.match(MiniLangParser.PUNTO_COMA)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -725,10 +727,10 @@ class MiniLangParser ( Parser ):
             else:
                 return self.getTypedRuleContext(MiniLangParser.ExprContext,i)
 
-        def MUL(self):
-            return self.getToken(MiniLangParser.MUL, 0)
-        def DIV(self):
-            return self.getToken(MiniLangParser.DIV, 0)
+        def MULTI(self):
+            return self.getToken(MiniLangParser.MULTI, 0)
+        def DIVIDE(self):
+            return self.getToken(MiniLangParser.DIVIDE, 0)
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterMulDiv" ):
@@ -760,10 +762,10 @@ class MiniLangParser ( Parser ):
             else:
                 return self.getTypedRuleContext(MiniLangParser.ExprContext,i)
 
-        def ADD(self):
-            return self.getToken(MiniLangParser.ADD, 0)
-        def SUB(self):
-            return self.getToken(MiniLangParser.SUB, 0)
+        def SUMA(self):
+            return self.getToken(MiniLangParser.SUMA, 0)
+        def RESTA(self):
+            return self.getToken(MiniLangParser.RESTA, 0)
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterAddSub" ):
@@ -888,8 +890,8 @@ class MiniLangParser ( Parser ):
             super().__init__(parser)
             self.copyFrom(ctx)
 
-        def SUB(self):
-            return self.getToken(MiniLangParser.SUB, 0)
+        def RESTA(self):
+            return self.getToken(MiniLangParser.RESTA, 0)
         def expr(self):
             return self.getTypedRuleContext(MiniLangParser.ExprContext,0)
 
@@ -987,13 +989,13 @@ class MiniLangParser ( Parser ):
             super().__init__(parser)
             self.copyFrom(ctx)
 
-        def LPAREN(self):
-            return self.getToken(MiniLangParser.LPAREN, 0)
+        def PARENTESIS_IZQ(self):
+            return self.getToken(MiniLangParser.PARENTESIS_IZQ, 0)
         def expr(self):
             return self.getTypedRuleContext(MiniLangParser.ExprContext,0)
 
-        def RPAREN(self):
-            return self.getToken(MiniLangParser.RPAREN, 0)
+        def PARENTESIS_DER(self):
+            return self.getToken(MiniLangParser.PARENTESIS_DER, 0)
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterParen" ):
@@ -1039,7 +1041,7 @@ class MiniLangParser ( Parser ):
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 66
-                self.match(MiniLangParser.SUB)
+                self.match(MiniLangParser.RESTA)
                 self.state = 67
                 self.expr(10)
                 pass
@@ -1048,11 +1050,11 @@ class MiniLangParser ( Parser ):
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 68
-                self.match(MiniLangParser.LPAREN)
+                self.match(MiniLangParser.PARENTESIS_IZQ)
                 self.state = 69
                 self.expr(0)
                 self.state = 70
-                self.match(MiniLangParser.RPAREN)
+                self.match(MiniLangParser.PARENTESIS_DER)
                 pass
             elif token in [32]:
                 localctx = MiniLangParser.IntLitContext(self, localctx)
