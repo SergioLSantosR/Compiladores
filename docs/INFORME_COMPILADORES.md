@@ -2,7 +2,7 @@
 
 <div align="center">
 
-# UNIVERSIDAD DE SAN CARLOS DE GUATEMALA
+# UNIVERSIDAD MARIANO GÁLVEZ DE GUATEMALA
 
 **Región Metropolitana**
 
