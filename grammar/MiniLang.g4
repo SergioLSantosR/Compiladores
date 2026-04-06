@@ -3,7 +3,23 @@ grammar MiniLang;
 // ==================== Reglas del Parser ====================
 
 programa
- : PROGRAMA bloque EOF
+ : PROGRAMA cuerpoPrincipal EOF
+ ;
+
+cuerpoPrincipal
+ : LLAVE_IZQ declaracionFuncion* sentencia* LLAVE_DER
+ ;
+
+declaracionFuncion
+ : FUNC tipo IDENTIFICADOR PAREN_IZQ listaParametros? PAREN_DER bloque
+ ;
+
+listaParametros
+ : parametro (COMA parametro)*
+ ;
+
+parametro
+ : tipo IDENTIFICADOR
  ;
 
 bloque
@@ -14,7 +30,9 @@ sentencia
  : declaracionVariable
  | asignacion
  | condicionalSi
+ | cicloMientras
  | imprimir
+ | retorno
  ;
 
 declaracionVariable
@@ -34,16 +52,24 @@ condicionalSi
  : SI PAREN_IZQ expresion PAREN_DER bloque (SINO bloque)?
  ;
 
+cicloMientras
+ : MIENTRAS PAREN_IZQ expresion PAREN_DER bloque
+ ;
+
 imprimir
  : IMPRIMIR PAREN_IZQ expresion PAREN_DER PUNTO_COMA
  ;
 
-// ==================== Expresiones  ====================
+retorno
+ : RETORNO expresion PUNTO_COMA
+ ;
 
+// ==================== Expresiones  ====================
 
 expresion
  : NEGACION expresion                                                            #NegacionLogica
  | RESTA expresion                                                               #MenosUnario
+ | IDENTIFICADOR PAREN_IZQ listaArgumentos? PAREN_DER                            #LlamadaFuncion
  | PAREN_IZQ expresion PAREN_DER                                                 #Parentesis
  | izq=expresion op=(MULTIPLICACION|DIVISION) der=expresion                      #MultiplicacionDivision
  | izq=expresion op=(SUMA|RESTA) der=expresion                                   #SumaResta
@@ -57,41 +83,42 @@ expresion
  | IDENTIFICADOR                                                                 #ReferenciaVariable
  ;
 
+listaArgumentos
+ : expresion (COMA expresion)*
+ ;
+
 // ==================== Reglas del Lexer ====================
 
-// Palabras clave
-PROGRAMA : 'program';
-SI       : 'if';
-SINO     : 'else';
-IMPRIMIR : 'print';
+PROGRAMA    : 'program';
+SI          : 'if';
+SINO        : 'else';
+IMPRIMIR    : 'print';
 TIPO_ENTERO : 'int';
 TIPO_BOOL   : 'bool';
 VERDADERO   : 'true';
 FALSO       : 'false';
+MIENTRAS    : 'while';
+FUNC        : 'func';
+RETORNO     : 'return';
 
-// Operadores lógicos
 Y_LOGICO  : '&&';
 O_LOGICO  : '||';
 NEGACION  : '!';
 
-// Operadores de igualdad
 IGUAL     : '==';
 DIFERENTE : '!=' | '<>';
 
-// Operadores relacionales
 MENOR_IGUAL : '<=';
 MAYOR_IGUAL : '>=';
 MENOR_QUE   : '<';
 MAYOR_QUE   : '>';
 
-// Asignación y aritméticos
 ASIGNACION    : '=';
 SUMA          : '+';
 RESTA         : '-';
 MULTIPLICACION: '*';
 DIVISION      : '/';
 
-// Símbolos de agrupación y puntuación
 PAREN_IZQ    : '(';
 PAREN_DER    : ')';
 LLAVE_IZQ    : '{';
@@ -101,11 +128,9 @@ CORCHETE_DER : ']';
 PUNTO_COMA   : ';';
 COMA         : ',';
 
-// Identificadores y literales numéricos
 IDENTIFICADOR : [a-zA-Z_][a-zA-Z_0-9]*;
 ENTERO        : [0-9]+;
 
-// Espacios en blanco y comentarios (se ignoran)
 ESPACIO           : [ \t\r\n]+ -> skip;
 COMENTARIO_LINEA  : '//' ~[\r\n]* -> skip;
 COMENTARIO_BLOQUE : '/*' .*? '*/' -> skip;
