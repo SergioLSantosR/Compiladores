@@ -14,6 +14,26 @@ class MiniLangVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by MiniLangParser#cuerpoPrincipal.
+    def visitCuerpoPrincipal(self, ctx:MiniLangParser.CuerpoPrincipalContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniLangParser#declaracionFuncion.
+    def visitDeclaracionFuncion(self, ctx:MiniLangParser.DeclaracionFuncionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniLangParser#listaParametros.
+    def visitListaParametros(self, ctx:MiniLangParser.ListaParametrosContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniLangParser#parametro.
+    def visitParametro(self, ctx:MiniLangParser.ParametroContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by MiniLangParser#bloque.
     def visitBloque(self, ctx:MiniLangParser.BloqueContext):
         return self.visitChildren(ctx)
@@ -44,8 +64,18 @@ class MiniLangVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by MiniLangParser#cicloMientras.
+    def visitCicloMientras(self, ctx:MiniLangParser.CicloMientrasContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by MiniLangParser#imprimir.
     def visitImprimir(self, ctx:MiniLangParser.ImprimirContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniLangParser#retorno.
+    def visitRetorno(self, ctx:MiniLangParser.RetornoContext):
         return self.visitChildren(ctx)
 
 
@@ -104,6 +134,11 @@ class MiniLangVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by MiniLangParser#LlamadaFuncion.
+    def visitLlamadaFuncion(self, ctx:MiniLangParser.LlamadaFuncionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by MiniLangParser#ReferenciaVariable.
     def visitReferenciaVariable(self, ctx:MiniLangParser.ReferenciaVariableContext):
         return self.visitChildren(ctx)
@@ -111,6 +146,11 @@ class MiniLangVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by MiniLangParser#LiteralFalso.
     def visitLiteralFalso(self, ctx:MiniLangParser.LiteralFalsoContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniLangParser#listaArgumentos.
+    def visitListaArgumentos(self, ctx:MiniLangParser.ListaArgumentosContext):
         return self.visitChildren(ctx)
 
 
