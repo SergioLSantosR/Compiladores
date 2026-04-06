@@ -1,6 +1,4 @@
-**Descarga desde GitHub:** [Markdown raw](https://raw.githubusercontent.com/SergioLSantosR/Compiladores/main/docs/INFORME_COMPILADORES.md) · [HTML para imprimir/PDF](https://raw.githubusercontent.com/SergioLSantosR/Compiladores/main/docs/INFORME_COMPILADORES.html) · [Guía de enlaces](DESCARGAR_INFORME.md)
 
----
 
 <div align="center">
 
@@ -29,17 +27,16 @@ Repositorio: [Compiladores](https://github.com/SergioLSantosR/Compiladores) (Git
 
 ### Integrantes
 
-| Nombre completo | Carné | % participación |
-|-----------------|-------|-----------------|
-| Julio Alexander Alvarado Morales | 7690-23-13706 | |
-| Jonathan Joel Istupe Martinez | 7690-23-15804 | |
-| Sergio Leonel Santos Ruano | 7690-23-433 | |
-| Juan Jose Marroquin Aquino | 7690-23-16390 | |
-| Emerson Steve Alvizures Palma | 7690-23-12526 | |
+| Nombre completo | Carné |
+|-----------------|-------|
+| Julio Alexander Alvarado Morales | 7690-23-13706 | 
+| Jonathan Joel Istupe Martinez | 7690-23-15804 | 
+| Sergio Leonel Santos Ruano | 7690-23-433 | 
+| Juan Jose Marroquin Aquino | 7690-23-16390 | 
+| Emerson Steve Alvizures Palma | 7690-23-12526 | 
 
-*Completar el porcentaje de participación (0 % – 100 % por integrante; la suma debe ser 100 %).*
 
-**Fecha de entrega:** 11 de marzo de 2026
+**Fecha de entrega:** 5 de abril de 2026
 
 </div>
 
@@ -241,7 +238,6 @@ Ubicación: **`tests/`**
 
 El script **`tests/run_tests.ps1`** ejecuta el pipeline sobre estos archivos y comprueba códigos de salida esperados.
 
-**Capturas para el PDF:** ejecutar los tres casos de error y el válido según `docs/ENTREGA_PIPELINE.md`, capturar la terminal y pegar las imágenes en la versión final del informe.
 
 ---
 
