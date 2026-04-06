@@ -1,3 +1,7 @@
+**Descarga desde GitHub:** [Markdown raw](https://raw.githubusercontent.com/SergioLSantosR/Compiladores/main/docs/INFORME_COMPILADORES.md) · [HTML para imprimir/PDF](https://raw.githubusercontent.com/SergioLSantosR/Compiladores/main/docs/INFORME_COMPILADORES.html) · [Guía de enlaces](DESCARGAR_INFORME.md)
+
+---
+
 <div align="center">
 
 # UNIVERSIDAD DE SAN CARLOS DE GUATEMALA
