@@ -14,5 +14,8 @@ gen/
 # VSCode
 .vscode/
 
+# ANTLR (descargar con tools/regenerate_parser.ps1)
+tools/antlr-4.13.1-complete.jar
+
 # Otros
 .DS_Store
