@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Informe — MiniLang | Compiladores</title>
+  <style>
+    :root { --text: #1a1a1a; --muted: #555; --border: #ccc; --bg: #fafafa; }
+    * { box-sizing: border-box; }
+    body { font-family: Georgia, "Times New Roman", serif; line-height: 1.55; color: var(--text); max-width: 48rem; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; background: #fff; }
+    h1, h2, h3 { font-family: system-ui, Segoe UI, sans-serif; font-weight: 600; }
+    h1 { font-size: 1.35rem; margin-top: 0; }
+    h2 { font-size: 1.15rem; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35rem; }
+    h3 { font-size: 1.05rem; margin-top: 1.25rem; }
+    .cover { text-align: center; padding: 1rem 0 2rem; border-bottom: 2px solid var(--text); margin-bottom: 2rem; }
+    .cover h1 { font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    .muted { color: var(--muted); font-size: 0.95rem; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.95rem; }
+    th, td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: left; }
+    th { background: var(--bg); }
+    pre, code { font-family: Consolas, "Courier New", monospace; font-size: 0.88rem; }
+    pre { background: var(--bg); padding: 0.85rem 1rem; overflow-x: auto; border: 1px solid var(--border); white-space: pre-wrap; }
+    a { color: #0b57d0; }
+    .diagram { font-family: Consolas, monospace; font-size: 0.82rem; background: var(--bg); padding: 1rem; border: 1px solid var(--border); overflow-x: auto; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+    @media print {
+      body { padding: 0; max-width: none; }
+      a { color: #000; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="cover">
+  <p><strong>UNIVERSIDAD DE SAN CARLOS DE GUATEMALA</strong></p>
+  <p><strong>Región Metropolitana</strong></p>
+  <p><strong>Facultad de Ingeniería en Sistemas de Información</strong></p>
+  <p><strong>Curso:</strong> Compiladores &nbsp;|&nbsp; <strong>Sección:</strong> B &nbsp;|&nbsp; <strong>Ciclo:</strong> 7</p>
+  <p><strong>Proyecto 1</strong></p>
+  <hr style="margin:1.5rem auto; max-width:12rem;">
+  <h1>Informe técnico — MiniLang</h1>
+  <p class="muted">Pipeline de compilación (léxico, sintáctico, semántico e intérprete)</p>
+  <p>Repositorio: <a href="https://github.com/SergioLSantosR/Compiladores">Compiladores</a> (GitHub)</p>
+  <h3>Integrantes</h3>
+  <table>
+    <thead><tr><th>Nombre completo</th><th>Carné</th><th>% participación</th></tr></thead>
+    <tbody>
+      <tr><td>Julio Alexander Alvarado Morales</td><td>7690-23-13706</td><td></td></tr>
+      <tr><td>Jonathan Joel Istupe Martinez</td><td>7690-23-15804</td><td></td></tr>
+      <tr><td>Sergio Leonel Santos Ruano</td><td>7690-23-433</td><td></td></tr>
+      <tr><td>Juan Jose Marroquin Aquino</td><td>7690-23-16390</td><td></td></tr>
+      <tr><td>Emerson Steve Alvizures Palma</td><td>7690-23-12526</td><td></td></tr>
+    </tbody>
+  </table>
+  <p class="muted"><em>Completar el porcentaje de participación (0 % – 100 % por integrante; la suma debe ser 100 %).</em></p>
+  <p><strong>Fecha de entrega:</strong> 11 de marzo de 2026</p>
+</header>
+
+<p><strong>Descarga / PDF:</strong> en el navegador use <kbd>Ctrl+P</kbd> → “Guardar como PDF”.  
+Enlaces raw del repositorio: ver <code>docs/DESCARGAR_INFORME.md</code>.</p>
+
+<h2>Índice</h2>
+<ol>
+  <li><a href="#r1">Resumen ejecutivo</a></li>
+  <li><a href="#r2">Objetivos</a></li>
+  <li><a href="#r3">Descripción del repositorio Git</a></li>
+  <li><a href="#r4">Arquitectura del proyecto</a></li>
+  <li><a href="#r5">Lenguaje MiniLang</a></li>
+  <li><a href="#r6">Gramática ANTLR</a></li>
+  <li><a href="#r7">Pipeline de compilación</a></li>
+  <li><a href="#r8">Manejo de errores</a></li>
+  <li><a href="#r9">Árbol de sintaxis abstracta (AST)</a></li>
+  <li><a href="#r10">Análisis semántico y ámbitos</a></li>
+  <li><a href="#r11">Intérprete</a></li>
+  <li><a href="#r12">Casos de prueba</a></li>
+  <li><a href="#r13">Cumplimiento frente al enunciado (Proyecto 2)</a></li>
+  <li><a href="#r14">Instrucciones de ejecución</a></li>
+  <li><a href="#r15">Conclusiones</a></li>
+  <li><a href="#r16">Referencias</a></li>
+</ol>
+
+<h2 id="r1">1. Resumen ejecutivo</h2>
+<p>Este documento describe el estado del proyecto <strong>MiniLang</strong> en el repositorio <strong>Compiladores</strong>: un front-end con <strong>ANTLR4</strong> y <strong>Python</strong> que implementa un <strong>pipeline</strong> secuencial (lectura del fuente → léxico → sintáctico → <strong>AST</strong> → semántica → interpretación), deteniéndose ante errores. El lenguaje incluye <code>int</code> y <code>bool</code>, <code>if</code>/<code>else</code>, <code>while</code>, <strong>funciones</strong> con <code>return</code> y llamadas, y <code>print</code>. Los errores léxico/sintáctico se formatean con listeners personalizados; la semántica valida tipos y ámbitos; el intérprete ejecuta el AST.</p>
+
+<h2 id="r2">2. Objetivos</h2>
+<ul>
+  <li><strong>General:</strong> Pipeline completo con intérprete, alineado al enunciado <em>Proyecto 2 Compiladores 2026</em>.</li>
+  <li><strong>Específicos:</strong> Orquestar <code>pipeline.py</code>; reportar errores con línea/columna; gramática con <code>while</code>, <code>func</code>, <code>return</code>; pila de tablas hash para ámbitos; pruebas y documentación.</li>
+</ul>
+
+<h2 id="r3">3. Descripción del repositorio Git</h2>
+<table>
+  <tr><th>Elemento</th><th>Descripción</th></tr>
+  <tr><td>Remoto</td><td><code>https://github.com/SergioLSantosR/Compiladores.git</code></td></tr>
+  <tr><td>Rama principal</td><td><code>main</code></td></tr>
+  <tr><td>Ramas de trabajo</td><td><code>feature/integracion-pipeline</code> (merge a <code>main</code>)</td></tr>
+  <tr><td>Contenido</td><td>Gramática <code>.g4</code>, <code>gen/grammar/</code>, <code>src/</code>, <code>examples/</code>, <code>tests/</code>, <code>tools/</code>, <code>docs/</code></td></tr>
+</table>
+
+<h2 id="r4">4. Arquitectura del proyecto</h2>
+<pre>Compiladores/
+├── grammar/MiniLang.g4
+├── gen/grammar/          # Lexer, parser, visitor (ANTLR)
+├── src/
+│   ├── pipeline.py
+│   ├── custom_errors.py
+│   ├── ast_nodes.py, ast_builder.py
+│   ├── semantic_visitor.py, interpreter_visitor.py
+│   └── run.py
+├── examples/, tests/, tools/
+└── docs/</pre>
+
+<h3>Diagrama de flujo del pipeline</h3>
+<div class="diagram">
+[Archivo fuente UTF-8]
+       ↓
+[Fase 1: Lexer + LexerErrorListener] ──errores──→ código salida 1
+       ↓
+[Fase 2: Parser + ParserErrorListener] ──errores──→ código 1
+       ↓
+[Fase 3: AstBuilder → AST]
+       ↓
+[Fase 4: SemanticVisitor] ──errores──→ código 2
+       ↓
+[Fase 5: InterpreterVisitor] ──error ejecución──→ código 3
+       ↓
+Salida estándar (print, estado variables) → código 0
+</div>
+
+<h2 id="r5">5. Lenguaje MiniLang</h2>
+<table>
+  <tr><th>Característica</th><th>Soporte</th></tr>
+  <tr><td>Tipos</td><td><code>int</code>, <code>bool</code></td></tr>
+  <tr><td>Programa</td><td><code>program { ... }</code>; funciones al inicio opcionalmente</td></tr>
+  <tr><td>Control</td><td><code>if</code>/<code>else</code>, <code>while</code></td></tr>
+  <tr><td>Funciones</td><td><code>func tipo nombre(params) { ... }</code>, <code>return</code>, llamadas</td></tr>
+  <tr><td>Salida</td><td><code>print(expr);</code></td></tr>
+</table>
+
+<h2 id="r6">6. Gramática ANTLR</h2>
+<p>Archivo <strong><code>grammar/MiniLang.g4</code></strong>. Generación con visitor y sin listener en el generador:</p>
+<pre>java -jar antlr-4.13.1-complete.jar -Dlanguage=Python3 -visitor -no-listener -o gen/grammar grammar/MiniLang.g4</pre>
+
+<h2 id="r7">7. Pipeline de compilación</h2>
+<p>El módulo <strong><code>src/pipeline.py</code></strong> ejecuta: lectura única del archivo → lexer → parser → AST → semántica → intérprete. Códigos de salida: <strong>1</strong> léxico/sintáctico, <strong>2</strong> semántico, <strong>3</strong> ejecución, <strong>0</strong> éxito.</p>
+
+<h2 id="r8">8. Manejo de errores</h2>
+<p><strong><code>src/custom_errors.py</code></strong>: formato léxico <code>[Error Léxico] Línea L, Columna C: Símbolo no reconocido '…'</code>; sintáctico <code>[Error Sintáctico] …</code>; semántico <code>[Error Semántico] …</code>. Columna en formato 1-based para el usuario.</p>
+
+<h2 id="r9">9. Árbol de sintaxis abstracta (AST)</h2>
+<p>Nodos en <code>ast_nodes.py</code>; construcción en <code>ast_builder.py</code> (visitor ANTLR).</p>
+
+<h2 id="r10">10. Análisis semántico y ámbitos</h2>
+<p><code>semantic_visitor.py</code> valida sin ejecutar. Pila de tablas hash: <code>list</code> de <code>dict</code> (<code>self.scopes</code>). El enunciado menciona <code>symbol_table.py</code>; aquí la lógica está integrada en el visitor (posible refactor futuro).</p>
+
+<h2 id="r11">11. Intérprete</h2>
+<p><code>interpreter_visitor.py</code>: evalúa el AST, pila de entornos para variables, llamadas y recursión, <code>print</code> a consola.</p>
+
+<h2 id="r12">12. Casos de prueba</h2>
+<p>Carpeta <code>tests/</code>: <code>test_valido.ml</code>, <code>test_error_lexico.ml</code>, <code>test_error_sintactico.ml</code>, <code>test_error_semantico.ml</code>. Script <code>tests/run_tests.ps1</code>.</p>
+
+<h2 id="r13">13. Cumplimiento frente al enunciado (Proyecto 2)</h2>
+<table>
+  <tr><th>Requisito</th><th>Estado</th></tr>
+  <tr><td>Pipeline y listeners</td><td>Cumplido</td></tr>
+  <tr><td><code>while</code>, funciones, <code>print</code></td><td>Cumplido</td></tr>
+  <tr><td>Pila de hash para scopes</td><td>Cumplido</td></tr>
+  <tr><td><code>float</code>, <code>string</code>, <code>for</code></td><td>No implementado en esta versión</td></tr>
+  <tr><td><code>symbol_table.py</code> separado</td><td>No; lógica en visitors</td></tr>
+</table>
+
+<h2 id="r14">14. Instrucciones de ejecución</h2>
+<pre>pip install -r requirements.txt
+python -m src.pipeline tests/test_valido.ml</pre>
+
+<h2 id="r15">15. Conclusiones</h2>
+<p>Se entregó un pipeline completo para MiniLang con fases separadas, manejo de errores y soporte de funciones, <code>while</code> y ámbitos anidados. Las extensiones pendientes pueden añadirse sobre esta base.</p>
+
+<h2 id="r16">16. Referencias</h2>
+<ul>
+  <li>Parr, T. <em>The Definitive ANTLR 4 Reference</em>.</li>
+  <li><a href="https://www.antlr.org/">antlr.org</a></li>
+  <li><a href="https://github.com/SergioLSantosR/Compiladores">github.com/SergioLSantosR/Compiladores</a></li>
+</ul>
+
+<hr>
+<p><em>Fin del informe.</em></p>
+
+</body>
+</html>
