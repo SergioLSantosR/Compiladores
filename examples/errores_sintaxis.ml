@@ -1,6 +1,6 @@
-// Prueba: errores de sintaxis (falta punto y coma, paréntesis, etc.)
-program {
-  int x
+// Prueba: falta punto y coma y paréntesis incompleto
+programa {
+  entero x
   x = 5;
-  imprime(x
+  imprimir(x
 }
