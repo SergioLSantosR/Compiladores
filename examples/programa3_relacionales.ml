@@ -7,11 +7,11 @@ program {
   x = 10;
   y = 20;
   r = x < y;       // true
-  print(r);
+  imprime(r);
   r = x == y;      // false
-  print(r);
+  imprime(r);
   r = x != y;      // true
-  print(r);
+  imprime(r);
   r = y >= x;      // true
-  print(r);
+  imprime(r);
 }

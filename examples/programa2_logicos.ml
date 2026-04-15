@@ -7,9 +7,9 @@ program {
   a = true;
   b = false;
   c = a && b;      // false
-  print(c);
+  imprime(c);
   c = a || b;      // true
-  print(c);
+  imprime(c);
   c = !b;          // true
-  print(c);
+  imprime(c);
 }

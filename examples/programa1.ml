@@ -1,19 +1,40 @@
-program {
-  int x;
-  int y;
-  int w;
-  int z;
+funcion vacio saludo(cadena nombre) {
+  imprimir("Hola " + nombre);
+}
+funcion entero suma(entero a, entero b) {
+  retorna a + b;
+}
+
+programa {
+  entero x;
+  flotante y;
+  cadena s;
+  booleano valor;
 
   x = 10;
-  y = 20;
-  z = x + y * 2;  // 10 + 20*2 = 50
+  y = 3.14;
+  s = "Hola";
+  valor = verdadero;
 
-  if (z > 30) {
-    w = z / 2;    // división entera -> 25
-  } else {
-    w = z - 5;
+  imprimir("Inicio");
+
+  mientras (x > 0) {
+    imprimir(x);
+    x = x - 1;
   }
 
-  print(z);       // imprime 50
-  print(w);       // imprime 25
+  para (entero i = 0; i < 5; i = i + 1) {
+    imprimir(i);
+  }
+
+  si (valor) {
+    imprimir("valor es verdadero");
+  } sino {
+    imprimir("valor es falso");
+  }
+
+  imprimir(s + " mundo");
+  imprimir(y * 2);
+  imprimir(suma(5, 3));
+  saludo("Mundo");
 }
