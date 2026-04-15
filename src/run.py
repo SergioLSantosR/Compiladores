@@ -1,18 +1,18 @@
-# src/run.py
+# src/run.py — Punto de entrada alternativo (usa pipeline.py internamente)
 import sys
 import argparse
-from antlr4 import *
+from antlr4 import CommonTokenStream, FileStream
 from gen.grammar.MiniLangLexer import MiniLangLexer
 from gen.grammar.MiniLangParser import MiniLangParser
-from src.error_listener import VerboseErrorListener
+from src.custom_errors import ColectorErrores
 from src.semantic_visitor import SemanticVisitor
-from src.EvalVisitorImpl import EvalVisitor
+from src.interpreter_visitor import InterpreterVisitor
 
 
 def parse_args():
-    ap = argparse.ArgumentParser(description="MiniLang - Parser + Semántica + Evaluador (ANTLR4 + Python)")
+    ap = argparse.ArgumentParser(description="MiniLang — Compilador e Intérprete")
     ap.add_argument("file", help="Ruta del archivo de entrada (*.ml)")
-    ap.add_argument("--no-print", action="store_true", help="No imprimir durante ejecución (solo guardar resultados)")
+    ap.add_argument("--no-print", action="store_true", help="No imprimir durante ejecución")
     return ap.parse_args()
 
 
@@ -20,38 +20,41 @@ def main():
     args = parse_args()
     input_stream = FileStream(args.file, encoding="utf-8")
 
+    colector = ColectorErrores()
+
     # Lexer
     lexer = MiniLangLexer(input_stream)
+    lexer.removeErrorListeners()
+    lexer.addErrorListener(colector)
+
     token_stream = CommonTokenStream(lexer)
 
     # Parser
     parser = MiniLangParser(token_stream)
-    err_listener = VerboseErrorListener()
     parser.removeErrorListeners()
-    parser.addErrorListener(err_listener)
+    parser.addErrorListener(colector)
 
     tree = parser.programa()
 
-    # Errores sintácticos
-    if err_listener.has_errors():
-        print(err_listener.report(), file=sys.stderr)
+    if colector.tiene_errores():
+        print(colector.reporte(), file=sys.stderr)
         sys.exit(1)
 
     # Análisis semántico
-    semantic_visitor = SemanticVisitor()
-    semantic_visitor.visit(tree)
+    semantico = SemanticVisitor()
+    semantico.visit(tree)
 
-    if semantic_visitor.tiene_errores():
-        print(semantic_visitor.reporte(), file=sys.stderr)
+    if semantico.tiene_errores():
+        print(semantico.reporte(), file=sys.stderr)
         sys.exit(2)
 
-    # Evaluación
-    visitor = EvalVisitor(stdout_print=(not args.no_print))
+    # Interpretación
+    interprete = InterpreterVisitor(stdout_print=(not args.no_print))
     try:
-        visitor.visit(tree)
+        interprete.visit(tree)
         print("\nPrograma válido ✔️")
     except RuntimeError as ex:
-        print(f"[Error en evaluación] {ex}", file=sys.stderr)
+        print(f"[Error de Ejecución] {ex}", file=sys.stderr)
         sys.exit(3)
 
 
