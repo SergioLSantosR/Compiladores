@@ -2,5 +2,5 @@
 program {
   int n;
   n = 42;
-  print(n);
+  imprime(n);
 }
