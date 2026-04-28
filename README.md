@@ -196,18 +196,87 @@ El primer comando debe completar la evaluación e imprimir resultados; el segund
 
 ## Estructura del proyecto
 
-```text
-Compiladores/
-├── grammar/
-│   └── MiniLang.g4          # Gramática ANTLR (léxica y sintáctica)
-├── gen/
-│   └── grammar/             # Código generado por ANTLR (lexer, parser, visitor base)
-├── src/
-│   ├── run.py               # Entrada: lee archivo, parsea, evalúa
-│   ├── EvalVisitorImpl.py   # Visitor de evaluación y validación
-│   └── error_listener.py    # Listener de errores de sintaxis
-├── examples/
-│   ├── programa1.ml         # Programa de ejemplo válido
-│   └── errores.ml           # Programa con errores (pruebas)
+Compiladores
+├── README.md
+├── examples
+│   ├── programa1.ml
+│   ├── programa2_logicos.ml
+│   ├── programa3_relacionales.ml
+│   └── programa4_minimo.ml
+├── gen
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   └── __init__.cpython-312.pyc
+│   └── grammar
+│       ├── MiniLang.interp
+│       ├── MiniLang.tokens
+│       ├── MiniLangLexer.interp
+│       ├── MiniLangLexer.py
+│       ├── MiniLangLexer.tokens
+│       ├── MiniLangListener.py
+│       ├── MiniLangParser.py
+│       ├── MiniLangVisitor.py
+│       ├── __init__.py
+│       └── __pycache__
+│           ├── MiniLangLexer.cpython-312.pyc
+│           ├── MiniLangParser.cpython-312.pyc
+│           ├── MiniLangVisitor.cpython-312.pyc
+│           └── __init__.cpython-312.pyc
+├── grammar
+│   └── MiniLang.g4
+├── pipeline.py
 ├── requirements.txt
-```
+├── src
+│   ├── EvalVisitorImpl.py
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── EvalVisitorImpl.cpython-312.pyc
+│   │   ├── __init__.cpython-312.pyc
+│   │   ├── custom_errors.cpython-312.pyc
+│   │   ├── generate_ir.cpython-312.pyc
+│   │   ├── interpreter_visitor.cpython-312.pyc
+│   │   ├── ir_generator.cpython-312.pyc
+│   │   ├── run.cpython-312.pyc
+│   │   ├── semantic_visitor.cpython-312.pyc
+│   │   ├── symbol_table.cpython-312.pyc
+│   │   ├── tac_generator.cpython-312.pyc
+│   │   └── test_tac.cpython-312.pyc
+│   ├── custom_errors.py
+│   ├── error_listener.py
+│   ├── generate_ir.py
+│   ├── interpreter_visitor.py
+│   ├── ir_generator.py
+│   ├── run.py
+│   ├── semantic_visitor.py
+│   ├── symbol_table.py
+│   ├── tac_generator.py
+│   └── test_tac.py
+├── tests
+│   ├── Ejemplo_break_continue.ml
+│   ├── busqueda_arreglos.ml
+│   ├── ejemplo_completo.ml
+│   ├── error_semantico_1.ml
+│   ├── errores.ml
+│   ├── errores_sintaxis.ml
+│   ├── fibonacci_mientras.ml
+│   ├── test_arreglo.ml
+│   ├── test_errores_lexicos.ml
+│   ├── test_errores_semanticos.ml
+│   ├── test_errores_semanticos_2.ml
+│   ├── test_errores_sintacticos.ml
+│   ├── test_fase2.ml
+│   ├── test_fase3.ml
+│   ├── test_modulo.ml
+│   ├── test_tabla_simbolos.py
+│   ├── test_tac.ll
+│   ├── test_tac.ml
+│   └── test_tac.tac
+└── web
+    ├── app.py
+    ├── static
+    │   ├── css
+    │   │   └── style.css
+    │   └── js
+    │       └── app.js
+    └── templates
+        └── index.html
