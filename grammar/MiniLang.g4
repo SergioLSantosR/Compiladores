@@ -25,16 +25,36 @@ bloque
 sentencia
  : declaracionVariable
  | asignacion
+ | asignacionArreglo          // Fase 3: asignación a elemento de arreglo
  | condicionalSi
  | impresion
  | cicloMientras
  | cicloPara
  | sentenciaRetorna
  | llamadaFuncion
+ | sentenciaBreak             // Fase 3: break
+ | sentenciaContinue          // Fase 3: continue
+ | sentenciaImportar          // Fase 3: import
  ;
 
 declaracionVariable
  : tipo IDENTIFICADOR (ASIGNACION expresion)? PUNTO_COMA
+ | tipo CORCHETE_IZQ CORCHETE_DER IDENTIFICADOR (ASIGNACION literalArreglo)? PUNTO_COMA   // Fase 3: arreglo
+ ;
+
+// Fase 3: literal para inicializar arreglos
+literalArreglo
+ : CORCHETE_IZQ (expresion (COMA expresion)*)? CORCHETE_DER
+ ;
+
+// Fase 3: acceso a elemento de arreglo (puede usarse en expresiones)
+accesoArreglo
+ : IDENTIFICADOR CORCHETE_IZQ expresion CORCHETE_DER
+ ;
+
+// Fase 3: asignación a elemento de arreglo
+asignacionArreglo
+ : accesoArreglo ASIGNACION expresion PUNTO_COMA
  ;
 
 tipo
@@ -76,11 +96,24 @@ sentenciaRetorna
  : RETORNA expresion? PUNTO_COMA
  ;
 
+// Fase 3: se agregan las nuevas sentencias
+sentenciaBreak
+ : ROMPER PUNTO_COMA
+ ;
+
+sentenciaContinue
+ : CONTINUAR PUNTO_COMA
+ ;
+
+sentenciaImportar
+ : IMPORTAR CADENA PUNTO_COMA
+ ;
+
 expresion
  : NEGACION expresion                                                                      #NegacionLogica
  | RESTA expresion                                                                         #MenosUnario
  | PAREN_IZQ expresion PAREN_DER                                                           #Parentesis
- | izq=expresion op=(MULTIPLICACION|DIVISION) der=expresion                                #MultiplicacionDivision
+ | izq=expresion op=(MULTIPLICACION|DIVISION|MODULO) der=expresion                         #MultiplicacionDivisionModulo  // Fase 3: añadir módulo
  | izq=expresion op=(SUMA|RESTA) der=expresion                                             #SumaResta
  | izq=expresion op=(IGUAL|DIFERENTE|MENOR_QUE|MENOR_IGUAL|MAYOR_QUE|MAYOR_IGUAL) der=expresion  #Relacional
  | izq=expresion op=(Y_LOGICO|O_LOGICO) der=expresion                                     #Logica
@@ -90,6 +123,7 @@ expresion
  | VERDADERO                                                                               #LiteralVerdadero
  | FALSO                                                                                   #LiteralFalso
  | IDENTIFICADOR                                                                           #ReferenciaVariable
+ | accesoArreglo                                                                           #AccesoArregloExpr      // Fase 3
  | IDENTIFICADOR PAREN_IZQ (expresion (COMA expresion)*)? PAREN_DER                        #LlamadaFuncionExpr
  ;
 
@@ -111,6 +145,9 @@ TIPO_FLOTANTE : 'flotante';
 TIPO_CADENA   : 'cadena';
 VERDADERO     : 'verdadero';
 FALSO         : 'falso';
+ROMPER        : 'romper';        // Fase 3: break
+CONTINUAR     : 'continuar';     // Fase 3: continue
+IMPORTAR      : 'importar';      // Fase 3: import
 
 // Operadores lógicos
 Y_LOGICO  : '&&';
@@ -133,6 +170,7 @@ SUMA          : '+';
 RESTA         : '-';
 MULTIPLICACION: '*';
 DIVISION      : '/';
+MODULO        : '%';             // Fase 3: operador módulo
 
 // Símbolos de agrupación y puntuación
 PAREN_IZQ    : '(';

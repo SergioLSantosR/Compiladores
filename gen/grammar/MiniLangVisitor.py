@@ -44,6 +44,21 @@ class MiniLangVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by MiniLangParser#literalArreglo.
+    def visitLiteralArreglo(self, ctx:MiniLangParser.LiteralArregloContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniLangParser#accesoArreglo.
+    def visitAccesoArreglo(self, ctx:MiniLangParser.AccesoArregloContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniLangParser#asignacionArreglo.
+    def visitAsignacionArreglo(self, ctx:MiniLangParser.AsignacionArregloContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by MiniLangParser#tipo.
     def visitTipo(self, ctx:MiniLangParser.TipoContext):
         return self.visitChildren(ctx)
@@ -99,6 +114,21 @@ class MiniLangVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by MiniLangParser#sentenciaBreak.
+    def visitSentenciaBreak(self, ctx:MiniLangParser.SentenciaBreakContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniLangParser#sentenciaContinue.
+    def visitSentenciaContinue(self, ctx:MiniLangParser.SentenciaContinueContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniLangParser#sentenciaImportar.
+    def visitSentenciaImportar(self, ctx:MiniLangParser.SentenciaImportarContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by MiniLangParser#LiteralCadena.
     def visitLiteralCadena(self, ctx:MiniLangParser.LiteralCadenaContext):
         return self.visitChildren(ctx)
@@ -116,11 +146,6 @@ class MiniLangVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by MiniLangParser#LlamadaFuncionExpr.
     def visitLlamadaFuncionExpr(self, ctx:MiniLangParser.LlamadaFuncionExprContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by MiniLangParser#MultiplicacionDivision.
-    def visitMultiplicacionDivision(self, ctx:MiniLangParser.MultiplicacionDivisionContext):
         return self.visitChildren(ctx)
 
 
@@ -161,6 +186,16 @@ class MiniLangVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by MiniLangParser#LiteralFalso.
     def visitLiteralFalso(self, ctx:MiniLangParser.LiteralFalsoContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniLangParser#AccesoArregloExpr.
+    def visitAccesoArregloExpr(self, ctx:MiniLangParser.AccesoArregloExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniLangParser#MultiplicacionDivisionModulo.
+    def visitMultiplicacionDivisionModulo(self, ctx:MiniLangParser.MultiplicacionDivisionModuloContext):
         return self.visitChildren(ctx)
 
 
