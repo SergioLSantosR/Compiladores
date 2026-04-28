@@ -3,10 +3,16 @@ from antlr4 import *
 from gen.grammar.MiniLangParser import MiniLangParser
 from gen.grammar.MiniLangVisitor import MiniLangVisitor
 
-
+# ===== EXCEPCIONES PARA CONTROL DE FLUJO =====
 class ExcepcionRetorno(Exception):
     def __init__(self, valor):
         self.valor = valor
+
+class BreakException(Exception):
+    pass
+
+class ContinueException(Exception):
+    pass
 
 
 class EvalVisitor(MiniLangVisitor):
@@ -43,14 +49,14 @@ class EvalVisitor(MiniLangVisitor):
         if nombre in tipos:
             raise RuntimeError(f"Variable '{nombre}' ya declarada en este ámbito (línea {ctx.start.line})")
         tipos[nombre] = tipo
-        if tipo == 'entero':
-            self.memoria_actual()[nombre] = 0
-        elif tipo == 'flotante':
-            self.memoria_actual()[nombre] = 0.0
-        elif tipo == 'booleano':
-            self.memoria_actual()[nombre] = False
-        elif tipo == 'cadena':
-            self.memoria_actual()[nombre] = ""
+        if tipo == 'entero' or tipo.startswith('entero['):
+            self.memoria_actual()[nombre] = 0 if tipo == 'entero' else []
+        elif tipo == 'flotante' or tipo.startswith('flotante['):
+            self.memoria_actual()[nombre] = 0.0 if tipo == 'flotante' else []
+        elif tipo == 'booleano' or tipo.startswith('booleano['):
+            self.memoria_actual()[nombre] = False if tipo == 'booleano' else []
+        elif tipo == 'cadena' or tipo.startswith('cadena['):
+            self.memoria_actual()[nombre] = "" if tipo == 'cadena' else []
 
     def obtener_variable(self, nombre, ctx):
         for memoria, _ in reversed(self.pila_ambitos):
@@ -86,11 +92,25 @@ class EvalVisitor(MiniLangVisitor):
             return "flotante"
         elif isinstance(valor, str):
             return "cadena"
+        elif isinstance(valor, list):
+            if not valor:
+                return "arreglo_vacio"
+            return f"arreglo_de_{self._tipo_de(valor[0])}"
         return "desconocido"
 
     def _verificar_tipo(self, esperado, valor, ctx, descripcion=""):
         actual = self._tipo_de(valor)
-        if esperado != actual:
+        if esperado.endswith('[]'):
+            esperado_base = esperado[:-2]
+            if actual.startswith('arreglo_de_'):
+                actual_base = actual.replace('arreglo_de_', '')
+                if esperado_base != actual_base:
+                    raise RuntimeError(
+                        f"Error de tipos en {descripcion} (línea {ctx.start.line}): "
+                        f"se esperaba arreglo de {esperado_base}, obtuvo {actual}"
+                    )
+                return
+        if esperado != actual and not (esperado == "flotante" and actual == "entero"):
             raise RuntimeError(
                 f"Error de tipos en {descripcion} (línea {ctx.start.line}): "
                 f"se esperaba {esperado}, obtuvo {actual}"
@@ -175,11 +195,39 @@ class EvalVisitor(MiniLangVisitor):
     def visitDeclaracionVariable(self, ctx: MiniLangParser.DeclaracionVariableContext):
         tipo = ctx.tipo().getText()
         nombre = ctx.IDENTIFICADOR().getText()
+        
+        es_arreglo = ctx.CORCHETE_IZQ() is not None and ctx.CORCHETE_DER() is not None
+        if es_arreglo:
+            tipo = tipo + "[]"
+        
         self.declarar_variable(nombre, tipo, ctx)
-        if ctx.expresion():
+        
+        valor = None
+        hay_inicializacion = False
+        
+        if ctx.expresion() is not None:
             valor = self.visit(ctx.expresion())
-            self._verificar_tipo(tipo, valor, ctx, "inicialización")
+            hay_inicializacion = True
+        else:
+            for child in ctx.getChildren():
+                if isinstance(child, MiniLangParser.LiteralArregloContext):
+                    valor = self.visit(child)
+                    hay_inicializacion = True
+                    break
+        
+        if hay_inicializacion:
+            if es_arreglo:
+                if not isinstance(valor, list):
+                    raise RuntimeError(f"No se puede asignar {type(valor)} a un arreglo. Se esperaba una lista.")
+                tipo_base = tipo.replace('[]', '')
+                for elem in valor:
+                    self._verificar_tipo(tipo_base, elem, ctx, "elemento del arreglo")
+            else:
+                self._verificar_tipo(tipo, valor, ctx, "inicialización")
             self.asignar_variable(nombre, valor, ctx)
+        elif es_arreglo:
+            self.asignar_variable(nombre, [], ctx)
+        
         return None
 
     def visitAsignacion(self, ctx: MiniLangParser.AsignacionContext):
@@ -190,7 +238,6 @@ class EvalVisitor(MiniLangVisitor):
             raise RuntimeError(f"Variable '{nombre}' no declarada (línea {ctx.start.line})")
         self._verificar_tipo(tipo_var, valor, ctx, "asignación")
         self.asignar_variable(nombre, valor, ctx)
-        self._imprimir(f"{nombre} = {valor}")
         return None
 
     def visitCondicionalSi(self, ctx: MiniLangParser.CondicionalSiContext):
@@ -204,19 +251,27 @@ class EvalVisitor(MiniLangVisitor):
 
     def visitImpresion(self, ctx: MiniLangParser.ImpresionContext):
         valor = self.visit(ctx.expresion())
-        self._imprimir(valor)
+        if isinstance(valor, list):
+            self._imprimir(str(valor))
+        else:
+            self._imprimir(valor)
         return None
 
+    # ---- Ciclos ----
     def visitCicloMientras(self, ctx: MiniLangParser.CicloMientrasContext):
         while True:
-            condicion = self.visit(ctx.expresion())
-            self._verificar_tipo("booleano", condicion, ctx, "condición mientras")
-            if not condicion:
+            try:
+                condicion = self.visit(ctx.expresion())
+                self._verificar_tipo("booleano", condicion, ctx, "condición mientras")
+                if not condicion:
+                    break
+                self.visit(ctx.bloque())
+            except BreakException:
                 break
-            self.visit(ctx.bloque())
+            except ContinueException:
+                continue
         return None
 
-    # ---- Bucle para ----
     def visitInicializacionPara(self, ctx: MiniLangParser.InicializacionParaContext):
         tipo = ctx.tipo().getText()
         nombre = ctx.IDENTIFICADOR().getText()
@@ -250,18 +305,25 @@ class EvalVisitor(MiniLangVisitor):
             self.visit(ctx.inicializacionPara())
         elif ctx.asignacionPara():
             self.visit(ctx.asignacionPara())
+        
         while True:
-            if ctx.cond:
-                condicion = self.visit(ctx.cond)
-                self._verificar_tipo("booleano", condicion, ctx, "condición para")
-                if not condicion:
-                    break
-            self.visit(ctx.bloque())
-            if ctx.actualizacionPara():
-                self.visit(ctx.actualizacionPara())
+            try:
+                if ctx.cond:
+                    condicion = self.visit(ctx.cond)
+                    self._verificar_tipo("booleano", condicion, ctx, "condición para")
+                    if not condicion:
+                        break
+                self.visit(ctx.bloque())
+                if ctx.actualizacionPara():
+                    self.visit(ctx.actualizacionPara())
+            except BreakException:
+                break
+            except ContinueException:
+                if ctx.actualizacionPara():
+                    self.visit(ctx.actualizacionPara())
+                continue
         return None
 
-    # ---- Llamada a funciones vacio como sentencia ----
     def visitLlamadaFuncion(self, ctx: MiniLangParser.LlamadaFuncionContext):
         nombre = ctx.IDENTIFICADOR().getText()
         if nombre not in self.funciones:
@@ -287,6 +349,19 @@ class EvalVisitor(MiniLangVisitor):
         self.salir_ambito()
         return None
 
+    # ---- Sentencias break/continue ----
+    def visitSentenciaBreak(self, ctx: MiniLangParser.SentenciaBreakContext):
+        raise BreakException()
+
+    def visitSentenciaContinue(self, ctx: MiniLangParser.SentenciaContinueContext):
+        raise ContinueException()
+
+    # ---- Import ----
+    def visitSentenciaImportar(self, ctx: MiniLangParser.SentenciaImportarContext):
+        nombre_archivo = ctx.CADENA().getText()[1:-1]
+        self._imprimir(f"[Importando] {nombre_archivo}")
+        return None
+
     # ---- Expresiones ----
     def visitNegacionLogica(self, ctx):
         v = self.visit(ctx.expresion())
@@ -303,26 +378,36 @@ class EvalVisitor(MiniLangVisitor):
     def visitParentesis(self, ctx):
         return self.visit(ctx.expresion())
 
-    def visitMultiplicacionDivision(self, ctx):
+    def visitMultiplicacionDivisionModulo(self, ctx):
         izq = self.visit(ctx.izq)
         der = self.visit(ctx.der)
         t1 = self._tipo_de(izq)
         t2 = self._tipo_de(der)
+        
+        if ctx.op.type == MiniLangParser.MODULO:
+            if t1 != "entero" or t2 != "entero":
+                raise RuntimeError(f"El operador % solo funciona con enteros, no con {t1} y {t2}")
+            if der == 0:
+                raise RuntimeError("Módulo por cero")
+            return izq % der
+        
         if t1 == "entero" and t2 == "entero":
             if ctx.op.type == MiniLangParser.MULTIPLICACION:
                 return izq * der
-            if der == 0:
-                raise RuntimeError("División por cero")
-            return izq // der
+            else:
+                if der == 0:
+                    raise RuntimeError("División por cero")
+                return izq // der
         if {t1, t2} <= {"entero", "flotante"}:
-            lf = float(izq)
-            rf = float(der)
+            lf = float(izq) if t1 == "entero" else izq
+            rf = float(der) if t2 == "entero" else der
             if ctx.op.type == MiniLangParser.MULTIPLICACION:
                 return lf * rf
-            if rf == 0.0:
-                raise RuntimeError("División por cero")
-            return lf / rf
-        raise RuntimeError(f"Tipos incompatibles para * o /: {t1} y {t2}")
+            else:
+                if rf == 0.0:
+                    raise RuntimeError("División por cero")
+                return lf / rf
+        raise RuntimeError(f"Tipos incompatibles para {ctx.op.text}: {t1} y {t2}")
 
     def visitSumaResta(self, ctx):
         izq = self.visit(ctx.izq)
@@ -381,6 +466,60 @@ class EvalVisitor(MiniLangVisitor):
     def visitLiteralFalso(self, ctx):
         return False
 
+    def visitLiteralArreglo(self, ctx):
+        valores = []
+        if ctx.expresion():
+            for expr in ctx.expresion():
+                valores.append(self.visit(expr))
+        return valores
+
     def visitReferenciaVariable(self, ctx):
         nombre = ctx.IDENTIFICADOR().getText()
         return self.obtener_variable(nombre, ctx)
+
+    def visitAccesoArreglo(self, ctx):
+        nombre = ctx.IDENTIFICADOR().getText()
+        indice = self.visit(ctx.expresion())
+        
+        if not isinstance(indice, int):
+            raise RuntimeError(f"El índice del arreglo debe ser entero, no {type(indice)}")
+        
+        arreglo = self.obtener_variable(nombre, ctx)
+        
+        if not isinstance(arreglo, list):
+            raise RuntimeError(f"La variable '{nombre}' no es un arreglo")
+        
+        if indice < 0 or indice >= len(arreglo):
+            raise RuntimeError(f"Índice {indice} fuera de rango para arreglo '{nombre}' (tamaño {len(arreglo)})")
+        
+        return arreglo[indice]
+
+    def visitAccesoArregloExpr(self, ctx):
+        return self.visitAccesoArreglo(ctx.accesoArreglo())
+
+    def visitAsignacionArreglo(self, ctx):
+        acceso = ctx.accesoArreglo()
+        nombre = acceso.IDENTIFICADOR().getText()
+        indice = self.visit(acceso.expresion())
+        valor = self.visit(ctx.expresion())
+        
+        if not isinstance(indice, int):
+            raise RuntimeError(f"El índice del arreglo debe ser entero, no {type(indice)}")
+        
+        arreglo = self.obtener_variable(nombre, ctx)
+        if not isinstance(arreglo, list):
+            raise RuntimeError(f"La variable '{nombre}' no es un arreglo")
+        
+        if indice < 0 or indice >= len(arreglo):
+            raise RuntimeError(f"Índice {indice} fuera de rango para arreglo '{nombre}' (tamaño {len(arreglo)})")
+        
+        tipo_arreglo = self.obtener_tipo(nombre)
+        tipo_base = tipo_arreglo.replace('[]', '')
+        self._verificar_tipo(tipo_base, valor, ctx, "asignación a arreglo")
+        
+        arreglo[indice] = valor
+        self.asignar_variable(nombre, arreglo, ctx)
+        return None
+
+    def visitMultiplicacionDivision(self, ctx):
+        return self.visitMultiplicacionDivisionModulo(ctx)

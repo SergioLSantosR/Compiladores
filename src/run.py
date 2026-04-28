@@ -6,7 +6,7 @@ from gen.grammar.MiniLangLexer import MiniLangLexer
 from gen.grammar.MiniLangParser import MiniLangParser
 from src.custom_errors import ColectorErrores
 from src.semantic_visitor import SemanticVisitor
-from src.interpreter_visitor import InterpreterVisitor
+from src.EvalVisitorImpl import EvalVisitor  # ← CAMBIADO: usar EvalVisitor en lugar de InterpreterVisitor
 
 
 def parse_args():
@@ -48,8 +48,8 @@ def main():
         print(semantico.reporte(), file=sys.stderr)
         sys.exit(2)
 
-    # Interpretación
-    interprete = InterpreterVisitor(stdout_print=(not args.no_print))
+    # Interpretación usando EvalVisitor
+    interprete = EvalVisitor(stdout_print=(not args.no_print))  # ← CAMBIADO
     try:
         interprete.visit(tree)
         print("\nPrograma válido ✔️")
