@@ -19,6 +19,7 @@ class TACGenerator(MiniLangVisitor):
         self.label_counter = 0       # Contador para etiquetas (L1, L2, ...)
         self.funcion_actual = None   # Nombre de la función actual
         self.tabla_temporales = {}   # Mapa de expresiones a temporales
+        self.pila_ciclos = []        # Pila de (etiqueta_inicio, etiqueta_fin) para break/continue
         
     def nuevo_temporal(self):
         """Genera un nuevo temporal (t1, t2, t3, ...)"""
@@ -281,7 +282,9 @@ class TACGenerator(MiniLangVisitor):
         condicion = self.visit(ctx.expresion())
         self.emitir(f"if {condicion} == false goto {etiqueta_fin}")
         
+        self.pila_ciclos.append((etiqueta_inicio, etiqueta_fin))
         self.visit(ctx.bloque())
+        self.pila_ciclos.pop()
         self.emitir(f"goto {etiqueta_inicio}")
         self.emitir(f"{etiqueta_fin}:")
         return None
@@ -304,7 +307,9 @@ class TACGenerator(MiniLangVisitor):
             self.emitir(f"if {condicion} == false goto {etiqueta_fin}")
         
         # Cuerpo
+        self.pila_ciclos.append((etiqueta_inicio, etiqueta_fin))
         self.visit(ctx.bloque())
+        self.pila_ciclos.pop()
         
         # Actualización
         if ctx.actualizacionPara():
@@ -377,11 +382,15 @@ class TACGenerator(MiniLangVisitor):
     # ========== Break y Continue ==========
     
     def visitSentenciaBreak(self, ctx: MiniLangParser.SentenciaBreakContext):
-        self.emitir("break")
+        if self.pila_ciclos:
+            _, etiqueta_fin = self.pila_ciclos[-1]
+            self.emitir(f"goto {etiqueta_fin}")
         return None
     
     def visitSentenciaContinue(self, ctx: MiniLangParser.SentenciaContinueContext):
-        self.emitir("continue")
+        if self.pila_ciclos:
+            etiqueta_inicio, _ = self.pila_ciclos[-1]
+            self.emitir(f"goto {etiqueta_inicio}")
         return None
     
     # ========== Import ==========

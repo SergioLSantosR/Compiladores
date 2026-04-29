@@ -17,5 +17,9 @@ gen/
 # ANTLR (descargar con tools/regenerate_parser.ps1)
 tools/antlr-4.13.1-complete.jar
 
+# Archivos generados por el pipeline
+*.tac
+*.ll
+
 # Otros
 .DS_Store
