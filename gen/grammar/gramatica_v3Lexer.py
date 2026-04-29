@@ -1,4 +1,4 @@
-# Generated from grammar/MiniLang.g4 by ANTLR 4.13.1
+# Generated from gramatica_v3.g4 by ANTLR 4.13.1
 from antlr4 import *
 from io import StringIO
 import sys
@@ -136,7 +136,7 @@ def serializedATN():
         323,333,344,1,6,0,0
     ]
 
-class MiniLangLexer(Lexer):
+class gramatica_v3Lexer(Lexer):
 
     atn = ATNDeserializer().deserialize(serializedATN())
 
@@ -225,7 +225,7 @@ class MiniLangLexer(Lexer):
                   "PUNTO_COMA", "COMA", "FLOTANTE", "ENTERO", "CADENA", 
                   "IDENTIFICADOR", "ESPACIO", "COMENTARIO_LINEA", "COMENTARIO_BLOQUE" ]
 
-    grammarFileName = "MiniLang.g4"
+    grammarFileName = "gramatica_v3.g4"
 
     def __init__(self, input=None, output:TextIO = sys.stdout):
         super().__init__(input, output)

@@ -1,7 +1,7 @@
 # src/EvalVisitorImpl.py
 from antlr4 import *
-from gen.grammar.MiniLangParser import MiniLangParser
-from gen.grammar.MiniLangVisitor import MiniLangVisitor
+from gen.grammar.gramatica_v3Parser import gramatica_v3Parser
+from gen.grammar.gramatica_v3Visitor import gramatica_v3Visitor
 
 # ===== EXCEPCIONES PARA CONTROL DE FLUJO =====
 class ExcepcionRetorno(Exception):
@@ -15,7 +15,7 @@ class ContinueException(Exception):
     pass
 
 
-class EvalVisitor(MiniLangVisitor):
+class EvalVisitor(gramatica_v3Visitor):
     def __init__(self, stdout_print=True):
         super().__init__()
         self.memoria_global = {}
@@ -122,7 +122,7 @@ class EvalVisitor(MiniLangVisitor):
         self.salida.append(str(texto))
 
     # ---- Programa y funciones ----
-    def visitPrograma(self, ctx: MiniLangParser.ProgramaContext):
+    def visitPrograma(self, ctx: gramatica_v3Parser.ProgramaContext):
         for func_ctx in ctx.funcionDeclaracion():
             self.visit(func_ctx)
         self.entrar_ambito()
@@ -130,7 +130,7 @@ class EvalVisitor(MiniLangVisitor):
         self.salir_ambito()
         return None
 
-    def visitFuncionDeclaracion(self, ctx: MiniLangParser.FuncionDeclaracionContext):
+    def visitFuncionDeclaracion(self, ctx: gramatica_v3Parser.FuncionDeclaracionContext):
         nombre = ctx.IDENTIFICADOR().getText()
         tipo_retorno = "vacio"
         if ctx.tipo():
@@ -146,7 +146,7 @@ class EvalVisitor(MiniLangVisitor):
         self.funciones[nombre] = (params, ctx.bloque(), tipo_retorno)
         return None
 
-    def visitLlamadaFuncionExpr(self, ctx: MiniLangParser.LlamadaFuncionExprContext):
+    def visitLlamadaFuncionExpr(self, ctx: gramatica_v3Parser.LlamadaFuncionExprContext):
         nombre = ctx.IDENTIFICADOR().getText()
         if nombre not in self.funciones:
             raise RuntimeError(f"Función '{nombre}' no definida (línea {ctx.start.line})")
@@ -176,7 +176,7 @@ class EvalVisitor(MiniLangVisitor):
             return self.valor_retorno
         return None
 
-    def visitSentenciaRetorna(self, ctx: MiniLangParser.SentenciaRetornaContext):
+    def visitSentenciaRetorna(self, ctx: gramatica_v3Parser.SentenciaRetornaContext):
         if self.funcion_actual is None:
             raise RuntimeError(f"retorna fuera de función (línea {ctx.start.line})")
         valor = None
@@ -185,14 +185,14 @@ class EvalVisitor(MiniLangVisitor):
         raise ExcepcionRetorno(valor)
 
     # ---- Bloque y sentencias ----
-    def visitBloque(self, ctx: MiniLangParser.BloqueContext):
+    def visitBloque(self, ctx: gramatica_v3Parser.BloqueContext):
         self.entrar_ambito()
         for s in ctx.sentencia():
             self.visit(s)
         self.salir_ambito()
         return None
 
-    def visitDeclaracionVariable(self, ctx: MiniLangParser.DeclaracionVariableContext):
+    def visitDeclaracionVariable(self, ctx: gramatica_v3Parser.DeclaracionVariableContext):
         tipo = ctx.tipo().getText()
         nombre = ctx.IDENTIFICADOR().getText()
         
@@ -210,7 +210,7 @@ class EvalVisitor(MiniLangVisitor):
             hay_inicializacion = True
         else:
             for child in ctx.getChildren():
-                if isinstance(child, MiniLangParser.LiteralArregloContext):
+                if isinstance(child, gramatica_v3Parser.LiteralArregloContext):
                     valor = self.visit(child)
                     hay_inicializacion = True
                     break
@@ -230,7 +230,7 @@ class EvalVisitor(MiniLangVisitor):
         
         return None
 
-    def visitAsignacion(self, ctx: MiniLangParser.AsignacionContext):
+    def visitAsignacion(self, ctx: gramatica_v3Parser.AsignacionContext):
         nombre = ctx.IDENTIFICADOR().getText()
         valor = self.visit(ctx.expresion())
         tipo_var = self.obtener_tipo(nombre)
@@ -240,7 +240,7 @@ class EvalVisitor(MiniLangVisitor):
         self.asignar_variable(nombre, valor, ctx)
         return None
 
-    def visitCondicionalSi(self, ctx: MiniLangParser.CondicionalSiContext):
+    def visitCondicionalSi(self, ctx: gramatica_v3Parser.CondicionalSiContext):
         condicion = self.visit(ctx.expresion())
         self._verificar_tipo("booleano", condicion, ctx, "condición si")
         if condicion:
@@ -249,7 +249,7 @@ class EvalVisitor(MiniLangVisitor):
             self.visit(ctx.bloque(1))
         return None
 
-    def visitImpresion(self, ctx: MiniLangParser.ImpresionContext):
+    def visitImpresion(self, ctx: gramatica_v3Parser.ImpresionContext):
         valor = self.visit(ctx.expresion())
         if isinstance(valor, list):
             self._imprimir(str(valor))
@@ -258,7 +258,7 @@ class EvalVisitor(MiniLangVisitor):
         return None
 
     # ---- Ciclos ----
-    def visitCicloMientras(self, ctx: MiniLangParser.CicloMientrasContext):
+    def visitCicloMientras(self, ctx: gramatica_v3Parser.CicloMientrasContext):
         while True:
             try:
                 condicion = self.visit(ctx.expresion())
@@ -272,7 +272,7 @@ class EvalVisitor(MiniLangVisitor):
                 continue
         return None
 
-    def visitInicializacionPara(self, ctx: MiniLangParser.InicializacionParaContext):
+    def visitInicializacionPara(self, ctx: gramatica_v3Parser.InicializacionParaContext):
         tipo = ctx.tipo().getText()
         nombre = ctx.IDENTIFICADOR().getText()
         valor = self.visit(ctx.expresion())
@@ -280,7 +280,7 @@ class EvalVisitor(MiniLangVisitor):
         self.asignar_variable(nombre, valor, ctx)
         return None
 
-    def visitAsignacionPara(self, ctx: MiniLangParser.AsignacionParaContext):
+    def visitAsignacionPara(self, ctx: gramatica_v3Parser.AsignacionParaContext):
         nombre = ctx.IDENTIFICADOR().getText()
         valor = self.visit(ctx.expresion())
         tipo_var = self.obtener_tipo(nombre)
@@ -290,7 +290,7 @@ class EvalVisitor(MiniLangVisitor):
         self.asignar_variable(nombre, valor, ctx)
         return None
 
-    def visitActualizacionPara(self, ctx: MiniLangParser.ActualizacionParaContext):
+    def visitActualizacionPara(self, ctx: gramatica_v3Parser.ActualizacionParaContext):
         nombre = ctx.IDENTIFICADOR().getText()
         valor = self.visit(ctx.expresion())
         tipo_var = self.obtener_tipo(nombre)
@@ -300,7 +300,7 @@ class EvalVisitor(MiniLangVisitor):
         self.asignar_variable(nombre, valor, ctx)
         return None
 
-    def visitCicloPara(self, ctx: MiniLangParser.CicloParaContext):
+    def visitCicloPara(self, ctx: gramatica_v3Parser.CicloParaContext):
         if ctx.inicializacionPara():
             self.visit(ctx.inicializacionPara())
         elif ctx.asignacionPara():
@@ -324,7 +324,7 @@ class EvalVisitor(MiniLangVisitor):
                 continue
         return None
 
-    def visitLlamadaFuncion(self, ctx: MiniLangParser.LlamadaFuncionContext):
+    def visitLlamadaFuncion(self, ctx: gramatica_v3Parser.LlamadaFuncionContext):
         nombre = ctx.IDENTIFICADOR().getText()
         if nombre not in self.funciones:
             raise RuntimeError(f"Función '{nombre}' no definida (línea {ctx.start.line})")
@@ -350,14 +350,14 @@ class EvalVisitor(MiniLangVisitor):
         return None
 
     # ---- Sentencias break/continue ----
-    def visitSentenciaBreak(self, ctx: MiniLangParser.SentenciaBreakContext):
+    def visitSentenciaBreak(self, ctx: gramatica_v3Parser.SentenciaBreakContext):
         raise BreakException()
 
-    def visitSentenciaContinue(self, ctx: MiniLangParser.SentenciaContinueContext):
+    def visitSentenciaContinue(self, ctx: gramatica_v3Parser.SentenciaContinueContext):
         raise ContinueException()
 
     # ---- Import ----
-    def visitSentenciaImportar(self, ctx: MiniLangParser.SentenciaImportarContext):
+    def visitSentenciaImportar(self, ctx: gramatica_v3Parser.SentenciaImportarContext):
         nombre_archivo = ctx.CADENA().getText()[1:-1]
         self._imprimir(f"[Importando] {nombre_archivo}")
         return None
@@ -384,7 +384,7 @@ class EvalVisitor(MiniLangVisitor):
         t1 = self._tipo_de(izq)
         t2 = self._tipo_de(der)
         
-        if ctx.op.type == MiniLangParser.MODULO:
+        if ctx.op.type == gramatica_v3Parser.MODULO:
             if t1 != "entero" or t2 != "entero":
                 raise RuntimeError(f"El operador % solo funciona con enteros, no con {t1} y {t2}")
             if der == 0:
@@ -392,7 +392,7 @@ class EvalVisitor(MiniLangVisitor):
             return izq % der
         
         if t1 == "entero" and t2 == "entero":
-            if ctx.op.type == MiniLangParser.MULTIPLICACION:
+            if ctx.op.type == gramatica_v3Parser.MULTIPLICACION:
                 return izq * der
             else:
                 if der == 0:
@@ -401,7 +401,7 @@ class EvalVisitor(MiniLangVisitor):
         if {t1, t2} <= {"entero", "flotante"}:
             lf = float(izq) if t1 == "entero" else izq
             rf = float(der) if t2 == "entero" else der
-            if ctx.op.type == MiniLangParser.MULTIPLICACION:
+            if ctx.op.type == gramatica_v3Parser.MULTIPLICACION:
                 return lf * rf
             else:
                 if rf == 0.0:
@@ -415,12 +415,12 @@ class EvalVisitor(MiniLangVisitor):
         t1 = self._tipo_de(izq)
         t2 = self._tipo_de(der)
         if t1 == "entero" and t2 == "entero":
-            return izq + der if ctx.op.type == MiniLangParser.SUMA else izq - der
+            return izq + der if ctx.op.type == gramatica_v3Parser.SUMA else izq - der
         if {t1, t2} <= {"entero", "flotante"}:
             lf = float(izq)
             rf = float(der)
-            return lf + rf if ctx.op.type == MiniLangParser.SUMA else lf - rf
-        if t1 == "cadena" and t2 == "cadena" and ctx.op.type == MiniLangParser.SUMA:
+            return lf + rf if ctx.op.type == gramatica_v3Parser.SUMA else lf - rf
+        if t1 == "cadena" and t2 == "cadena" and ctx.op.type == gramatica_v3Parser.SUMA:
             return izq + der
         raise RuntimeError(f"Tipos incompatibles para + o -: {t1} y {t2}")
 
@@ -430,15 +430,15 @@ class EvalVisitor(MiniLangVisitor):
         t1 = self._tipo_de(izq)
         t2 = self._tipo_de(der)
         op = ctx.op.type
-        if op in (MiniLangParser.IGUAL, MiniLangParser.DIFERENTE):
-            return (izq == der) if op == MiniLangParser.IGUAL else (izq != der)
+        if op in (gramatica_v3Parser.IGUAL, gramatica_v3Parser.DIFERENTE):
+            return (izq == der) if op == gramatica_v3Parser.IGUAL else (izq != der)
         if {t1, t2} <= {"entero", "flotante"}:
             lf = float(izq)
             rf = float(der)
-            if op == MiniLangParser.MENOR_QUE: return lf < rf
-            if op == MiniLangParser.MENOR_IGUAL: return lf <= rf
-            if op == MiniLangParser.MAYOR_QUE: return lf > rf
-            if op == MiniLangParser.MAYOR_IGUAL: return lf >= rf
+            if op == gramatica_v3Parser.MENOR_QUE: return lf < rf
+            if op == gramatica_v3Parser.MENOR_IGUAL: return lf <= rf
+            if op == gramatica_v3Parser.MAYOR_QUE: return lf > rf
+            if op == gramatica_v3Parser.MAYOR_IGUAL: return lf >= rf
         raise RuntimeError(f"Operadores relacionales solo para números: {t1} y {t2}")
 
     def visitLogica(self, ctx):
@@ -446,7 +446,7 @@ class EvalVisitor(MiniLangVisitor):
         der = self.visit(ctx.der)
         self._verificar_tipo("booleano", izq, ctx, "operación lógica")
         self._verificar_tipo("booleano", der, ctx, "operación lógica")
-        if ctx.op.type == MiniLangParser.Y_LOGICO:
+        if ctx.op.type == gramatica_v3Parser.Y_LOGICO:
             return izq and der
         return izq or der
 

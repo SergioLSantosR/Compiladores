@@ -1,4 +1,4 @@
-# Generated from grammar/MiniLang.g4 by ANTLR 4.13.1
+# Generated from gramatica_v3.g4 by ANTLR 4.13.1
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
@@ -116,9 +116,9 @@ def serializedATN():
         170,185,188,216,220,224,231,268,271,274,288,290
     ]
 
-class MiniLangParser ( Parser ):
+class gramatica_v3Parser ( Parser ):
 
-    grammarFileName = "MiniLang.g4"
+    grammarFileName = "gramatica_v3.g4"
 
     atn = ATNDeserializer().deserialize(serializedATN())
 
@@ -248,32 +248,24 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def PROGRAMA(self):
-            return self.getToken(MiniLangParser.PROGRAMA, 0)
+            return self.getToken(gramatica_v3Parser.PROGRAMA, 0)
 
         def bloque(self):
-            return self.getTypedRuleContext(MiniLangParser.BloqueContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.BloqueContext,0)
 
 
         def EOF(self):
-            return self.getToken(MiniLangParser.EOF, 0)
+            return self.getToken(gramatica_v3Parser.EOF, 0)
 
         def funcionDeclaracion(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(MiniLangParser.FuncionDeclaracionContext)
+                return self.getTypedRuleContexts(gramatica_v3Parser.FuncionDeclaracionContext)
             else:
-                return self.getTypedRuleContext(MiniLangParser.FuncionDeclaracionContext,i)
+                return self.getTypedRuleContext(gramatica_v3Parser.FuncionDeclaracionContext,i)
 
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_programa
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterPrograma" ):
-                listener.enterPrograma(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitPrograma" ):
-                listener.exitPrograma(self)
+            return gramatica_v3Parser.RULE_programa
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitPrograma" ):
@@ -286,7 +278,7 @@ class MiniLangParser ( Parser ):
 
     def programa(self):
 
-        localctx = MiniLangParser.ProgramaContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.ProgramaContext(self, self._ctx, self.state)
         self.enterRule(localctx, 0, self.RULE_programa)
         self._la = 0 # Token type
         try:
@@ -302,7 +294,7 @@ class MiniLangParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 56
-            self.match(MiniLangParser.PROGRAMA)
+            self.match(gramatica_v3Parser.PROGRAMA)
             self.state = 57
             self.bloque()
             self.state = 61
@@ -316,7 +308,7 @@ class MiniLangParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 64
-            self.match(MiniLangParser.EOF)
+            self.match(gramatica_v3Parser.EOF)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -334,42 +326,34 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def FUNCION(self):
-            return self.getToken(MiniLangParser.FUNCION, 0)
+            return self.getToken(gramatica_v3Parser.FUNCION, 0)
 
         def IDENTIFICADOR(self):
-            return self.getToken(MiniLangParser.IDENTIFICADOR, 0)
+            return self.getToken(gramatica_v3Parser.IDENTIFICADOR, 0)
 
         def PAREN_IZQ(self):
-            return self.getToken(MiniLangParser.PAREN_IZQ, 0)
+            return self.getToken(gramatica_v3Parser.PAREN_IZQ, 0)
 
         def PAREN_DER(self):
-            return self.getToken(MiniLangParser.PAREN_DER, 0)
+            return self.getToken(gramatica_v3Parser.PAREN_DER, 0)
 
         def bloque(self):
-            return self.getTypedRuleContext(MiniLangParser.BloqueContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.BloqueContext,0)
 
 
         def tipo(self):
-            return self.getTypedRuleContext(MiniLangParser.TipoContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.TipoContext,0)
 
 
         def VOID(self):
-            return self.getToken(MiniLangParser.VOID, 0)
+            return self.getToken(gramatica_v3Parser.VOID, 0)
 
         def parametros(self):
-            return self.getTypedRuleContext(MiniLangParser.ParametrosContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.ParametrosContext,0)
 
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_funcionDeclaracion
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFuncionDeclaracion" ):
-                listener.enterFuncionDeclaracion(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFuncionDeclaracion" ):
-                listener.exitFuncionDeclaracion(self)
+            return gramatica_v3Parser.RULE_funcionDeclaracion
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitFuncionDeclaracion" ):
@@ -382,13 +366,13 @@ class MiniLangParser ( Parser ):
 
     def funcionDeclaracion(self):
 
-        localctx = MiniLangParser.FuncionDeclaracionContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.FuncionDeclaracionContext(self, self._ctx, self.state)
         self.enterRule(localctx, 2, self.RULE_funcionDeclaracion)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 66
-            self.match(MiniLangParser.FUNCION)
+            self.match(gramatica_v3Parser.FUNCION)
             self.state = 69
             self._errHandler.sync(self)
             token = self._input.LA(1)
@@ -398,15 +382,15 @@ class MiniLangParser ( Parser ):
                 pass
             elif token in [9]:
                 self.state = 68
-                self.match(MiniLangParser.VOID)
+                self.match(gramatica_v3Parser.VOID)
                 pass
             else:
                 raise NoViableAltException(self)
 
             self.state = 71
-            self.match(MiniLangParser.IDENTIFICADOR)
+            self.match(gramatica_v3Parser.IDENTIFICADOR)
             self.state = 72
-            self.match(MiniLangParser.PAREN_IZQ)
+            self.match(gramatica_v3Parser.PAREN_IZQ)
             self.state = 74
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -416,7 +400,7 @@ class MiniLangParser ( Parser ):
 
 
             self.state = 76
-            self.match(MiniLangParser.PAREN_DER)
+            self.match(gramatica_v3Parser.PAREN_DER)
             self.state = 77
             self.bloque()
         except RecognitionException as re:
@@ -437,27 +421,19 @@ class MiniLangParser ( Parser ):
 
         def parametro(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(MiniLangParser.ParametroContext)
+                return self.getTypedRuleContexts(gramatica_v3Parser.ParametroContext)
             else:
-                return self.getTypedRuleContext(MiniLangParser.ParametroContext,i)
+                return self.getTypedRuleContext(gramatica_v3Parser.ParametroContext,i)
 
 
         def COMA(self, i:int=None):
             if i is None:
-                return self.getTokens(MiniLangParser.COMA)
+                return self.getTokens(gramatica_v3Parser.COMA)
             else:
-                return self.getToken(MiniLangParser.COMA, i)
+                return self.getToken(gramatica_v3Parser.COMA, i)
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_parametros
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterParametros" ):
-                listener.enterParametros(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitParametros" ):
-                listener.exitParametros(self)
+            return gramatica_v3Parser.RULE_parametros
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitParametros" ):
@@ -470,7 +446,7 @@ class MiniLangParser ( Parser ):
 
     def parametros(self):
 
-        localctx = MiniLangParser.ParametrosContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.ParametrosContext(self, self._ctx, self.state)
         self.enterRule(localctx, 4, self.RULE_parametros)
         self._la = 0 # Token type
         try:
@@ -482,7 +458,7 @@ class MiniLangParser ( Parser ):
             _la = self._input.LA(1)
             while _la==41:
                 self.state = 80
-                self.match(MiniLangParser.COMA)
+                self.match(gramatica_v3Parser.COMA)
                 self.state = 81
                 self.parametro()
                 self.state = 86
@@ -506,22 +482,14 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def tipo(self):
-            return self.getTypedRuleContext(MiniLangParser.TipoContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.TipoContext,0)
 
 
         def IDENTIFICADOR(self):
-            return self.getToken(MiniLangParser.IDENTIFICADOR, 0)
+            return self.getToken(gramatica_v3Parser.IDENTIFICADOR, 0)
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_parametro
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterParametro" ):
-                listener.enterParametro(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitParametro" ):
-                listener.exitParametro(self)
+            return gramatica_v3Parser.RULE_parametro
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitParametro" ):
@@ -534,14 +502,14 @@ class MiniLangParser ( Parser ):
 
     def parametro(self):
 
-        localctx = MiniLangParser.ParametroContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.ParametroContext(self, self._ctx, self.state)
         self.enterRule(localctx, 6, self.RULE_parametro)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 87
             self.tipo()
             self.state = 88
-            self.match(MiniLangParser.IDENTIFICADOR)
+            self.match(gramatica_v3Parser.IDENTIFICADOR)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -559,28 +527,20 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def LLAVE_IZQ(self):
-            return self.getToken(MiniLangParser.LLAVE_IZQ, 0)
+            return self.getToken(gramatica_v3Parser.LLAVE_IZQ, 0)
 
         def LLAVE_DER(self):
-            return self.getToken(MiniLangParser.LLAVE_DER, 0)
+            return self.getToken(gramatica_v3Parser.LLAVE_DER, 0)
 
         def sentencia(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(MiniLangParser.SentenciaContext)
+                return self.getTypedRuleContexts(gramatica_v3Parser.SentenciaContext)
             else:
-                return self.getTypedRuleContext(MiniLangParser.SentenciaContext,i)
+                return self.getTypedRuleContext(gramatica_v3Parser.SentenciaContext,i)
 
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_bloque
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterBloque" ):
-                listener.enterBloque(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitBloque" ):
-                listener.exitBloque(self)
+            return gramatica_v3Parser.RULE_bloque
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitBloque" ):
@@ -593,13 +553,13 @@ class MiniLangParser ( Parser ):
 
     def bloque(self):
 
-        localctx = MiniLangParser.BloqueContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.BloqueContext(self, self._ctx, self.state)
         self.enterRule(localctx, 8, self.RULE_bloque)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 90
-            self.match(MiniLangParser.LLAVE_IZQ)
+            self.match(gramatica_v3Parser.LLAVE_IZQ)
             self.state = 94
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -611,7 +571,7 @@ class MiniLangParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 97
-            self.match(MiniLangParser.LLAVE_DER)
+            self.match(gramatica_v3Parser.LLAVE_DER)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -629,63 +589,55 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def declaracionVariable(self):
-            return self.getTypedRuleContext(MiniLangParser.DeclaracionVariableContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.DeclaracionVariableContext,0)
 
 
         def asignacion(self):
-            return self.getTypedRuleContext(MiniLangParser.AsignacionContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.AsignacionContext,0)
 
 
         def asignacionArreglo(self):
-            return self.getTypedRuleContext(MiniLangParser.AsignacionArregloContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.AsignacionArregloContext,0)
 
 
         def condicionalSi(self):
-            return self.getTypedRuleContext(MiniLangParser.CondicionalSiContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.CondicionalSiContext,0)
 
 
         def impresion(self):
-            return self.getTypedRuleContext(MiniLangParser.ImpresionContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.ImpresionContext,0)
 
 
         def cicloMientras(self):
-            return self.getTypedRuleContext(MiniLangParser.CicloMientrasContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.CicloMientrasContext,0)
 
 
         def cicloPara(self):
-            return self.getTypedRuleContext(MiniLangParser.CicloParaContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.CicloParaContext,0)
 
 
         def sentenciaRetorna(self):
-            return self.getTypedRuleContext(MiniLangParser.SentenciaRetornaContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.SentenciaRetornaContext,0)
 
 
         def llamadaFuncion(self):
-            return self.getTypedRuleContext(MiniLangParser.LlamadaFuncionContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.LlamadaFuncionContext,0)
 
 
         def sentenciaBreak(self):
-            return self.getTypedRuleContext(MiniLangParser.SentenciaBreakContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.SentenciaBreakContext,0)
 
 
         def sentenciaContinue(self):
-            return self.getTypedRuleContext(MiniLangParser.SentenciaContinueContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.SentenciaContinueContext,0)
 
 
         def sentenciaImportar(self):
-            return self.getTypedRuleContext(MiniLangParser.SentenciaImportarContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.SentenciaImportarContext,0)
 
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_sentencia
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterSentencia" ):
-                listener.enterSentencia(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitSentencia" ):
-                listener.exitSentencia(self)
+            return gramatica_v3Parser.RULE_sentencia
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitSentencia" ):
@@ -698,7 +650,7 @@ class MiniLangParser ( Parser ):
 
     def sentencia(self):
 
-        localctx = MiniLangParser.SentenciaContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.SentenciaContext(self, self._ctx, self.state)
         self.enterRule(localctx, 10, self.RULE_sentencia)
         try:
             self.state = 111
@@ -794,42 +746,34 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def tipo(self):
-            return self.getTypedRuleContext(MiniLangParser.TipoContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.TipoContext,0)
 
 
         def IDENTIFICADOR(self):
-            return self.getToken(MiniLangParser.IDENTIFICADOR, 0)
+            return self.getToken(gramatica_v3Parser.IDENTIFICADOR, 0)
 
         def PUNTO_COMA(self):
-            return self.getToken(MiniLangParser.PUNTO_COMA, 0)
+            return self.getToken(gramatica_v3Parser.PUNTO_COMA, 0)
 
         def ASIGNACION(self):
-            return self.getToken(MiniLangParser.ASIGNACION, 0)
+            return self.getToken(gramatica_v3Parser.ASIGNACION, 0)
 
         def expresion(self):
-            return self.getTypedRuleContext(MiniLangParser.ExpresionContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,0)
 
 
         def CORCHETE_IZQ(self):
-            return self.getToken(MiniLangParser.CORCHETE_IZQ, 0)
+            return self.getToken(gramatica_v3Parser.CORCHETE_IZQ, 0)
 
         def CORCHETE_DER(self):
-            return self.getToken(MiniLangParser.CORCHETE_DER, 0)
+            return self.getToken(gramatica_v3Parser.CORCHETE_DER, 0)
 
         def literalArreglo(self):
-            return self.getTypedRuleContext(MiniLangParser.LiteralArregloContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.LiteralArregloContext,0)
 
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_declaracionVariable
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterDeclaracionVariable" ):
-                listener.enterDeclaracionVariable(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitDeclaracionVariable" ):
-                listener.exitDeclaracionVariable(self)
+            return gramatica_v3Parser.RULE_declaracionVariable
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitDeclaracionVariable" ):
@@ -842,7 +786,7 @@ class MiniLangParser ( Parser ):
 
     def declaracionVariable(self):
 
-        localctx = MiniLangParser.DeclaracionVariableContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.DeclaracionVariableContext(self, self._ctx, self.state)
         self.enterRule(localctx, 12, self.RULE_declaracionVariable)
         self._la = 0 # Token type
         try:
@@ -854,19 +798,19 @@ class MiniLangParser ( Parser ):
                 self.state = 113
                 self.tipo()
                 self.state = 114
-                self.match(MiniLangParser.IDENTIFICADOR)
+                self.match(gramatica_v3Parser.IDENTIFICADOR)
                 self.state = 117
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if _la==28:
                     self.state = 115
-                    self.match(MiniLangParser.ASIGNACION)
+                    self.match(gramatica_v3Parser.ASIGNACION)
                     self.state = 116
                     self.expresion(0)
 
 
                 self.state = 119
-                self.match(MiniLangParser.PUNTO_COMA)
+                self.match(gramatica_v3Parser.PUNTO_COMA)
                 pass
 
             elif la_ == 2:
@@ -874,23 +818,23 @@ class MiniLangParser ( Parser ):
                 self.state = 121
                 self.tipo()
                 self.state = 122
-                self.match(MiniLangParser.CORCHETE_IZQ)
+                self.match(gramatica_v3Parser.CORCHETE_IZQ)
                 self.state = 123
-                self.match(MiniLangParser.CORCHETE_DER)
+                self.match(gramatica_v3Parser.CORCHETE_DER)
                 self.state = 124
-                self.match(MiniLangParser.IDENTIFICADOR)
+                self.match(gramatica_v3Parser.IDENTIFICADOR)
                 self.state = 127
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if _la==28:
                     self.state = 125
-                    self.match(MiniLangParser.ASIGNACION)
+                    self.match(gramatica_v3Parser.ASIGNACION)
                     self.state = 126
                     self.literalArreglo()
 
 
                 self.state = 129
-                self.match(MiniLangParser.PUNTO_COMA)
+                self.match(gramatica_v3Parser.PUNTO_COMA)
                 pass
 
 
@@ -911,34 +855,26 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def CORCHETE_IZQ(self):
-            return self.getToken(MiniLangParser.CORCHETE_IZQ, 0)
+            return self.getToken(gramatica_v3Parser.CORCHETE_IZQ, 0)
 
         def CORCHETE_DER(self):
-            return self.getToken(MiniLangParser.CORCHETE_DER, 0)
+            return self.getToken(gramatica_v3Parser.CORCHETE_DER, 0)
 
         def expresion(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(MiniLangParser.ExpresionContext)
+                return self.getTypedRuleContexts(gramatica_v3Parser.ExpresionContext)
             else:
-                return self.getTypedRuleContext(MiniLangParser.ExpresionContext,i)
+                return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,i)
 
 
         def COMA(self, i:int=None):
             if i is None:
-                return self.getTokens(MiniLangParser.COMA)
+                return self.getTokens(gramatica_v3Parser.COMA)
             else:
-                return self.getToken(MiniLangParser.COMA, i)
+                return self.getToken(gramatica_v3Parser.COMA, i)
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_literalArreglo
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterLiteralArreglo" ):
-                listener.enterLiteralArreglo(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitLiteralArreglo" ):
-                listener.exitLiteralArreglo(self)
+            return gramatica_v3Parser.RULE_literalArreglo
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitLiteralArreglo" ):
@@ -951,13 +887,13 @@ class MiniLangParser ( Parser ):
 
     def literalArreglo(self):
 
-        localctx = MiniLangParser.LiteralArregloContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.LiteralArregloContext(self, self._ctx, self.state)
         self.enterRule(localctx, 14, self.RULE_literalArreglo)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 133
-            self.match(MiniLangParser.CORCHETE_IZQ)
+            self.match(gramatica_v3Parser.CORCHETE_IZQ)
             self.state = 142
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -969,7 +905,7 @@ class MiniLangParser ( Parser ):
                 _la = self._input.LA(1)
                 while _la==41:
                     self.state = 135
-                    self.match(MiniLangParser.COMA)
+                    self.match(gramatica_v3Parser.COMA)
                     self.state = 136
                     self.expresion(0)
                     self.state = 141
@@ -979,7 +915,7 @@ class MiniLangParser ( Parser ):
 
 
             self.state = 144
-            self.match(MiniLangParser.CORCHETE_DER)
+            self.match(gramatica_v3Parser.CORCHETE_DER)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -997,28 +933,20 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def IDENTIFICADOR(self):
-            return self.getToken(MiniLangParser.IDENTIFICADOR, 0)
+            return self.getToken(gramatica_v3Parser.IDENTIFICADOR, 0)
 
         def CORCHETE_IZQ(self):
-            return self.getToken(MiniLangParser.CORCHETE_IZQ, 0)
+            return self.getToken(gramatica_v3Parser.CORCHETE_IZQ, 0)
 
         def expresion(self):
-            return self.getTypedRuleContext(MiniLangParser.ExpresionContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,0)
 
 
         def CORCHETE_DER(self):
-            return self.getToken(MiniLangParser.CORCHETE_DER, 0)
+            return self.getToken(gramatica_v3Parser.CORCHETE_DER, 0)
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_accesoArreglo
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterAccesoArreglo" ):
-                listener.enterAccesoArreglo(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitAccesoArreglo" ):
-                listener.exitAccesoArreglo(self)
+            return gramatica_v3Parser.RULE_accesoArreglo
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitAccesoArreglo" ):
@@ -1031,18 +959,18 @@ class MiniLangParser ( Parser ):
 
     def accesoArreglo(self):
 
-        localctx = MiniLangParser.AccesoArregloContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.AccesoArregloContext(self, self._ctx, self.state)
         self.enterRule(localctx, 16, self.RULE_accesoArreglo)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 146
-            self.match(MiniLangParser.IDENTIFICADOR)
+            self.match(gramatica_v3Parser.IDENTIFICADOR)
             self.state = 147
-            self.match(MiniLangParser.CORCHETE_IZQ)
+            self.match(gramatica_v3Parser.CORCHETE_IZQ)
             self.state = 148
             self.expresion(0)
             self.state = 149
-            self.match(MiniLangParser.CORCHETE_DER)
+            self.match(gramatica_v3Parser.CORCHETE_DER)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1060,29 +988,21 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def accesoArreglo(self):
-            return self.getTypedRuleContext(MiniLangParser.AccesoArregloContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.AccesoArregloContext,0)
 
 
         def ASIGNACION(self):
-            return self.getToken(MiniLangParser.ASIGNACION, 0)
+            return self.getToken(gramatica_v3Parser.ASIGNACION, 0)
 
         def expresion(self):
-            return self.getTypedRuleContext(MiniLangParser.ExpresionContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,0)
 
 
         def PUNTO_COMA(self):
-            return self.getToken(MiniLangParser.PUNTO_COMA, 0)
+            return self.getToken(gramatica_v3Parser.PUNTO_COMA, 0)
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_asignacionArreglo
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterAsignacionArreglo" ):
-                listener.enterAsignacionArreglo(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitAsignacionArreglo" ):
-                listener.exitAsignacionArreglo(self)
+            return gramatica_v3Parser.RULE_asignacionArreglo
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitAsignacionArreglo" ):
@@ -1095,18 +1015,18 @@ class MiniLangParser ( Parser ):
 
     def asignacionArreglo(self):
 
-        localctx = MiniLangParser.AsignacionArregloContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.AsignacionArregloContext(self, self._ctx, self.state)
         self.enterRule(localctx, 18, self.RULE_asignacionArreglo)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 151
             self.accesoArreglo()
             self.state = 152
-            self.match(MiniLangParser.ASIGNACION)
+            self.match(gramatica_v3Parser.ASIGNACION)
             self.state = 153
             self.expresion(0)
             self.state = 154
-            self.match(MiniLangParser.PUNTO_COMA)
+            self.match(gramatica_v3Parser.PUNTO_COMA)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1124,27 +1044,19 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def TIPO_ENTERO(self):
-            return self.getToken(MiniLangParser.TIPO_ENTERO, 0)
+            return self.getToken(gramatica_v3Parser.TIPO_ENTERO, 0)
 
         def TIPO_BOOL(self):
-            return self.getToken(MiniLangParser.TIPO_BOOL, 0)
+            return self.getToken(gramatica_v3Parser.TIPO_BOOL, 0)
 
         def TIPO_FLOTANTE(self):
-            return self.getToken(MiniLangParser.TIPO_FLOTANTE, 0)
+            return self.getToken(gramatica_v3Parser.TIPO_FLOTANTE, 0)
 
         def TIPO_CADENA(self):
-            return self.getToken(MiniLangParser.TIPO_CADENA, 0)
+            return self.getToken(gramatica_v3Parser.TIPO_CADENA, 0)
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_tipo
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterTipo" ):
-                listener.enterTipo(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitTipo" ):
-                listener.exitTipo(self)
+            return gramatica_v3Parser.RULE_tipo
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitTipo" ):
@@ -1157,7 +1069,7 @@ class MiniLangParser ( Parser ):
 
     def tipo(self):
 
-        localctx = MiniLangParser.TipoContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.TipoContext(self, self._ctx, self.state)
         self.enterRule(localctx, 20, self.RULE_tipo)
         self._la = 0 # Token type
         try:
@@ -1186,28 +1098,20 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def IDENTIFICADOR(self):
-            return self.getToken(MiniLangParser.IDENTIFICADOR, 0)
+            return self.getToken(gramatica_v3Parser.IDENTIFICADOR, 0)
 
         def ASIGNACION(self):
-            return self.getToken(MiniLangParser.ASIGNACION, 0)
+            return self.getToken(gramatica_v3Parser.ASIGNACION, 0)
 
         def expresion(self):
-            return self.getTypedRuleContext(MiniLangParser.ExpresionContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,0)
 
 
         def PUNTO_COMA(self):
-            return self.getToken(MiniLangParser.PUNTO_COMA, 0)
+            return self.getToken(gramatica_v3Parser.PUNTO_COMA, 0)
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_asignacion
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterAsignacion" ):
-                listener.enterAsignacion(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitAsignacion" ):
-                listener.exitAsignacion(self)
+            return gramatica_v3Parser.RULE_asignacion
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitAsignacion" ):
@@ -1220,18 +1124,18 @@ class MiniLangParser ( Parser ):
 
     def asignacion(self):
 
-        localctx = MiniLangParser.AsignacionContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.AsignacionContext(self, self._ctx, self.state)
         self.enterRule(localctx, 22, self.RULE_asignacion)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 158
-            self.match(MiniLangParser.IDENTIFICADOR)
+            self.match(gramatica_v3Parser.IDENTIFICADOR)
             self.state = 159
-            self.match(MiniLangParser.ASIGNACION)
+            self.match(gramatica_v3Parser.ASIGNACION)
             self.state = 160
             self.expresion(0)
             self.state = 161
-            self.match(MiniLangParser.PUNTO_COMA)
+            self.match(gramatica_v3Parser.PUNTO_COMA)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1249,38 +1153,30 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def SI(self):
-            return self.getToken(MiniLangParser.SI, 0)
+            return self.getToken(gramatica_v3Parser.SI, 0)
 
         def PAREN_IZQ(self):
-            return self.getToken(MiniLangParser.PAREN_IZQ, 0)
+            return self.getToken(gramatica_v3Parser.PAREN_IZQ, 0)
 
         def expresion(self):
-            return self.getTypedRuleContext(MiniLangParser.ExpresionContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,0)
 
 
         def PAREN_DER(self):
-            return self.getToken(MiniLangParser.PAREN_DER, 0)
+            return self.getToken(gramatica_v3Parser.PAREN_DER, 0)
 
         def bloque(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(MiniLangParser.BloqueContext)
+                return self.getTypedRuleContexts(gramatica_v3Parser.BloqueContext)
             else:
-                return self.getTypedRuleContext(MiniLangParser.BloqueContext,i)
+                return self.getTypedRuleContext(gramatica_v3Parser.BloqueContext,i)
 
 
         def SINO(self):
-            return self.getToken(MiniLangParser.SINO, 0)
+            return self.getToken(gramatica_v3Parser.SINO, 0)
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_condicionalSi
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCondicionalSi" ):
-                listener.enterCondicionalSi(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCondicionalSi" ):
-                listener.exitCondicionalSi(self)
+            return gramatica_v3Parser.RULE_condicionalSi
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitCondicionalSi" ):
@@ -1293,19 +1189,19 @@ class MiniLangParser ( Parser ):
 
     def condicionalSi(self):
 
-        localctx = MiniLangParser.CondicionalSiContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.CondicionalSiContext(self, self._ctx, self.state)
         self.enterRule(localctx, 24, self.RULE_condicionalSi)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 163
-            self.match(MiniLangParser.SI)
+            self.match(gramatica_v3Parser.SI)
             self.state = 164
-            self.match(MiniLangParser.PAREN_IZQ)
+            self.match(gramatica_v3Parser.PAREN_IZQ)
             self.state = 165
             self.expresion(0)
             self.state = 166
-            self.match(MiniLangParser.PAREN_DER)
+            self.match(gramatica_v3Parser.PAREN_DER)
             self.state = 167
             self.bloque()
             self.state = 170
@@ -1313,7 +1209,7 @@ class MiniLangParser ( Parser ):
             _la = self._input.LA(1)
             if _la==3:
                 self.state = 168
-                self.match(MiniLangParser.SINO)
+                self.match(gramatica_v3Parser.SINO)
                 self.state = 169
                 self.bloque()
 
@@ -1335,31 +1231,23 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def IMPRIMIR(self):
-            return self.getToken(MiniLangParser.IMPRIMIR, 0)
+            return self.getToken(gramatica_v3Parser.IMPRIMIR, 0)
 
         def PAREN_IZQ(self):
-            return self.getToken(MiniLangParser.PAREN_IZQ, 0)
+            return self.getToken(gramatica_v3Parser.PAREN_IZQ, 0)
 
         def expresion(self):
-            return self.getTypedRuleContext(MiniLangParser.ExpresionContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,0)
 
 
         def PAREN_DER(self):
-            return self.getToken(MiniLangParser.PAREN_DER, 0)
+            return self.getToken(gramatica_v3Parser.PAREN_DER, 0)
 
         def PUNTO_COMA(self):
-            return self.getToken(MiniLangParser.PUNTO_COMA, 0)
+            return self.getToken(gramatica_v3Parser.PUNTO_COMA, 0)
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_impresion
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterImpresion" ):
-                listener.enterImpresion(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitImpresion" ):
-                listener.exitImpresion(self)
+            return gramatica_v3Parser.RULE_impresion
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitImpresion" ):
@@ -1372,20 +1260,20 @@ class MiniLangParser ( Parser ):
 
     def impresion(self):
 
-        localctx = MiniLangParser.ImpresionContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.ImpresionContext(self, self._ctx, self.state)
         self.enterRule(localctx, 26, self.RULE_impresion)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 172
-            self.match(MiniLangParser.IMPRIMIR)
+            self.match(gramatica_v3Parser.IMPRIMIR)
             self.state = 173
-            self.match(MiniLangParser.PAREN_IZQ)
+            self.match(gramatica_v3Parser.PAREN_IZQ)
             self.state = 174
             self.expresion(0)
             self.state = 175
-            self.match(MiniLangParser.PAREN_DER)
+            self.match(gramatica_v3Parser.PAREN_DER)
             self.state = 176
-            self.match(MiniLangParser.PUNTO_COMA)
+            self.match(gramatica_v3Parser.PUNTO_COMA)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1403,40 +1291,32 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def IDENTIFICADOR(self):
-            return self.getToken(MiniLangParser.IDENTIFICADOR, 0)
+            return self.getToken(gramatica_v3Parser.IDENTIFICADOR, 0)
 
         def PAREN_IZQ(self):
-            return self.getToken(MiniLangParser.PAREN_IZQ, 0)
+            return self.getToken(gramatica_v3Parser.PAREN_IZQ, 0)
 
         def PAREN_DER(self):
-            return self.getToken(MiniLangParser.PAREN_DER, 0)
+            return self.getToken(gramatica_v3Parser.PAREN_DER, 0)
 
         def PUNTO_COMA(self):
-            return self.getToken(MiniLangParser.PUNTO_COMA, 0)
+            return self.getToken(gramatica_v3Parser.PUNTO_COMA, 0)
 
         def expresion(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(MiniLangParser.ExpresionContext)
+                return self.getTypedRuleContexts(gramatica_v3Parser.ExpresionContext)
             else:
-                return self.getTypedRuleContext(MiniLangParser.ExpresionContext,i)
+                return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,i)
 
 
         def COMA(self, i:int=None):
             if i is None:
-                return self.getTokens(MiniLangParser.COMA)
+                return self.getTokens(gramatica_v3Parser.COMA)
             else:
-                return self.getToken(MiniLangParser.COMA, i)
+                return self.getToken(gramatica_v3Parser.COMA, i)
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_llamadaFuncion
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterLlamadaFuncion" ):
-                listener.enterLlamadaFuncion(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitLlamadaFuncion" ):
-                listener.exitLlamadaFuncion(self)
+            return gramatica_v3Parser.RULE_llamadaFuncion
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitLlamadaFuncion" ):
@@ -1449,15 +1329,15 @@ class MiniLangParser ( Parser ):
 
     def llamadaFuncion(self):
 
-        localctx = MiniLangParser.LlamadaFuncionContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.LlamadaFuncionContext(self, self._ctx, self.state)
         self.enterRule(localctx, 28, self.RULE_llamadaFuncion)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 178
-            self.match(MiniLangParser.IDENTIFICADOR)
+            self.match(gramatica_v3Parser.IDENTIFICADOR)
             self.state = 179
-            self.match(MiniLangParser.PAREN_IZQ)
+            self.match(gramatica_v3Parser.PAREN_IZQ)
             self.state = 188
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -1469,7 +1349,7 @@ class MiniLangParser ( Parser ):
                 _la = self._input.LA(1)
                 while _la==41:
                     self.state = 181
-                    self.match(MiniLangParser.COMA)
+                    self.match(gramatica_v3Parser.COMA)
                     self.state = 182
                     self.expresion(0)
                     self.state = 187
@@ -1479,9 +1359,9 @@ class MiniLangParser ( Parser ):
 
 
             self.state = 190
-            self.match(MiniLangParser.PAREN_DER)
+            self.match(gramatica_v3Parser.PAREN_DER)
             self.state = 191
-            self.match(MiniLangParser.PUNTO_COMA)
+            self.match(gramatica_v3Parser.PUNTO_COMA)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1499,29 +1379,21 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def tipo(self):
-            return self.getTypedRuleContext(MiniLangParser.TipoContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.TipoContext,0)
 
 
         def IDENTIFICADOR(self):
-            return self.getToken(MiniLangParser.IDENTIFICADOR, 0)
+            return self.getToken(gramatica_v3Parser.IDENTIFICADOR, 0)
 
         def ASIGNACION(self):
-            return self.getToken(MiniLangParser.ASIGNACION, 0)
+            return self.getToken(gramatica_v3Parser.ASIGNACION, 0)
 
         def expresion(self):
-            return self.getTypedRuleContext(MiniLangParser.ExpresionContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,0)
 
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_inicializacionPara
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterInicializacionPara" ):
-                listener.enterInicializacionPara(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitInicializacionPara" ):
-                listener.exitInicializacionPara(self)
+            return gramatica_v3Parser.RULE_inicializacionPara
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitInicializacionPara" ):
@@ -1534,16 +1406,16 @@ class MiniLangParser ( Parser ):
 
     def inicializacionPara(self):
 
-        localctx = MiniLangParser.InicializacionParaContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.InicializacionParaContext(self, self._ctx, self.state)
         self.enterRule(localctx, 30, self.RULE_inicializacionPara)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 193
             self.tipo()
             self.state = 194
-            self.match(MiniLangParser.IDENTIFICADOR)
+            self.match(gramatica_v3Parser.IDENTIFICADOR)
             self.state = 195
-            self.match(MiniLangParser.ASIGNACION)
+            self.match(gramatica_v3Parser.ASIGNACION)
             self.state = 196
             self.expresion(0)
         except RecognitionException as re:
@@ -1563,25 +1435,17 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def IDENTIFICADOR(self):
-            return self.getToken(MiniLangParser.IDENTIFICADOR, 0)
+            return self.getToken(gramatica_v3Parser.IDENTIFICADOR, 0)
 
         def ASIGNACION(self):
-            return self.getToken(MiniLangParser.ASIGNACION, 0)
+            return self.getToken(gramatica_v3Parser.ASIGNACION, 0)
 
         def expresion(self):
-            return self.getTypedRuleContext(MiniLangParser.ExpresionContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,0)
 
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_asignacionPara
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterAsignacionPara" ):
-                listener.enterAsignacionPara(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitAsignacionPara" ):
-                listener.exitAsignacionPara(self)
+            return gramatica_v3Parser.RULE_asignacionPara
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitAsignacionPara" ):
@@ -1594,14 +1458,14 @@ class MiniLangParser ( Parser ):
 
     def asignacionPara(self):
 
-        localctx = MiniLangParser.AsignacionParaContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.AsignacionParaContext(self, self._ctx, self.state)
         self.enterRule(localctx, 32, self.RULE_asignacionPara)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 198
-            self.match(MiniLangParser.IDENTIFICADOR)
+            self.match(gramatica_v3Parser.IDENTIFICADOR)
             self.state = 199
-            self.match(MiniLangParser.ASIGNACION)
+            self.match(gramatica_v3Parser.ASIGNACION)
             self.state = 200
             self.expresion(0)
         except RecognitionException as re:
@@ -1621,25 +1485,17 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def IDENTIFICADOR(self):
-            return self.getToken(MiniLangParser.IDENTIFICADOR, 0)
+            return self.getToken(gramatica_v3Parser.IDENTIFICADOR, 0)
 
         def ASIGNACION(self):
-            return self.getToken(MiniLangParser.ASIGNACION, 0)
+            return self.getToken(gramatica_v3Parser.ASIGNACION, 0)
 
         def expresion(self):
-            return self.getTypedRuleContext(MiniLangParser.ExpresionContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,0)
 
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_actualizacionPara
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterActualizacionPara" ):
-                listener.enterActualizacionPara(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitActualizacionPara" ):
-                listener.exitActualizacionPara(self)
+            return gramatica_v3Parser.RULE_actualizacionPara
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitActualizacionPara" ):
@@ -1652,14 +1508,14 @@ class MiniLangParser ( Parser ):
 
     def actualizacionPara(self):
 
-        localctx = MiniLangParser.ActualizacionParaContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.ActualizacionParaContext(self, self._ctx, self.state)
         self.enterRule(localctx, 34, self.RULE_actualizacionPara)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 202
-            self.match(MiniLangParser.IDENTIFICADOR)
+            self.match(gramatica_v3Parser.IDENTIFICADOR)
             self.state = 203
-            self.match(MiniLangParser.ASIGNACION)
+            self.match(gramatica_v3Parser.ASIGNACION)
             self.state = 204
             self.expresion(0)
         except RecognitionException as re:
@@ -1679,32 +1535,24 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def MIENTRAS(self):
-            return self.getToken(MiniLangParser.MIENTRAS, 0)
+            return self.getToken(gramatica_v3Parser.MIENTRAS, 0)
 
         def PAREN_IZQ(self):
-            return self.getToken(MiniLangParser.PAREN_IZQ, 0)
+            return self.getToken(gramatica_v3Parser.PAREN_IZQ, 0)
 
         def expresion(self):
-            return self.getTypedRuleContext(MiniLangParser.ExpresionContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,0)
 
 
         def PAREN_DER(self):
-            return self.getToken(MiniLangParser.PAREN_DER, 0)
+            return self.getToken(gramatica_v3Parser.PAREN_DER, 0)
 
         def bloque(self):
-            return self.getTypedRuleContext(MiniLangParser.BloqueContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.BloqueContext,0)
 
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_cicloMientras
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCicloMientras" ):
-                listener.enterCicloMientras(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCicloMientras" ):
-                listener.exitCicloMientras(self)
+            return gramatica_v3Parser.RULE_cicloMientras
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitCicloMientras" ):
@@ -1717,18 +1565,18 @@ class MiniLangParser ( Parser ):
 
     def cicloMientras(self):
 
-        localctx = MiniLangParser.CicloMientrasContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.CicloMientrasContext(self, self._ctx, self.state)
         self.enterRule(localctx, 36, self.RULE_cicloMientras)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 206
-            self.match(MiniLangParser.MIENTRAS)
+            self.match(gramatica_v3Parser.MIENTRAS)
             self.state = 207
-            self.match(MiniLangParser.PAREN_IZQ)
+            self.match(gramatica_v3Parser.PAREN_IZQ)
             self.state = 208
             self.expresion(0)
             self.state = 209
-            self.match(MiniLangParser.PAREN_DER)
+            self.match(gramatica_v3Parser.PAREN_DER)
             self.state = 210
             self.bloque()
         except RecognitionException as re:
@@ -1749,50 +1597,42 @@ class MiniLangParser ( Parser ):
             self.cond = None # ExpresionContext
 
         def PARA(self):
-            return self.getToken(MiniLangParser.PARA, 0)
+            return self.getToken(gramatica_v3Parser.PARA, 0)
 
         def PAREN_IZQ(self):
-            return self.getToken(MiniLangParser.PAREN_IZQ, 0)
+            return self.getToken(gramatica_v3Parser.PAREN_IZQ, 0)
 
         def PUNTO_COMA(self, i:int=None):
             if i is None:
-                return self.getTokens(MiniLangParser.PUNTO_COMA)
+                return self.getTokens(gramatica_v3Parser.PUNTO_COMA)
             else:
-                return self.getToken(MiniLangParser.PUNTO_COMA, i)
+                return self.getToken(gramatica_v3Parser.PUNTO_COMA, i)
 
         def PAREN_DER(self):
-            return self.getToken(MiniLangParser.PAREN_DER, 0)
+            return self.getToken(gramatica_v3Parser.PAREN_DER, 0)
 
         def bloque(self):
-            return self.getTypedRuleContext(MiniLangParser.BloqueContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.BloqueContext,0)
 
 
         def inicializacionPara(self):
-            return self.getTypedRuleContext(MiniLangParser.InicializacionParaContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.InicializacionParaContext,0)
 
 
         def asignacionPara(self):
-            return self.getTypedRuleContext(MiniLangParser.AsignacionParaContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.AsignacionParaContext,0)
 
 
         def actualizacionPara(self):
-            return self.getTypedRuleContext(MiniLangParser.ActualizacionParaContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.ActualizacionParaContext,0)
 
 
         def expresion(self):
-            return self.getTypedRuleContext(MiniLangParser.ExpresionContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,0)
 
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_cicloPara
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCicloPara" ):
-                listener.enterCicloPara(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCicloPara" ):
-                listener.exitCicloPara(self)
+            return gramatica_v3Parser.RULE_cicloPara
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitCicloPara" ):
@@ -1805,15 +1645,15 @@ class MiniLangParser ( Parser ):
 
     def cicloPara(self):
 
-        localctx = MiniLangParser.CicloParaContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.CicloParaContext(self, self._ctx, self.state)
         self.enterRule(localctx, 38, self.RULE_cicloPara)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 212
-            self.match(MiniLangParser.PARA)
+            self.match(gramatica_v3Parser.PARA)
             self.state = 213
-            self.match(MiniLangParser.PAREN_IZQ)
+            self.match(gramatica_v3Parser.PAREN_IZQ)
             self.state = 216
             self._errHandler.sync(self)
             token = self._input.LA(1)
@@ -1830,7 +1670,7 @@ class MiniLangParser ( Parser ):
             else:
                 pass
             self.state = 218
-            self.match(MiniLangParser.PUNTO_COMA)
+            self.match(gramatica_v3Parser.PUNTO_COMA)
             self.state = 220
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -1840,7 +1680,7 @@ class MiniLangParser ( Parser ):
 
 
             self.state = 222
-            self.match(MiniLangParser.PUNTO_COMA)
+            self.match(gramatica_v3Parser.PUNTO_COMA)
             self.state = 224
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -1850,7 +1690,7 @@ class MiniLangParser ( Parser ):
 
 
             self.state = 226
-            self.match(MiniLangParser.PAREN_DER)
+            self.match(gramatica_v3Parser.PAREN_DER)
             self.state = 227
             self.bloque()
         except RecognitionException as re:
@@ -1870,25 +1710,17 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def RETORNA(self):
-            return self.getToken(MiniLangParser.RETORNA, 0)
+            return self.getToken(gramatica_v3Parser.RETORNA, 0)
 
         def PUNTO_COMA(self):
-            return self.getToken(MiniLangParser.PUNTO_COMA, 0)
+            return self.getToken(gramatica_v3Parser.PUNTO_COMA, 0)
 
         def expresion(self):
-            return self.getTypedRuleContext(MiniLangParser.ExpresionContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,0)
 
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_sentenciaRetorna
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterSentenciaRetorna" ):
-                listener.enterSentenciaRetorna(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitSentenciaRetorna" ):
-                listener.exitSentenciaRetorna(self)
+            return gramatica_v3Parser.RULE_sentenciaRetorna
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitSentenciaRetorna" ):
@@ -1901,13 +1733,13 @@ class MiniLangParser ( Parser ):
 
     def sentenciaRetorna(self):
 
-        localctx = MiniLangParser.SentenciaRetornaContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.SentenciaRetornaContext(self, self._ctx, self.state)
         self.enterRule(localctx, 40, self.RULE_sentenciaRetorna)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 229
-            self.match(MiniLangParser.RETORNA)
+            self.match(gramatica_v3Parser.RETORNA)
             self.state = 231
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -1917,7 +1749,7 @@ class MiniLangParser ( Parser ):
 
 
             self.state = 233
-            self.match(MiniLangParser.PUNTO_COMA)
+            self.match(gramatica_v3Parser.PUNTO_COMA)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1935,21 +1767,13 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def ROMPER(self):
-            return self.getToken(MiniLangParser.ROMPER, 0)
+            return self.getToken(gramatica_v3Parser.ROMPER, 0)
 
         def PUNTO_COMA(self):
-            return self.getToken(MiniLangParser.PUNTO_COMA, 0)
+            return self.getToken(gramatica_v3Parser.PUNTO_COMA, 0)
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_sentenciaBreak
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterSentenciaBreak" ):
-                listener.enterSentenciaBreak(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitSentenciaBreak" ):
-                listener.exitSentenciaBreak(self)
+            return gramatica_v3Parser.RULE_sentenciaBreak
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitSentenciaBreak" ):
@@ -1962,14 +1786,14 @@ class MiniLangParser ( Parser ):
 
     def sentenciaBreak(self):
 
-        localctx = MiniLangParser.SentenciaBreakContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.SentenciaBreakContext(self, self._ctx, self.state)
         self.enterRule(localctx, 42, self.RULE_sentenciaBreak)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 235
-            self.match(MiniLangParser.ROMPER)
+            self.match(gramatica_v3Parser.ROMPER)
             self.state = 236
-            self.match(MiniLangParser.PUNTO_COMA)
+            self.match(gramatica_v3Parser.PUNTO_COMA)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1987,21 +1811,13 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def CONTINUAR(self):
-            return self.getToken(MiniLangParser.CONTINUAR, 0)
+            return self.getToken(gramatica_v3Parser.CONTINUAR, 0)
 
         def PUNTO_COMA(self):
-            return self.getToken(MiniLangParser.PUNTO_COMA, 0)
+            return self.getToken(gramatica_v3Parser.PUNTO_COMA, 0)
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_sentenciaContinue
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterSentenciaContinue" ):
-                listener.enterSentenciaContinue(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitSentenciaContinue" ):
-                listener.exitSentenciaContinue(self)
+            return gramatica_v3Parser.RULE_sentenciaContinue
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitSentenciaContinue" ):
@@ -2014,14 +1830,14 @@ class MiniLangParser ( Parser ):
 
     def sentenciaContinue(self):
 
-        localctx = MiniLangParser.SentenciaContinueContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.SentenciaContinueContext(self, self._ctx, self.state)
         self.enterRule(localctx, 44, self.RULE_sentenciaContinue)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 238
-            self.match(MiniLangParser.CONTINUAR)
+            self.match(gramatica_v3Parser.CONTINUAR)
             self.state = 239
-            self.match(MiniLangParser.PUNTO_COMA)
+            self.match(gramatica_v3Parser.PUNTO_COMA)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -2039,24 +1855,16 @@ class MiniLangParser ( Parser ):
             self.parser = parser
 
         def IMPORTAR(self):
-            return self.getToken(MiniLangParser.IMPORTAR, 0)
+            return self.getToken(gramatica_v3Parser.IMPORTAR, 0)
 
         def CADENA(self):
-            return self.getToken(MiniLangParser.CADENA, 0)
+            return self.getToken(gramatica_v3Parser.CADENA, 0)
 
         def PUNTO_COMA(self):
-            return self.getToken(MiniLangParser.PUNTO_COMA, 0)
+            return self.getToken(gramatica_v3Parser.PUNTO_COMA, 0)
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_sentenciaImportar
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterSentenciaImportar" ):
-                listener.enterSentenciaImportar(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitSentenciaImportar" ):
-                listener.exitSentenciaImportar(self)
+            return gramatica_v3Parser.RULE_sentenciaImportar
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitSentenciaImportar" ):
@@ -2069,16 +1877,16 @@ class MiniLangParser ( Parser ):
 
     def sentenciaImportar(self):
 
-        localctx = MiniLangParser.SentenciaImportarContext(self, self._ctx, self.state)
+        localctx = gramatica_v3Parser.SentenciaImportarContext(self, self._ctx, self.state)
         self.enterRule(localctx, 46, self.RULE_sentenciaImportar)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 241
-            self.match(MiniLangParser.IMPORTAR)
+            self.match(gramatica_v3Parser.IMPORTAR)
             self.state = 242
-            self.match(MiniLangParser.CADENA)
+            self.match(gramatica_v3Parser.CADENA)
             self.state = 243
-            self.match(MiniLangParser.PUNTO_COMA)
+            self.match(gramatica_v3Parser.PUNTO_COMA)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -2097,7 +1905,7 @@ class MiniLangParser ( Parser ):
 
 
         def getRuleIndex(self):
-            return MiniLangParser.RULE_expresion
+            return gramatica_v3Parser.RULE_expresion
 
      
         def copyFrom(self, ctx:ParserRuleContext):
@@ -2106,20 +1914,12 @@ class MiniLangParser ( Parser ):
 
     class LiteralCadenaContext(ExpresionContext):
 
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniLangParser.ExpresionContext
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a gramatica_v3Parser.ExpresionContext
             super().__init__(parser)
             self.copyFrom(ctx)
 
         def CADENA(self):
-            return self.getToken(MiniLangParser.CADENA, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterLiteralCadena" ):
-                listener.enterLiteralCadena(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitLiteralCadena" ):
-                listener.exitLiteralCadena(self)
+            return self.getToken(gramatica_v3Parser.CADENA, 0)
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitLiteralCadena" ):
@@ -2130,25 +1930,17 @@ class MiniLangParser ( Parser ):
 
     class ParentesisContext(ExpresionContext):
 
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniLangParser.ExpresionContext
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a gramatica_v3Parser.ExpresionContext
             super().__init__(parser)
             self.copyFrom(ctx)
 
         def PAREN_IZQ(self):
-            return self.getToken(MiniLangParser.PAREN_IZQ, 0)
+            return self.getToken(gramatica_v3Parser.PAREN_IZQ, 0)
         def expresion(self):
-            return self.getTypedRuleContext(MiniLangParser.ExpresionContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,0)
 
         def PAREN_DER(self):
-            return self.getToken(MiniLangParser.PAREN_DER, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterParentesis" ):
-                listener.enterParentesis(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitParentesis" ):
-                listener.exitParentesis(self)
+            return self.getToken(gramatica_v3Parser.PAREN_DER, 0)
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitParentesis" ):
@@ -2159,23 +1951,15 @@ class MiniLangParser ( Parser ):
 
     class MenosUnarioContext(ExpresionContext):
 
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniLangParser.ExpresionContext
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a gramatica_v3Parser.ExpresionContext
             super().__init__(parser)
             self.copyFrom(ctx)
 
         def RESTA(self):
-            return self.getToken(MiniLangParser.RESTA, 0)
+            return self.getToken(gramatica_v3Parser.RESTA, 0)
         def expresion(self):
-            return self.getTypedRuleContext(MiniLangParser.ExpresionContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,0)
 
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMenosUnario" ):
-                listener.enterMenosUnario(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMenosUnario" ):
-                listener.exitMenosUnario(self)
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitMenosUnario" ):
@@ -2186,35 +1970,27 @@ class MiniLangParser ( Parser ):
 
     class LlamadaFuncionExprContext(ExpresionContext):
 
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniLangParser.ExpresionContext
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a gramatica_v3Parser.ExpresionContext
             super().__init__(parser)
             self.copyFrom(ctx)
 
         def IDENTIFICADOR(self):
-            return self.getToken(MiniLangParser.IDENTIFICADOR, 0)
+            return self.getToken(gramatica_v3Parser.IDENTIFICADOR, 0)
         def PAREN_IZQ(self):
-            return self.getToken(MiniLangParser.PAREN_IZQ, 0)
+            return self.getToken(gramatica_v3Parser.PAREN_IZQ, 0)
         def PAREN_DER(self):
-            return self.getToken(MiniLangParser.PAREN_DER, 0)
+            return self.getToken(gramatica_v3Parser.PAREN_DER, 0)
         def expresion(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(MiniLangParser.ExpresionContext)
+                return self.getTypedRuleContexts(gramatica_v3Parser.ExpresionContext)
             else:
-                return self.getTypedRuleContext(MiniLangParser.ExpresionContext,i)
+                return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,i)
 
         def COMA(self, i:int=None):
             if i is None:
-                return self.getTokens(MiniLangParser.COMA)
+                return self.getTokens(gramatica_v3Parser.COMA)
             else:
-                return self.getToken(MiniLangParser.COMA, i)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterLlamadaFuncionExpr" ):
-                listener.enterLlamadaFuncionExpr(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitLlamadaFuncionExpr" ):
-                listener.exitLlamadaFuncionExpr(self)
+                return self.getToken(gramatica_v3Parser.COMA, i)
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitLlamadaFuncionExpr" ):
@@ -2225,20 +2001,12 @@ class MiniLangParser ( Parser ):
 
     class LiteralEnteroContext(ExpresionContext):
 
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniLangParser.ExpresionContext
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a gramatica_v3Parser.ExpresionContext
             super().__init__(parser)
             self.copyFrom(ctx)
 
         def ENTERO(self):
-            return self.getToken(MiniLangParser.ENTERO, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterLiteralEntero" ):
-                listener.enterLiteralEntero(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitLiteralEntero" ):
-                listener.exitLiteralEntero(self)
+            return self.getToken(gramatica_v3Parser.ENTERO, 0)
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitLiteralEntero" ):
@@ -2249,20 +2017,12 @@ class MiniLangParser ( Parser ):
 
     class LiteralVerdaderoContext(ExpresionContext):
 
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniLangParser.ExpresionContext
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a gramatica_v3Parser.ExpresionContext
             super().__init__(parser)
             self.copyFrom(ctx)
 
         def VERDADERO(self):
-            return self.getToken(MiniLangParser.VERDADERO, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterLiteralVerdadero" ):
-                listener.enterLiteralVerdadero(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitLiteralVerdadero" ):
-                listener.exitLiteralVerdadero(self)
+            return self.getToken(gramatica_v3Parser.VERDADERO, 0)
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitLiteralVerdadero" ):
@@ -2273,7 +2033,7 @@ class MiniLangParser ( Parser ):
 
     class SumaRestaContext(ExpresionContext):
 
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniLangParser.ExpresionContext
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a gramatica_v3Parser.ExpresionContext
             super().__init__(parser)
             self.izq = None # ExpresionContext
             self.op = None # Token
@@ -2282,22 +2042,14 @@ class MiniLangParser ( Parser ):
 
         def expresion(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(MiniLangParser.ExpresionContext)
+                return self.getTypedRuleContexts(gramatica_v3Parser.ExpresionContext)
             else:
-                return self.getTypedRuleContext(MiniLangParser.ExpresionContext,i)
+                return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,i)
 
         def SUMA(self):
-            return self.getToken(MiniLangParser.SUMA, 0)
+            return self.getToken(gramatica_v3Parser.SUMA, 0)
         def RESTA(self):
-            return self.getToken(MiniLangParser.RESTA, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterSumaResta" ):
-                listener.enterSumaResta(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitSumaResta" ):
-                listener.exitSumaResta(self)
+            return self.getToken(gramatica_v3Parser.RESTA, 0)
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitSumaResta" ):
@@ -2308,20 +2060,12 @@ class MiniLangParser ( Parser ):
 
     class LiteralFlotanteContext(ExpresionContext):
 
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniLangParser.ExpresionContext
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a gramatica_v3Parser.ExpresionContext
             super().__init__(parser)
             self.copyFrom(ctx)
 
         def FLOTANTE(self):
-            return self.getToken(MiniLangParser.FLOTANTE, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterLiteralFlotante" ):
-                listener.enterLiteralFlotante(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitLiteralFlotante" ):
-                listener.exitLiteralFlotante(self)
+            return self.getToken(gramatica_v3Parser.FLOTANTE, 0)
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitLiteralFlotante" ):
@@ -2332,23 +2076,15 @@ class MiniLangParser ( Parser ):
 
     class NegacionLogicaContext(ExpresionContext):
 
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniLangParser.ExpresionContext
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a gramatica_v3Parser.ExpresionContext
             super().__init__(parser)
             self.copyFrom(ctx)
 
         def NEGACION(self):
-            return self.getToken(MiniLangParser.NEGACION, 0)
+            return self.getToken(gramatica_v3Parser.NEGACION, 0)
         def expresion(self):
-            return self.getTypedRuleContext(MiniLangParser.ExpresionContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,0)
 
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterNegacionLogica" ):
-                listener.enterNegacionLogica(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitNegacionLogica" ):
-                listener.exitNegacionLogica(self)
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitNegacionLogica" ):
@@ -2359,7 +2095,7 @@ class MiniLangParser ( Parser ):
 
     class RelacionalContext(ExpresionContext):
 
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniLangParser.ExpresionContext
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a gramatica_v3Parser.ExpresionContext
             super().__init__(parser)
             self.izq = None # ExpresionContext
             self.op = None # Token
@@ -2368,30 +2104,22 @@ class MiniLangParser ( Parser ):
 
         def expresion(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(MiniLangParser.ExpresionContext)
+                return self.getTypedRuleContexts(gramatica_v3Parser.ExpresionContext)
             else:
-                return self.getTypedRuleContext(MiniLangParser.ExpresionContext,i)
+                return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,i)
 
         def IGUAL(self):
-            return self.getToken(MiniLangParser.IGUAL, 0)
+            return self.getToken(gramatica_v3Parser.IGUAL, 0)
         def DIFERENTE(self):
-            return self.getToken(MiniLangParser.DIFERENTE, 0)
+            return self.getToken(gramatica_v3Parser.DIFERENTE, 0)
         def MENOR_QUE(self):
-            return self.getToken(MiniLangParser.MENOR_QUE, 0)
+            return self.getToken(gramatica_v3Parser.MENOR_QUE, 0)
         def MENOR_IGUAL(self):
-            return self.getToken(MiniLangParser.MENOR_IGUAL, 0)
+            return self.getToken(gramatica_v3Parser.MENOR_IGUAL, 0)
         def MAYOR_QUE(self):
-            return self.getToken(MiniLangParser.MAYOR_QUE, 0)
+            return self.getToken(gramatica_v3Parser.MAYOR_QUE, 0)
         def MAYOR_IGUAL(self):
-            return self.getToken(MiniLangParser.MAYOR_IGUAL, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterRelacional" ):
-                listener.enterRelacional(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitRelacional" ):
-                listener.exitRelacional(self)
+            return self.getToken(gramatica_v3Parser.MAYOR_IGUAL, 0)
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitRelacional" ):
@@ -2402,20 +2130,12 @@ class MiniLangParser ( Parser ):
 
     class ReferenciaVariableContext(ExpresionContext):
 
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniLangParser.ExpresionContext
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a gramatica_v3Parser.ExpresionContext
             super().__init__(parser)
             self.copyFrom(ctx)
 
         def IDENTIFICADOR(self):
-            return self.getToken(MiniLangParser.IDENTIFICADOR, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterReferenciaVariable" ):
-                listener.enterReferenciaVariable(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitReferenciaVariable" ):
-                listener.exitReferenciaVariable(self)
+            return self.getToken(gramatica_v3Parser.IDENTIFICADOR, 0)
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitReferenciaVariable" ):
@@ -2426,20 +2146,12 @@ class MiniLangParser ( Parser ):
 
     class LiteralFalsoContext(ExpresionContext):
 
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniLangParser.ExpresionContext
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a gramatica_v3Parser.ExpresionContext
             super().__init__(parser)
             self.copyFrom(ctx)
 
         def FALSO(self):
-            return self.getToken(MiniLangParser.FALSO, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterLiteralFalso" ):
-                listener.enterLiteralFalso(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitLiteralFalso" ):
-                listener.exitLiteralFalso(self)
+            return self.getToken(gramatica_v3Parser.FALSO, 0)
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitLiteralFalso" ):
@@ -2450,21 +2162,13 @@ class MiniLangParser ( Parser ):
 
     class AccesoArregloExprContext(ExpresionContext):
 
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniLangParser.ExpresionContext
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a gramatica_v3Parser.ExpresionContext
             super().__init__(parser)
             self.copyFrom(ctx)
 
         def accesoArreglo(self):
-            return self.getTypedRuleContext(MiniLangParser.AccesoArregloContext,0)
+            return self.getTypedRuleContext(gramatica_v3Parser.AccesoArregloContext,0)
 
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterAccesoArregloExpr" ):
-                listener.enterAccesoArregloExpr(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitAccesoArregloExpr" ):
-                listener.exitAccesoArregloExpr(self)
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitAccesoArregloExpr" ):
@@ -2475,7 +2179,7 @@ class MiniLangParser ( Parser ):
 
     class MultiplicacionDivisionModuloContext(ExpresionContext):
 
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniLangParser.ExpresionContext
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a gramatica_v3Parser.ExpresionContext
             super().__init__(parser)
             self.izq = None # ExpresionContext
             self.op = None # Token
@@ -2484,24 +2188,16 @@ class MiniLangParser ( Parser ):
 
         def expresion(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(MiniLangParser.ExpresionContext)
+                return self.getTypedRuleContexts(gramatica_v3Parser.ExpresionContext)
             else:
-                return self.getTypedRuleContext(MiniLangParser.ExpresionContext,i)
+                return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,i)
 
         def MULTIPLICACION(self):
-            return self.getToken(MiniLangParser.MULTIPLICACION, 0)
+            return self.getToken(gramatica_v3Parser.MULTIPLICACION, 0)
         def DIVISION(self):
-            return self.getToken(MiniLangParser.DIVISION, 0)
+            return self.getToken(gramatica_v3Parser.DIVISION, 0)
         def MODULO(self):
-            return self.getToken(MiniLangParser.MODULO, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterMultiplicacionDivisionModulo" ):
-                listener.enterMultiplicacionDivisionModulo(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitMultiplicacionDivisionModulo" ):
-                listener.exitMultiplicacionDivisionModulo(self)
+            return self.getToken(gramatica_v3Parser.MODULO, 0)
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitMultiplicacionDivisionModulo" ):
@@ -2512,7 +2208,7 @@ class MiniLangParser ( Parser ):
 
     class LogicaContext(ExpresionContext):
 
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a MiniLangParser.ExpresionContext
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a gramatica_v3Parser.ExpresionContext
             super().__init__(parser)
             self.izq = None # ExpresionContext
             self.op = None # Token
@@ -2521,22 +2217,14 @@ class MiniLangParser ( Parser ):
 
         def expresion(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(MiniLangParser.ExpresionContext)
+                return self.getTypedRuleContexts(gramatica_v3Parser.ExpresionContext)
             else:
-                return self.getTypedRuleContext(MiniLangParser.ExpresionContext,i)
+                return self.getTypedRuleContext(gramatica_v3Parser.ExpresionContext,i)
 
         def Y_LOGICO(self):
-            return self.getToken(MiniLangParser.Y_LOGICO, 0)
+            return self.getToken(gramatica_v3Parser.Y_LOGICO, 0)
         def O_LOGICO(self):
-            return self.getToken(MiniLangParser.O_LOGICO, 0)
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterLogica" ):
-                listener.enterLogica(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitLogica" ):
-                listener.exitLogica(self)
+            return self.getToken(gramatica_v3Parser.O_LOGICO, 0)
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitLogica" ):
@@ -2549,7 +2237,7 @@ class MiniLangParser ( Parser ):
     def expresion(self, _p:int=0):
         _parentctx = self._ctx
         _parentState = self.state
-        localctx = MiniLangParser.ExpresionContext(self, self._ctx, _parentState)
+        localctx = gramatica_v3Parser.ExpresionContext(self, self._ctx, _parentState)
         _prevctx = localctx
         _startState = 48
         self.enterRecursionRule(localctx, 48, self.RULE_expresion, _p)
@@ -2560,88 +2248,88 @@ class MiniLangParser ( Parser ):
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,21,self._ctx)
             if la_ == 1:
-                localctx = MiniLangParser.NegacionLogicaContext(self, localctx)
+                localctx = gramatica_v3Parser.NegacionLogicaContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
 
                 self.state = 246
-                self.match(MiniLangParser.NEGACION)
+                self.match(gramatica_v3Parser.NEGACION)
                 self.state = 247
                 self.expresion(15)
                 pass
 
             elif la_ == 2:
-                localctx = MiniLangParser.MenosUnarioContext(self, localctx)
+                localctx = gramatica_v3Parser.MenosUnarioContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 248
-                self.match(MiniLangParser.RESTA)
+                self.match(gramatica_v3Parser.RESTA)
                 self.state = 249
                 self.expresion(14)
                 pass
 
             elif la_ == 3:
-                localctx = MiniLangParser.ParentesisContext(self, localctx)
+                localctx = gramatica_v3Parser.ParentesisContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 250
-                self.match(MiniLangParser.PAREN_IZQ)
+                self.match(gramatica_v3Parser.PAREN_IZQ)
                 self.state = 251
                 self.expresion(0)
                 self.state = 252
-                self.match(MiniLangParser.PAREN_DER)
+                self.match(gramatica_v3Parser.PAREN_DER)
                 pass
 
             elif la_ == 4:
-                localctx = MiniLangParser.LiteralEnteroContext(self, localctx)
+                localctx = gramatica_v3Parser.LiteralEnteroContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 254
-                self.match(MiniLangParser.ENTERO)
+                self.match(gramatica_v3Parser.ENTERO)
                 pass
 
             elif la_ == 5:
-                localctx = MiniLangParser.LiteralFlotanteContext(self, localctx)
+                localctx = gramatica_v3Parser.LiteralFlotanteContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 255
-                self.match(MiniLangParser.FLOTANTE)
+                self.match(gramatica_v3Parser.FLOTANTE)
                 pass
 
             elif la_ == 6:
-                localctx = MiniLangParser.LiteralCadenaContext(self, localctx)
+                localctx = gramatica_v3Parser.LiteralCadenaContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 256
-                self.match(MiniLangParser.CADENA)
+                self.match(gramatica_v3Parser.CADENA)
                 pass
 
             elif la_ == 7:
-                localctx = MiniLangParser.LiteralVerdaderoContext(self, localctx)
+                localctx = gramatica_v3Parser.LiteralVerdaderoContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 257
-                self.match(MiniLangParser.VERDADERO)
+                self.match(gramatica_v3Parser.VERDADERO)
                 pass
 
             elif la_ == 8:
-                localctx = MiniLangParser.LiteralFalsoContext(self, localctx)
+                localctx = gramatica_v3Parser.LiteralFalsoContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 258
-                self.match(MiniLangParser.FALSO)
+                self.match(gramatica_v3Parser.FALSO)
                 pass
 
             elif la_ == 9:
-                localctx = MiniLangParser.ReferenciaVariableContext(self, localctx)
+                localctx = gramatica_v3Parser.ReferenciaVariableContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 259
-                self.match(MiniLangParser.IDENTIFICADOR)
+                self.match(gramatica_v3Parser.IDENTIFICADOR)
                 pass
 
             elif la_ == 10:
-                localctx = MiniLangParser.AccesoArregloExprContext(self, localctx)
+                localctx = gramatica_v3Parser.AccesoArregloExprContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 260
@@ -2649,13 +2337,13 @@ class MiniLangParser ( Parser ):
                 pass
 
             elif la_ == 11:
-                localctx = MiniLangParser.LlamadaFuncionExprContext(self, localctx)
+                localctx = gramatica_v3Parser.LlamadaFuncionExprContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 261
-                self.match(MiniLangParser.IDENTIFICADOR)
+                self.match(gramatica_v3Parser.IDENTIFICADOR)
                 self.state = 262
-                self.match(MiniLangParser.PAREN_IZQ)
+                self.match(gramatica_v3Parser.PAREN_IZQ)
                 self.state = 271
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
@@ -2667,7 +2355,7 @@ class MiniLangParser ( Parser ):
                     _la = self._input.LA(1)
                     while _la==41:
                         self.state = 264
-                        self.match(MiniLangParser.COMA)
+                        self.match(gramatica_v3Parser.COMA)
                         self.state = 265
                         self.expresion(0)
                         self.state = 270
@@ -2677,7 +2365,7 @@ class MiniLangParser ( Parser ):
 
 
                 self.state = 273
-                self.match(MiniLangParser.PAREN_DER)
+                self.match(gramatica_v3Parser.PAREN_DER)
                 pass
 
 
@@ -2694,7 +2382,7 @@ class MiniLangParser ( Parser ):
                     self._errHandler.sync(self)
                     la_ = self._interp.adaptivePredict(self._input,22,self._ctx)
                     if la_ == 1:
-                        localctx = MiniLangParser.MultiplicacionDivisionModuloContext(self, MiniLangParser.ExpresionContext(self, _parentctx, _parentState))
+                        localctx = gramatica_v3Parser.MultiplicacionDivisionModuloContext(self, gramatica_v3Parser.ExpresionContext(self, _parentctx, _parentState))
                         localctx.izq = _prevctx
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expresion)
                         self.state = 276
@@ -2714,7 +2402,7 @@ class MiniLangParser ( Parser ):
                         pass
 
                     elif la_ == 2:
-                        localctx = MiniLangParser.SumaRestaContext(self, MiniLangParser.ExpresionContext(self, _parentctx, _parentState))
+                        localctx = gramatica_v3Parser.SumaRestaContext(self, gramatica_v3Parser.ExpresionContext(self, _parentctx, _parentState))
                         localctx.izq = _prevctx
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expresion)
                         self.state = 279
@@ -2734,7 +2422,7 @@ class MiniLangParser ( Parser ):
                         pass
 
                     elif la_ == 3:
-                        localctx = MiniLangParser.RelacionalContext(self, MiniLangParser.ExpresionContext(self, _parentctx, _parentState))
+                        localctx = gramatica_v3Parser.RelacionalContext(self, gramatica_v3Parser.ExpresionContext(self, _parentctx, _parentState))
                         localctx.izq = _prevctx
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expresion)
                         self.state = 282
@@ -2754,7 +2442,7 @@ class MiniLangParser ( Parser ):
                         pass
 
                     elif la_ == 4:
-                        localctx = MiniLangParser.LogicaContext(self, MiniLangParser.ExpresionContext(self, _parentctx, _parentState))
+                        localctx = gramatica_v3Parser.LogicaContext(self, gramatica_v3Parser.ExpresionContext(self, _parentctx, _parentState))
                         localctx.izq = _prevctx
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expresion)
                         self.state = 285
