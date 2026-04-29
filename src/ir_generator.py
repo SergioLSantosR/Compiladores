@@ -5,8 +5,8 @@ from gen.grammar.MiniLangVisitor import MiniLangVisitor
 
 class IRGenerator(MiniLangVisitor):
     """
-    Generador de LLVM IR
-    Produce código .ll ejecutable con lli o compilable con llc
+    Generador de LLVM IR simplificado
+    Produce código .ll demostrativo
     """
     
     def __init__(self):
@@ -17,6 +17,10 @@ class IRGenerator(MiniLangVisitor):
         self.funcion_actual = None
         self.variables = {}
         self.call_counter = 0
+        self.funciones_info = {}
+        self.pila_ciclos = []
+        self.string_constants = []
+        self.string_counter = 0
         
     def nuevo_temporal(self):
         self.temp_counter += 1
@@ -36,37 +40,106 @@ class IRGenerator(MiniLangVisitor):
     def get_ir(self):
         return "\n".join(self.codigo)
     
+    def _nueva_cadena(self, texto):
+        self.string_counter += 1
+        name = f"@.str.{self.string_counter}"
+        escaped = texto.replace('\\', '\\5C').replace('"', '\\22')
+        length = len(texto) + 1
+        self.string_constants.append(
+            f'{name} = private unnamed_addr constant [{length} x i8] c"{escaped}\\00", align 1'
+        )
+        return name, length
+    
     def visitPrograma(self, ctx: MiniLangParser.ProgramaContext):
-        # Cabecera del módulo
-        self.emitir("; ModuleID = 'MiniLang'")
-        self.emitir("")
+        self.codigo = []
+        self.string_constants = []
         
-        # Declaraciones de funciones externas
-        self.emitir("declare i32 @printf(i8*, ...)")
-        self.emitir("")
+        # Collect function info
+        for func_ctx in ctx.funcionDeclaracion():
+            nombre = func_ctx.IDENTIFICADOR().getText()
+            params = []
+            if func_ctx.parametros():
+                for p in func_ctx.parametros().parametro():
+                    params.append((p.IDENTIFICADOR().getText(), p.tipo().getText()))
+            tipo_ret = "vacio"
+            if func_ctx.tipo():
+                tipo_ret = func_ctx.tipo().getText()
+            self.funciones_info[nombre] = {"params": params, "return": tipo_ret}
         
-        # Strings para formato de impresión
-        self.emitir("@.str.int = private unnamed_addr constant [4 x i8] c\"%d\\0A\\00\", align 1")
-        self.emitir("")
+        header = []
+        header.append("; ModuleID = 'MiniLang'")
+        header.append("")
+        header.append("declare i32 @printf(i8*, ...)")
+        header.append("declare i32 @puts(i8*)")
+        header.append("")
         
-        # Generar función main
-        self.emitir("define i32 @main() {")
-        self.emitir("entry:")
+        func_code = []
         
+        # Generate user functions
+        for func_ctx in ctx.funcionDeclaracion():
+            self.codigo = []
+            self.variables = {}
+            self.temp_counter = 0
+            self.label_counter = 0
+            self.call_counter = 0
+            self._gen_funcion(func_ctx)
+            func_code.extend(self.codigo)
+            func_code.append("")
+        
+        # Generate main
+        self.codigo = []
         self.variables = {}
         self.temp_counter = 0
         self.label_counter = 0
         self.call_counter = 0
         
+        self.emitir("define i32 @main() {")
+        self.emitir("entry:")
         self.visit(ctx.bloque())
-        
         self.emitir("  ret i32 0")
         self.emitir("}")
         
+        main_code = self.codigo
+        
+        # Assemble final output
+        final = header
+        # Format strings
+        final.append('@.str.int = private unnamed_addr constant [4 x i8] c"%d\\0A\\00", align 1')
+        final.append('@.str.float = private unnamed_addr constant [4 x i8] c"%f\\0A\\00", align 1')
+        for sc in self.string_constants:
+            final.append(sc)
+        final.append("")
+        final.extend(func_code)
+        final.extend(main_code)
+        
+        self.codigo = final
         return self.get_ir()
     
-    def visitFuncionDeclaracion(self, ctx: MiniLangParser.FuncionDeclaracionContext):
-        return None
+    def _gen_funcion(self, ctx):
+        nombre = ctx.IDENTIFICADOR().getText()
+        info = self.funciones_info[nombre]
+        ret_type = "i32" if info["return"] != "vacio" else "void"
+        
+        params_ir = ", ".join(f"i32 %{p[0]}.arg" for p in info["params"])
+        self.emitir(f"define {ret_type} @{nombre}({params_ir}) {{")
+        self.emitir("entry:")
+        
+        # Alloca for params
+        for pname, ptype in info["params"]:
+            self.variables[pname] = f"%{pname}"
+            self.emitir(f"  %{pname} = alloca i32")
+            self.emitir(f"  store i32 %{pname}.arg, i32* %{pname}")
+        
+        # Body
+        self.visit(ctx.bloque())
+        
+        # Default return if not already returned
+        if ret_type == "void":
+            self.emitir("  ret void")
+        else:
+            self.emitir("  ret i32 0")
+        
+        self.emitir("}")
     
     def visitBloque(self, ctx: MiniLangParser.BloqueContext):
         for sentencia in ctx.sentencia():
@@ -110,7 +183,10 @@ class IRGenerator(MiniLangVisitor):
     
     def visitLiteralCadena(self, ctx):
         s = ctx.CADENA().getText()[1:-1]
-        return f"c\"{s}\\00\""
+        name, length = self._nueva_cadena(s)
+        temp = self.nuevo_temporal()
+        self.emitir(f"  {temp} = getelementptr [{length} x i8], [{length} x i8]* {name}, i32 0, i32 0")
+        return temp
     
     def visitLiteralVerdadero(self, ctx):
         return "1"
@@ -156,9 +232,9 @@ class IRGenerator(MiniLangVisitor):
     
     def visitNegacionLogica(self, ctx):
         expr = self.visit(ctx.expresion())
-        temp = self.nuevo_temporal()
         temp_bool = self.nuevo_temporal()
         temp_not = self.nuevo_temporal()
+        temp = self.nuevo_temporal()
         self.emitir(f"  {temp_bool} = icmp ne i32 {expr}, 0")
         self.emitir(f"  {temp_not} = xor i1 {temp_bool}, true")
         self.emitir(f"  {temp} = zext i1 {temp_not} to i32")
@@ -200,10 +276,10 @@ class IRGenerator(MiniLangVisitor):
         izq = self.visit(ctx.izq)
         der = self.visit(ctx.der)
         op = ctx.op.text
-        temp = self.nuevo_temporal()
         temp_bool_izq = self.nuevo_temporal()
         temp_bool_der = self.nuevo_temporal()
         temp_result = self.nuevo_temporal()
+        temp = self.nuevo_temporal()
         
         self.emitir(f"  {temp_bool_izq} = icmp ne i32 {izq}, 0")
         self.emitir(f"  {temp_bool_der} = icmp ne i32 {der}, 0")
@@ -252,7 +328,9 @@ class IRGenerator(MiniLangVisitor):
         self.emitir(f"  br i1 {cond_temp}, label %{etiqueta_body}, label %{etiqueta_end}")
         
         self.emitir(f"\n{etiqueta_body}:")
+        self.pila_ciclos.append((etiqueta_cond, etiqueta_end))
         self.visit(ctx.bloque())
+        self.pila_ciclos.pop()
         self.emitir(f"  br label %{etiqueta_cond}")
         
         self.emitir(f"\n{etiqueta_end}:")
@@ -281,7 +359,9 @@ class IRGenerator(MiniLangVisitor):
             self.emitir(f"  br label %{etiqueta_body}")
         
         self.emitir(f"\n{etiqueta_body}:")
+        self.pila_ciclos.append((etiqueta_step, etiqueta_end))
         self.visit(ctx.bloque())
+        self.pila_ciclos.pop()
         self.emitir(f"  br label %{etiqueta_step}")
         
         self.emitir(f"\n{etiqueta_step}:")
@@ -312,11 +392,63 @@ class IRGenerator(MiniLangVisitor):
         self.emitir(f"  store i32 {valor}, i32* %{nombre}")
         return None
     
+    def visitSentenciaRetorna(self, ctx):
+        if ctx.expresion():
+            valor = self.visit(ctx.expresion())
+            self.emitir(f"  ret i32 {valor}")
+        else:
+            self.emitir(f"  ret void")
+        return None
+    
+    def visitLlamadaFuncion(self, ctx):
+        nombre = ctx.IDENTIFICADOR().getText()
+        args = []
+        if ctx.expresion():
+            for arg in ctx.expresion():
+                args.append(self.visit(arg))
+        
+        info = self.funciones_info.get(nombre)
+        if info and info["return"] == "vacio":
+            args_str = ", ".join(f"i32 {a}" for a in args)
+            self.emitir(f"  call void @{nombre}({args_str})")
+        else:
+            args_str = ", ".join(f"i32 {a}" for a in args)
+            temp = self.nueva_llamada()
+            self.emitir(f"  {temp} = call i32 @{nombre}({args_str})")
+        return None
+    
+    def visitLlamadaFuncionExpr(self, ctx):
+        nombre = ctx.IDENTIFICADOR().getText()
+        args = []
+        if ctx.expresion():
+            for arg in ctx.expresion():
+                args.append(self.visit(arg))
+        
+        args_str = ", ".join(f"i32 {a}" for a in args)
+        temp = self.nueva_llamada()
+        self.emitir(f"  {temp} = call i32 @{nombre}({args_str})")
+        return temp
+    
+    def visitSentenciaBreak(self, ctx):
+        if self.pila_ciclos:
+            _, etiqueta_end = self.pila_ciclos[-1]
+            self.emitir(f"  br label %{etiqueta_end}")
+        return None
+    
+    def visitSentenciaContinue(self, ctx):
+        if self.pila_ciclos:
+            etiqueta_cond, _ = self.pila_ciclos[-1]
+            self.emitir(f"  br label %{etiqueta_cond}")
+        return None
+    
+    def visitSentenciaImportar(self, ctx):
+        return None
+    
     def visitAccesoArreglo(self, ctx):
         nombre = ctx.IDENTIFICADOR().getText()
         indice = self.visit(ctx.expresion())
-        temp = self.nuevo_temporal()
         temp_ptr = self.nuevo_temporal()
+        temp = self.nuevo_temporal()
         
         if nombre in self.variables:
             self.emitir(f"  {temp_ptr} = getelementptr i32, i32* %{nombre}, i32 {indice}")
@@ -339,18 +471,12 @@ class IRGenerator(MiniLangVisitor):
             self.emitir(f"  store i32 {valor}, i32* {temp_ptr}")
         return None
     
-    def visitMultiplicacionDivision(self, ctx):
-        return self.visitMultiplicacionDivisionModulo(ctx)
-    
-    def visitSentenciaBreak(self, ctx):
-        return None
-    
-    def visitSentenciaContinue(self, ctx):
-        return None
-    
     def visitLiteralArreglo(self, ctx):
         valores = []
         if ctx.expresion():
             for expr in ctx.expresion():
                 valores.append(self.visit(expr))
         return valores
+    
+    def visitMultiplicacionDivision(self, ctx):
+        return self.visitMultiplicacionDivisionModulo(ctx)
