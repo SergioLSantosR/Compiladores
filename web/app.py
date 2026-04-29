@@ -10,8 +10,8 @@ from flask import Flask, render_template, request, jsonify
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from antlr4 import *
-from gen.grammar.MiniLangLexer import MiniLangLexer
-from gen.grammar.MiniLangParser import MiniLangParser
+from gen.grammar.gramatica_v3Lexer import gramatica_v3Lexer
+from gen.grammar.gramatica_v3Parser import gramatica_v3Parser
 from src.custom_errors import ColectorErrores
 from src.semantic_visitor import SemanticVisitor
 from src.EvalVisitorImpl import EvalVisitor
@@ -41,7 +41,7 @@ def ejecutar_fases(codigo):
         t0 = time.perf_counter()
         input_stream = FileStream(archivo_temp, encoding='utf-8')
         colector = ColectorErrores()
-        lexer = MiniLangLexer(input_stream)
+        lexer = gramatica_v3Lexer(input_stream)
         lexer.removeErrorListeners()
         lexer.addErrorListener(colector)
         token_stream = CommonTokenStream(lexer)
@@ -65,7 +65,7 @@ def ejecutar_fases(codigo):
 
         # Fase 2: Sintáctico
         t0 = time.perf_counter()
-        parser = MiniLangParser(token_stream)
+        parser = gramatica_v3Parser(token_stream)
         parser.removeErrorListeners()
         parser.addErrorListener(colector)
         tree = parser.programa()
@@ -145,6 +145,9 @@ def ejecutar_fases(codigo):
 
         resultados["exito"] = True
 
+        # Intentar ejecutar el IR con lli
+        resultados["ir_output"] = _ejecutar_ll(resultados["ir"])
+
     except Exception as e:
         resultados["fases"].append({
             "nombre": "Error de Ejecución",
@@ -161,6 +164,36 @@ def ejecutar_fases(codigo):
             pass
 
     return resultados
+
+
+def _ejecutar_ll(ir_code: str) -> dict:
+    """Escribe el IR a un archivo temporal y ejecuta con lli."""
+    resultado = {"salida": "", "error": "", "disponible": False}
+    if not ir_code:
+        return resultado
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".ll", delete=False) as f:
+            f.write(ir_code)
+            ll_path = f.name
+        proc = subprocess.run(
+            ["lli", ll_path],
+            capture_output=True, text=True, timeout=5,
+        )
+        resultado["disponible"] = True
+        resultado["salida"] = proc.stdout
+        resultado["error"] = proc.stderr
+    except FileNotFoundError:
+        resultado["error"] = "lli no encontrado. Instala LLVM para ejecutar el IR."
+    except subprocess.TimeoutExpired:
+        resultado["error"] = "Tiempo de ejecución agotado (5s)."
+    except Exception as ex:
+        resultado["error"] = str(ex)
+    finally:
+        try:
+            os.unlink(ll_path)
+        except (OSError, NameError):
+            pass
+    return resultado
 
 
 @app.route('/')

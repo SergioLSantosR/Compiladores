@@ -6,8 +6,8 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from antlr4 import *
-from gen.grammar.MiniLangLexer import MiniLangLexer
-from gen.grammar.MiniLangParser import MiniLangParser
+from gen.grammar.gramatica_v3Lexer import gramatica_v3Lexer
+from gen.grammar.gramatica_v3Parser import gramatica_v3Parser
 from src.tac_generator import TACGenerator
 
 
@@ -19,9 +19,9 @@ def main():
     
     archivo = sys.argv[1]
     input_stream = FileStream(archivo, encoding='utf-8')
-    lexer = MiniLangLexer(input_stream)
+    lexer = gramatica_v3Lexer(input_stream)
     token_stream = CommonTokenStream(lexer)
-    parser = MiniLangParser(token_stream)
+    parser = gramatica_v3Parser(token_stream)
     tree = parser.programa()
     
     tac = TACGenerator()

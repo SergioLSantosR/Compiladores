@@ -334,9 +334,11 @@
                 <div class="tabs">
                     <button class="tab active" data-tab="tac">📊 Código TAC</button>
                     <button class="tab" data-tab="ir">⚙️ LLVM IR</button>
+                    <button class="tab" data-tab="ir_exec">🔧 Ejecución IR</button>
                 </div>
                 <div id="tac" class="tab-content" style="display: block;"></div>
                 <div id="ir" class="tab-content" style="display: none;"></div>
+                <div id="ir_exec" class="tab-content" style="display: none;">Compila un programa para ver la ejecución del archivo .ll con lli</div>
             </div>
         </div>
 
@@ -426,6 +428,21 @@
                 }
                 if (data.ir) {
                     document.getElementById('ir').innerHTML = `<pre>${escapeHtml(data.ir)}</pre>`;
+                }
+
+                // Panel ejecución IR (lli)
+                if (data.ir_output) {
+                    const iro = data.ir_output;
+                    let html = '';
+                    if (iro.disponible && iro.salida) {
+                        html = `<div style="color:#2ea043;margin-bottom:8px;">✅ Ejecutado con lli</div><pre>${escapeHtml(iro.salida)}</pre>`;
+                    } else if (iro.error) {
+                        html = `<div style="color:#f85149;margin-bottom:8px;">⚠️ ${escapeHtml(iro.error)}</div>`;
+                        if (iro.salida) html += `<pre>${escapeHtml(iro.salida)}</pre>`;
+                    } else {
+                        html = '<div style="color:#8b949e;">No se pudo ejecutar el IR.</div>';
+                    }
+                    document.getElementById('ir_exec').innerHTML = html;
                 }
                 
                 // Actualizar consola

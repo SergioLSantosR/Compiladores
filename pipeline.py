@@ -18,8 +18,8 @@ import time
 
 from antlr4 import CommonTokenStream, FileStream
 
-from gen.grammar.MiniLangLexer import MiniLangLexer
-from gen.grammar.MiniLangParser import MiniLangParser
+from gen.grammar.gramatica_v3Lexer import gramatica_v3Lexer
+from gen.grammar.gramatica_v3Parser import gramatica_v3Parser
 from src.custom_errors import ColectorErrores
 from src.semantic_visitor import SemanticVisitor
 from src.tac_generator import TACGenerator
@@ -69,7 +69,7 @@ def ejecutar_pipeline(
     input_stream = FileStream(ruta_archivo, encoding="utf-8")
     colector = ColectorErrores()
 
-    lexer = MiniLangLexer(input_stream)
+    lexer = gramatica_v3Lexer(input_stream)
     lexer.removeErrorListeners()
     lexer.addErrorListener(colector)
 
@@ -84,7 +84,7 @@ def ejecutar_pipeline(
 
     # ── Fase 2: Sintáctico ─────────────────────────────────────
     t0 = time.perf_counter()
-    parser = MiniLangParser(token_stream)
+    parser = gramatica_v3Parser(token_stream)
     parser.removeErrorListeners()
     parser.addErrorListener(colector)
     tree = parser.programa()

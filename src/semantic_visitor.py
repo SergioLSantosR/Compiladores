@@ -1,9 +1,9 @@
 # src/semantic_visitor.py
-from gen.grammar.MiniLangParser import MiniLangParser
-from gen.grammar.MiniLangVisitor import MiniLangVisitor
+from gen.grammar.gramatica_v3Parser import gramatica_v3Parser
+from gen.grammar.gramatica_v3Visitor import gramatica_v3Visitor
 from src.symbol_table import TablaSimbolos
 
-class SemanticVisitor(MiniLangVisitor):
+class SemanticVisitor(gramatica_v3Visitor):
     def __init__(self):
         super().__init__()
         self.tabla = TablaSimbolos()
@@ -62,7 +62,7 @@ class SemanticVisitor(MiniLangVisitor):
     # ------------------------------------------------------------------
     # Programa y funciones
     # ------------------------------------------------------------------
-    def visitPrograma(self, ctx: MiniLangParser.ProgramaContext):
+    def visitPrograma(self, ctx: gramatica_v3Parser.ProgramaContext):
         # Primera pasada: registrar todas las funciones
         for func_ctx in ctx.funcionDeclaracion():
             self._registrar_funcion(func_ctx)
@@ -73,7 +73,7 @@ class SemanticVisitor(MiniLangVisitor):
         self.visit(ctx.bloque())
         return None
 
-    def _registrar_funcion(self, ctx: MiniLangParser.FuncionDeclaracionContext):
+    def _registrar_funcion(self, ctx: gramatica_v3Parser.FuncionDeclaracionContext):
         nombre = ctx.IDENTIFICADOR().getText()
         tipo_retorno = self.tipo_desde_ctx(ctx.tipo())
         parametros = []
@@ -92,7 +92,7 @@ class SemanticVisitor(MiniLangVisitor):
         if creada is None:
             self.agregar_error(ctx, f"La función '{nombre}' ya fue declarada")
 
-    def _analizar_funcion(self, ctx: MiniLangParser.FuncionDeclaracionContext):
+    def _analizar_funcion(self, ctx: gramatica_v3Parser.FuncionDeclaracionContext):
         nombre = ctx.IDENTIFICADOR().getText()
         simbolo_func = self.tabla.buscar_funcion(nombre)
         if simbolo_func is None:
@@ -134,19 +134,19 @@ class SemanticVisitor(MiniLangVisitor):
         self.encontro_retorno_actual = retorno_anterior
         return None
 
-    def visitFuncionDeclaracion(self, ctx: MiniLangParser.FuncionDeclaracionContext):
+    def visitFuncionDeclaracion(self, ctx: gramatica_v3Parser.FuncionDeclaracionContext):
         return None
 
     # ------------------------------------------------------------------
     # Bloques
     # ------------------------------------------------------------------
-    def visitBloque(self, ctx: MiniLangParser.BloqueContext):
+    def visitBloque(self, ctx: gramatica_v3Parser.BloqueContext):
         return self._visitar_bloque(ctx, crear_ambito=True)
 
     # ------------------------------------------------------------------
     # Declaraciones y asignaciones
     # ------------------------------------------------------------------
-    def visitDeclaracionVariable(self, ctx: MiniLangParser.DeclaracionVariableContext):
+    def visitDeclaracionVariable(self, ctx: gramatica_v3Parser.DeclaracionVariableContext):
         tipo = ctx.tipo().getText()
         nombre = ctx.IDENTIFICADOR().getText()
         
@@ -181,7 +181,7 @@ class SemanticVisitor(MiniLangVisitor):
                 )
         return None
 
-    def visitAsignacion(self, ctx: MiniLangParser.AsignacionContext):
+    def visitAsignacion(self, ctx: gramatica_v3Parser.AsignacionContext):
         nombre = ctx.IDENTIFICADOR().getText()
         simbolo = self.tabla.buscar(nombre)
         tipo_expr = self.visit(ctx.expresion())
@@ -197,7 +197,7 @@ class SemanticVisitor(MiniLangVisitor):
             )
         return None
 
-    def visitAsignacionArreglo(self, ctx: MiniLangParser.AsignacionArregloContext):
+    def visitAsignacionArreglo(self, ctx: gramatica_v3Parser.AsignacionArregloContext):
         nombre = ctx.accesoArreglo().IDENTIFICADOR().getText()
         simbolo = self.tabla.buscar(nombre)
 
@@ -225,7 +225,7 @@ class SemanticVisitor(MiniLangVisitor):
         
         return None
 
-    def visitInicializacionPara(self, ctx: MiniLangParser.InicializacionParaContext):
+    def visitInicializacionPara(self, ctx: gramatica_v3Parser.InicializacionParaContext):
         tipo = ctx.tipo().getText()
         nombre = ctx.IDENTIFICADOR().getText()
         tipo_expr = self.visit(ctx.expresion())
@@ -250,7 +250,7 @@ class SemanticVisitor(MiniLangVisitor):
             )
         return None
 
-    def visitAsignacionPara(self, ctx: MiniLangParser.AsignacionParaContext):
+    def visitAsignacionPara(self, ctx: gramatica_v3Parser.AsignacionParaContext):
         nombre = ctx.IDENTIFICADOR().getText()
         simbolo = self.tabla.buscar(nombre)
         tipo_expr = self.visit(ctx.expresion())
@@ -266,7 +266,7 @@ class SemanticVisitor(MiniLangVisitor):
             )
         return None
 
-    def visitActualizacionPara(self, ctx: MiniLangParser.ActualizacionParaContext):
+    def visitActualizacionPara(self, ctx: gramatica_v3Parser.ActualizacionParaContext):
         nombre = ctx.IDENTIFICADOR().getText()
         simbolo = self.tabla.buscar(nombre)
         tipo_expr = self.visit(ctx.expresion())
@@ -285,7 +285,7 @@ class SemanticVisitor(MiniLangVisitor):
     # ------------------------------------------------------------------
     # Condicionales, ciclos e impresión
     # ------------------------------------------------------------------
-    def visitCondicionalSi(self, ctx: MiniLangParser.CondicionalSiContext):
+    def visitCondicionalSi(self, ctx: gramatica_v3Parser.CondicionalSiContext):
         tipo_cond = self.visit(ctx.expresion())
         if tipo_cond != "booleano" and tipo_cond != "error":
             self.agregar_error(
@@ -297,7 +297,7 @@ class SemanticVisitor(MiniLangVisitor):
             self.visit(ctx.bloque(1))
         return None
 
-    def visitCicloMientras(self, ctx: MiniLangParser.CicloMientrasContext):
+    def visitCicloMientras(self, ctx: gramatica_v3Parser.CicloMientrasContext):
         self.en_ciclo += 1
         tipo_cond = self.visit(ctx.expresion())
         if tipo_cond != "booleano" and tipo_cond != "error":
@@ -309,7 +309,7 @@ class SemanticVisitor(MiniLangVisitor):
         self.en_ciclo -= 1
         return None
 
-    def visitCicloPara(self, ctx: MiniLangParser.CicloParaContext):
+    def visitCicloPara(self, ctx: gramatica_v3Parser.CicloParaContext):
         self.en_ciclo += 1
         if ctx.inicializacionPara():
             self.visit(ctx.inicializacionPara())
@@ -331,19 +331,19 @@ class SemanticVisitor(MiniLangVisitor):
         self.en_ciclo -= 1
         return None
 
-    def visitImpresion(self, ctx: MiniLangParser.ImpresionContext):
+    def visitImpresion(self, ctx: gramatica_v3Parser.ImpresionContext):
         self.visit(ctx.expresion())
         return None
 
     # ------------------------------------------------------------------
     # Break y Continue
     # ------------------------------------------------------------------
-    def visitSentenciaBreak(self, ctx: MiniLangParser.SentenciaBreakContext):
+    def visitSentenciaBreak(self, ctx: gramatica_v3Parser.SentenciaBreakContext):
         if self.en_ciclo == 0:
             self.agregar_error(ctx, "La sentencia 'romper' solo puede usarse dentro de un ciclo")
         return None
 
-    def visitSentenciaContinue(self, ctx: MiniLangParser.SentenciaContinueContext):
+    def visitSentenciaContinue(self, ctx: gramatica_v3Parser.SentenciaContinueContext):
         if self.en_ciclo == 0:
             self.agregar_error(ctx, "La sentencia 'continuar' solo puede usarse dentro de un ciclo")
         return None
@@ -351,7 +351,7 @@ class SemanticVisitor(MiniLangVisitor):
     # ------------------------------------------------------------------
     # Import
     # ------------------------------------------------------------------
-    def visitSentenciaImportar(self, ctx: MiniLangParser.SentenciaImportarContext):
+    def visitSentenciaImportar(self, ctx: gramatica_v3Parser.SentenciaImportarContext):
         # Por ahora solo verificamos que sea una cadena válida
         # La resolución de imports se hará en tiempo de ejecución
         return None
@@ -359,7 +359,7 @@ class SemanticVisitor(MiniLangVisitor):
     # ------------------------------------------------------------------
     # Return
     # ------------------------------------------------------------------
-    def visitSentenciaRetorna(self, ctx: MiniLangParser.SentenciaRetornaContext):
+    def visitSentenciaRetorna(self, ctx: gramatica_v3Parser.SentenciaRetornaContext):
         if self.funcion_actual is None:
             self.agregar_error(ctx, "La sentencia 'retorna' solo puede usarse dentro de una función")
             if ctx.expresion():
@@ -430,17 +430,17 @@ class SemanticVisitor(MiniLangVisitor):
 
         return simbolo_func.tipo_retorno
 
-    def visitLlamadaFuncion(self, ctx: MiniLangParser.LlamadaFuncionContext):
+    def visitLlamadaFuncion(self, ctx: gramatica_v3Parser.LlamadaFuncionContext):
         self._validar_llamada_funcion(ctx, usada_como_expresion=False)
         return None
 
-    def visitLlamadaFuncionExpr(self, ctx: MiniLangParser.LlamadaFuncionExprContext):
+    def visitLlamadaFuncionExpr(self, ctx: gramatica_v3Parser.LlamadaFuncionExprContext):
         return self._validar_llamada_funcion(ctx, usada_como_expresion=True)
 
     # ------------------------------------------------------------------
     # Expresiones
     # ------------------------------------------------------------------
-    def visitNegacionLogica(self, ctx: MiniLangParser.NegacionLogicaContext):
+    def visitNegacionLogica(self, ctx: gramatica_v3Parser.NegacionLogicaContext):
         tipo_expr = self.visit(ctx.expresion())
         if tipo_expr == "error":
             return "error"
@@ -452,7 +452,7 @@ class SemanticVisitor(MiniLangVisitor):
             return "error"
         return "booleano"
 
-    def visitMenosUnario(self, ctx: MiniLangParser.MenosUnarioContext):
+    def visitMenosUnario(self, ctx: gramatica_v3Parser.MenosUnarioContext):
         tipo_expr = self.visit(ctx.expresion())
         if tipo_expr == "error":
             return "error"
@@ -464,10 +464,10 @@ class SemanticVisitor(MiniLangVisitor):
             return "error"
         return tipo_expr
 
-    def visitParentesis(self, ctx: MiniLangParser.ParentesisContext):
+    def visitParentesis(self, ctx: gramatica_v3Parser.ParentesisContext):
         return self.visit(ctx.expresion())
 
-    def visitMultiplicacionDivisionModulo(self, ctx: MiniLangParser.MultiplicacionDivisionModuloContext):
+    def visitMultiplicacionDivisionModulo(self, ctx: gramatica_v3Parser.MultiplicacionDivisionModuloContext):
         tipo_izq = self.visit(ctx.izq)
         tipo_der = self.visit(ctx.der)
 
@@ -475,7 +475,7 @@ class SemanticVisitor(MiniLangVisitor):
             return "error"
 
         # Operador módulo (%) - solo con enteros
-        if ctx.op.type == MiniLangParser.MODULO:
+        if ctx.op.type == gramatica_v3Parser.MODULO:
             if tipo_izq != "entero" or tipo_der != "entero":
                 self.agregar_error(
                     ctx,
@@ -486,7 +486,7 @@ class SemanticVisitor(MiniLangVisitor):
 
         # Multiplicación y división
         if self.es_tipo_numerico(tipo_izq) and self.es_tipo_numerico(tipo_der):
-            if ctx.op.type == MiniLangParser.DIVISION and tipo_izq == "entero" and tipo_der == "entero":
+            if ctx.op.type == gramatica_v3Parser.DIVISION and tipo_izq == "entero" and tipo_der == "entero":
                 return "entero"
             if tipo_izq == "flotante" or tipo_der == "flotante":
                 return "flotante"
@@ -498,14 +498,14 @@ class SemanticVisitor(MiniLangVisitor):
         )
         return "error"
 
-    def visitSumaResta(self, ctx: MiniLangParser.SumaRestaContext):
+    def visitSumaResta(self, ctx: gramatica_v3Parser.SumaRestaContext):
         tipo_izq = self.visit(ctx.izq)
         tipo_der = self.visit(ctx.der)
 
         if tipo_izq == "error" or tipo_der == "error":
             return "error"
 
-        if ctx.op.type == MiniLangParser.SUMA:
+        if ctx.op.type == gramatica_v3Parser.SUMA:
             if tipo_izq == "cadena" and tipo_der == "cadena":
                 return "cadena"
             if self.es_tipo_numerico(tipo_izq) and self.es_tipo_numerico(tipo_der):
@@ -530,14 +530,14 @@ class SemanticVisitor(MiniLangVisitor):
         )
         return "error"
 
-    def visitRelacional(self, ctx: MiniLangParser.RelacionalContext):
+    def visitRelacional(self, ctx: gramatica_v3Parser.RelacionalContext):
         tipo_izq = self.visit(ctx.izq)
         tipo_der = self.visit(ctx.der)
 
         if tipo_izq == "error" or tipo_der == "error":
             return "error"
 
-        if ctx.op.type in (MiniLangParser.IGUAL, MiniLangParser.DIFERENTE):
+        if ctx.op.type in (gramatica_v3Parser.IGUAL, gramatica_v3Parser.DIFERENTE):
             if tipo_izq == tipo_der:
                 return "booleano"
             if self.es_tipo_numerico(tipo_izq) and self.es_tipo_numerico(tipo_der):
@@ -557,7 +557,7 @@ class SemanticVisitor(MiniLangVisitor):
         )
         return "error"
 
-    def visitLogica(self, ctx: MiniLangParser.LogicaContext):
+    def visitLogica(self, ctx: gramatica_v3Parser.LogicaContext):
         tipo_izq = self.visit(ctx.izq)
         tipo_der = self.visit(ctx.der)
 
@@ -573,7 +573,7 @@ class SemanticVisitor(MiniLangVisitor):
         )
         return "error"
 
-    def visitAccesoArregloExpr(self, ctx: MiniLangParser.AccesoArregloExprContext):
+    def visitAccesoArregloExpr(self, ctx: gramatica_v3Parser.AccesoArregloExprContext):
         nombre = ctx.accesoArreglo().IDENTIFICADOR().getText()
         simbolo = self.tabla.buscar(nombre)
 
@@ -596,22 +596,22 @@ class SemanticVisitor(MiniLangVisitor):
     # ------------------------------------------------------------------
     # Literales y referencias
     # ------------------------------------------------------------------
-    def visitLiteralEntero(self, ctx: MiniLangParser.LiteralEnteroContext):
+    def visitLiteralEntero(self, ctx: gramatica_v3Parser.LiteralEnteroContext):
         return "entero"
 
-    def visitLiteralFlotante(self, ctx: MiniLangParser.LiteralFlotanteContext):
+    def visitLiteralFlotante(self, ctx: gramatica_v3Parser.LiteralFlotanteContext):
         return "flotante"
 
-    def visitLiteralCadena(self, ctx: MiniLangParser.LiteralCadenaContext):
+    def visitLiteralCadena(self, ctx: gramatica_v3Parser.LiteralCadenaContext):
         return "cadena"
 
-    def visitLiteralVerdadero(self, ctx: MiniLangParser.LiteralVerdaderoContext):
+    def visitLiteralVerdadero(self, ctx: gramatica_v3Parser.LiteralVerdaderoContext):
         return "booleano"
 
-    def visitLiteralFalso(self, ctx: MiniLangParser.LiteralFalsoContext):
+    def visitLiteralFalso(self, ctx: gramatica_v3Parser.LiteralFalsoContext):
         return "booleano"
 
-    def visitReferenciaVariable(self, ctx: MiniLangParser.ReferenciaVariableContext):
+    def visitReferenciaVariable(self, ctx: gramatica_v3Parser.ReferenciaVariableContext):
         nombre = ctx.IDENTIFICADOR().getText()
         simbolo = self.tabla.buscar(nombre)
 
@@ -621,7 +621,7 @@ class SemanticVisitor(MiniLangVisitor):
 
         return simbolo.tipo
 
-    def visitLiteralArreglo(self, ctx: MiniLangParser.LiteralArregloContext):
+    def visitLiteralArreglo(self, ctx: gramatica_v3Parser.LiteralArregloContext):
         # El tipo se determinará por el contexto de la declaración
         # Por ahora, retornamos un tipo especial
         if ctx.expresion():

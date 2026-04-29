@@ -1,9 +1,9 @@
 # src/tac_generator.py
-from gen.grammar.MiniLangParser import MiniLangParser
-from gen.grammar.MiniLangVisitor import MiniLangVisitor
+from gen.grammar.gramatica_v3Parser import gramatica_v3Parser
+from gen.grammar.gramatica_v3Visitor import gramatica_v3Visitor
 
 
-class TACGenerator(MiniLangVisitor):
+class TACGenerator(gramatica_v3Visitor):
     """
     Generador de Código de Tres Direcciones (TAC)
     Emite instrucciones como:
@@ -41,7 +41,7 @@ class TACGenerator(MiniLangVisitor):
     
     # ========== Programa y funciones ==========
     
-    def visitPrograma(self, ctx: MiniLangParser.ProgramaContext):
+    def visitPrograma(self, ctx: gramatica_v3Parser.ProgramaContext):
         # Reiniciar contadores
         self.temp_counter = 0
         self.label_counter = 0
@@ -59,7 +59,7 @@ class TACGenerator(MiniLangVisitor):
         
         return self.get_tac()
     
-    def visitFuncionDeclaracion(self, ctx: MiniLangParser.FuncionDeclaracionContext):
+    def visitFuncionDeclaracion(self, ctx: gramatica_v3Parser.FuncionDeclaracionContext):
         nombre = ctx.IDENTIFICADOR().getText()
         self.funcion_actual = nombre
         
@@ -91,14 +91,14 @@ class TACGenerator(MiniLangVisitor):
     
     # ========== Bloque ==========
     
-    def visitBloque(self, ctx: MiniLangParser.BloqueContext):
+    def visitBloque(self, ctx: gramatica_v3Parser.BloqueContext):
         for sentencia in ctx.sentencia():
             self.visit(sentencia)
         return None
     
     # ========== Declaraciones y asignaciones ==========
     
-    def visitDeclaracionVariable(self, ctx: MiniLangParser.DeclaracionVariableContext):
+    def visitDeclaracionVariable(self, ctx: gramatica_v3Parser.DeclaracionVariableContext):
         tipo = ctx.tipo().getText()
         nombre = ctx.IDENTIFICADOR().getText()
         
@@ -111,7 +111,7 @@ class TACGenerator(MiniLangVisitor):
         else:
             # Buscar literalArreglo
             for child in ctx.getChildren():
-                if isinstance(child, MiniLangParser.LiteralArregloContext):
+                if isinstance(child, gramatica_v3Parser.LiteralArregloContext):
                     valor = self.visit(child)
                     break
         
@@ -140,13 +140,13 @@ class TACGenerator(MiniLangVisitor):
         
         return None
     
-    def visitAsignacion(self, ctx: MiniLangParser.AsignacionContext):
+    def visitAsignacion(self, ctx: gramatica_v3Parser.AsignacionContext):
         nombre = ctx.IDENTIFICADOR().getText()
         valor = self.visit(ctx.expresion())
         self.emitir(f"{nombre} = {valor}")
         return None
     
-    def visitAsignacionArreglo(self, ctx: MiniLangParser.AsignacionArregloContext):
+    def visitAsignacionArreglo(self, ctx: gramatica_v3Parser.AsignacionArregloContext):
         acceso = ctx.accesoArreglo()
         nombre = acceso.IDENTIFICADOR().getText()
         indice = self.visit(acceso.expresion())
@@ -252,7 +252,7 @@ class TACGenerator(MiniLangVisitor):
     
     # ========== Condicionales ==========
     
-    def visitCondicionalSi(self, ctx: MiniLangParser.CondicionalSiContext):
+    def visitCondicionalSi(self, ctx: gramatica_v3Parser.CondicionalSiContext):
         condicion = self.visit(ctx.expresion())
         
         etiqueta_else = self.nueva_etiqueta()
@@ -274,7 +274,7 @@ class TACGenerator(MiniLangVisitor):
     
     # ========== Ciclos ==========
     
-    def visitCicloMientras(self, ctx: MiniLangParser.CicloMientrasContext):
+    def visitCicloMientras(self, ctx: gramatica_v3Parser.CicloMientrasContext):
         etiqueta_inicio = self.nueva_etiqueta()
         etiqueta_fin = self.nueva_etiqueta()
         
@@ -289,7 +289,7 @@ class TACGenerator(MiniLangVisitor):
         self.emitir(f"{etiqueta_fin}:")
         return None
     
-    def visitCicloPara(self, ctx: MiniLangParser.CicloParaContext):
+    def visitCicloPara(self, ctx: gramatica_v3Parser.CicloParaContext):
         etiqueta_inicio = self.nueva_etiqueta()
         etiqueta_fin = self.nueva_etiqueta()
         
@@ -319,20 +319,20 @@ class TACGenerator(MiniLangVisitor):
         self.emitir(f"{etiqueta_fin}:")
         return None
     
-    def visitInicializacionPara(self, ctx: MiniLangParser.InicializacionParaContext):
+    def visitInicializacionPara(self, ctx: gramatica_v3Parser.InicializacionParaContext):
         tipo = ctx.tipo().getText()
         nombre = ctx.IDENTIFICADOR().getText()
         valor = self.visit(ctx.expresion())
         self.emitir(f"{nombre} = {valor}")
         return None
     
-    def visitAsignacionPara(self, ctx: MiniLangParser.AsignacionParaContext):
+    def visitAsignacionPara(self, ctx: gramatica_v3Parser.AsignacionParaContext):
         nombre = ctx.IDENTIFICADOR().getText()
         valor = self.visit(ctx.expresion())
         self.emitir(f"{nombre} = {valor}")
         return None
     
-    def visitActualizacionPara(self, ctx: MiniLangParser.ActualizacionParaContext):
+    def visitActualizacionPara(self, ctx: gramatica_v3Parser.ActualizacionParaContext):
         nombre = ctx.IDENTIFICADOR().getText()
         valor = self.visit(ctx.expresion())
         self.emitir(f"{nombre} = {valor}")
@@ -340,7 +340,7 @@ class TACGenerator(MiniLangVisitor):
     
     # ========== Funciones ==========
     
-    def visitLlamadaFuncion(self, ctx: MiniLangParser.LlamadaFuncionContext):
+    def visitLlamadaFuncion(self, ctx: gramatica_v3Parser.LlamadaFuncionContext):
         nombre = ctx.IDENTIFICADOR().getText()
         args = []
         if ctx.expresion():
@@ -352,7 +352,7 @@ class TACGenerator(MiniLangVisitor):
         self.emitir(f"{temp} = call {nombre}, {args_str}")
         return temp
     
-    def visitLlamadaFuncionExpr(self, ctx: MiniLangParser.LlamadaFuncionExprContext):
+    def visitLlamadaFuncionExpr(self, ctx: gramatica_v3Parser.LlamadaFuncionExprContext):
         nombre = ctx.IDENTIFICADOR().getText()
         args = []
         if ctx.expresion():
@@ -364,7 +364,7 @@ class TACGenerator(MiniLangVisitor):
         self.emitir(f"{temp} = call {nombre}, {args_str}")
         return temp
     
-    def visitSentenciaRetorna(self, ctx: MiniLangParser.SentenciaRetornaContext):
+    def visitSentenciaRetorna(self, ctx: gramatica_v3Parser.SentenciaRetornaContext):
         if ctx.expresion():
             valor = self.visit(ctx.expresion())
             self.emitir(f"return {valor}")
@@ -374,20 +374,20 @@ class TACGenerator(MiniLangVisitor):
     
     # ========== Impresión ==========
     
-    def visitImpresion(self, ctx: MiniLangParser.ImpresionContext):
+    def visitImpresion(self, ctx: gramatica_v3Parser.ImpresionContext):
         valor = self.visit(ctx.expresion())
         self.emitir(f"print {valor}")
         return None
     
     # ========== Break y Continue ==========
     
-    def visitSentenciaBreak(self, ctx: MiniLangParser.SentenciaBreakContext):
+    def visitSentenciaBreak(self, ctx: gramatica_v3Parser.SentenciaBreakContext):
         if self.pila_ciclos:
             _, etiqueta_fin = self.pila_ciclos[-1]
             self.emitir(f"goto {etiqueta_fin}")
         return None
     
-    def visitSentenciaContinue(self, ctx: MiniLangParser.SentenciaContinueContext):
+    def visitSentenciaContinue(self, ctx: gramatica_v3Parser.SentenciaContinueContext):
         if self.pila_ciclos:
             etiqueta_inicio, _ = self.pila_ciclos[-1]
             self.emitir(f"goto {etiqueta_inicio}")
@@ -395,7 +395,7 @@ class TACGenerator(MiniLangVisitor):
     
     # ========== Import ==========
     
-    def visitSentenciaImportar(self, ctx: MiniLangParser.SentenciaImportarContext):
+    def visitSentenciaImportar(self, ctx: gramatica_v3Parser.SentenciaImportarContext):
         nombre_archivo = ctx.CADENA().getText()
         self.emitir(f"import {nombre_archivo}")
         return None

@@ -1,4 +1,4 @@
-grammar MiniLang;
+grammar gramatica_v3;
 
 // ==================== Reglas del Parser ====================
 
