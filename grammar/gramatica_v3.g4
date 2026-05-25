@@ -1,4 +1,4 @@
-grammar gramatica_v3;
+grammar gramatica_v4;
 
 // ==================== Reglas del Parser ====================
 
@@ -25,34 +25,39 @@ bloque
 sentencia
  : declaracionVariable
  | asignacion
- | asignacionArreglo          // Fase 3: asignación a elemento de arreglo
+ | asignacionArreglo
  | condicionalSi
  | impresion
  | cicloMientras
  | cicloPara
  | sentenciaRetorna
  | llamadaFuncion
- | sentenciaBreak             // Fase 3: break
- | sentenciaContinue          // Fase 3: continue
- | sentenciaImportar          // Fase 3: import
+ | sentenciaBreak
+ | sentenciaContinue
+ | sentenciaImportar
+ | sentenciaSwitch           // NUEVO v4: Switch/Case
+ | sentenciaStruct           // NUEVO v4: Declaración de struct
  ;
 
 declaracionVariable
  : tipo IDENTIFICADOR (ASIGNACION expresion)? PUNTO_COMA
- | tipo CORCHETE_IZQ CORCHETE_DER IDENTIFICADOR (ASIGNACION literalArreglo)? PUNTO_COMA   // Fase 3: arreglo
+ | tipo CORCHETE_IZQ CORCHETE_DER IDENTIFICADOR (ASIGNACION literalArreglo)? PUNTO_COMA
+ | tipoStruct IDENTIFICADOR (ASIGNACION literalStruct)? PUNTO_COMA  // NUEVO v4: Variable de tipo struct
  ;
 
-// Fase 3: literal para inicializar arreglos
 literalArreglo
  : CORCHETE_IZQ (expresion (COMA expresion)*)? CORCHETE_DER
  ;
 
-// Fase 3: acceso a elemento de arreglo (puede usarse en expresiones)
+// NUEVO v4: Literal para inicializar structs
+literalStruct
+ : LLAVE_IZQ (expresion (COMA expresion)*)? LLAVE_DER
+ ;
+
 accesoArreglo
  : IDENTIFICADOR CORCHETE_IZQ expresion CORCHETE_DER
  ;
 
-// Fase 3: asignación a elemento de arreglo
 asignacionArreglo
  : accesoArreglo ASIGNACION expresion PUNTO_COMA
  ;
@@ -64,8 +69,13 @@ tipo
  | TIPO_CADENA
  ;
 
+// NUEVO v4: Tipo struct (puede ser usado en declaraciones)
+tipoStruct
+ : IDENTIFICADOR
+ ;
+
 asignacion
- : IDENTIFICADOR ASIGNACION expresion PUNTO_COMA
+ : (IDENTIFICADOR | accesoStruct) ASIGNACION expresion PUNTO_COMA  // NUEVO v4: Asignación a struct
  ;
 
 condicionalSi
@@ -96,7 +106,6 @@ sentenciaRetorna
  : RETORNA expresion? PUNTO_COMA
  ;
 
-// Fase 3: se agregan las nuevas sentencias
 sentenciaBreak
  : ROMPER PUNTO_COMA
  ;
@@ -109,27 +118,60 @@ sentenciaImportar
  : IMPORTAR CADENA PUNTO_COMA
  ;
 
+// NUEVO v4: Sentencia Switch/Case
+sentenciaSwitch
+ : SWITCH PAREN_IZQ expresion PAREN_DER LLAVE_IZQ (caso)* (casoDefault)? LLAVE_DER
+ ;
+
+// NUEVO v4: Caso individual
+caso
+ : CASE expresion DOS_PUNTOS sentencia*
+ ;
+
+// NUEVO v4: Caso default
+casoDefault
+ : DEFAULT DOS_PUNTOS sentencia*
+ ;
+
+// NUEVO v4: Declaración de struct
+sentenciaStruct
+ : STRUCT IDENTIFICADOR LLAVE_IZQ (declaracionCampoStruct)* LLAVE_DER
+ ;
+
+// NUEVO v4: Campo dentro de un struct
+declaracionCampoStruct
+ : tipo IDENTIFICADOR PUNTO_COMA
+ ;
+
+// NUEVO v4: Acceso a campo de struct
+accesoStruct
+ : IDENTIFICADOR PUNTO IDENTIFICADOR
+ ;
+
 expresion
  : NEGACION expresion                                                                      #NegacionLogica
  | RESTA expresion                                                                         #MenosUnario
  | PAREN_IZQ expresion PAREN_DER                                                           #Parentesis
- | izq=expresion op=(MULTIPLICACION|DIVISION|MODULO) der=expresion                         #MultiplicacionDivisionModulo  // Fase 3: añadir módulo
+ | izq=expresion op=(MULTIPLICACION|DIVISION|MODULO) der=expresion                         #MultiplicacionDivisionModulo
  | izq=expresion op=(SUMA|RESTA) der=expresion                                             #SumaResta
  | izq=expresion op=(IGUAL|DIFERENTE|MENOR_QUE|MENOR_IGUAL|MAYOR_QUE|MAYOR_IGUAL) der=expresion  #Relacional
  | izq=expresion op=(Y_LOGICO|O_LOGICO) der=expresion                                     #Logica
+ | <assoc=right> condicion=expresion '?' verdadero=expresion ':' falso=expresion           #OperadorTernario   // NUEVO v4
+ | <assoc=right> PAREN_IZQ tipo PAREN_DER expresion                                        #CastingExplicito   // NUEVO v4
  | ENTERO                                                                                  #LiteralEntero
  | FLOTANTE                                                                                #LiteralFlotante
  | CADENA                                                                                  #LiteralCadena
  | VERDADERO                                                                               #LiteralVerdadero
  | FALSO                                                                                   #LiteralFalso
  | IDENTIFICADOR                                                                           #ReferenciaVariable
- | accesoArreglo                                                                           #AccesoArregloExpr      // Fase 3
+ | accesoArreglo                                                                           #AccesoArregloExpr
+ | accesoStruct                                                                           #AccesoStructExpr    // NUEVO v4
  | IDENTIFICADOR PAREN_IZQ (expresion (COMA expresion)*)? PAREN_DER                        #LlamadaFuncionExpr
  ;
 
 // ==================== Reglas del Lexer ====================
 
-// Palabras clave
+// Palabras clave existentes
 PROGRAMA    : 'programa';
 SI          : 'si';
 SINO        : 'sino';
@@ -145,9 +187,15 @@ TIPO_FLOTANTE : 'flotante';
 TIPO_CADENA   : 'cadena';
 VERDADERO     : 'verdadero';
 FALSO         : 'falso';
-ROMPER        : 'romper';        // Fase 3: break
-CONTINUAR     : 'continuar';     // Fase 3: continue
-IMPORTAR      : 'importar';      // Fase 3: import
+ROMPER        : 'romper';
+CONTINUAR     : 'continuar';
+IMPORTAR      : 'importar';
+
+// NUEVAS PALABRAS CLAVE v4
+STRUCT      : 'struct';
+SWITCH      : 'switch';
+CASE        : 'case';
+DEFAULT     : 'default';
 
 // Operadores lógicos
 Y_LOGICO  : '&&';
@@ -170,7 +218,7 @@ SUMA          : '+';
 RESTA         : '-';
 MULTIPLICACION: '*';
 DIVISION      : '/';
-MODULO        : '%';             // Fase 3: operador módulo
+MODULO        : '%';
 
 // Símbolos de agrupación y puntuación
 PAREN_IZQ    : '(';
@@ -181,14 +229,16 @@ CORCHETE_IZQ : '[';
 CORCHETE_DER : ']';
 PUNTO_COMA   : ';';
 COMA         : ',';
+PUNTO        : '.';        // NUEVO v4: Para acceso a structs
+DOS_PUNTOS   : ':';        // NUEVO v4: Para case y default
 
-// Literales (FLOTANTE antes de ENTERO para priorizar el match más largo)
+// Literales
 FLOTANTE      : [0-9]+ '.' [0-9]+;
 ENTERO        : [0-9]+;
 CADENA        : '"' (~["\r\n])* '"';
 IDENTIFICADOR : [a-zA-Z_][a-zA-Z_0-9]*;
 
-// Espacios en blanco y comentarios (se ignoran)
+// Espacios en blanco y comentarios
 ESPACIO           : [ \t\r\n]+ -> skip;
 COMENTARIO_LINEA  : '//' ~[\r\n]* -> skip;
 COMENTARIO_BLOQUE : '/*' .*? '*/' -> skip;

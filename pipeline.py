@@ -31,8 +31,8 @@ from src.semantic_visitor import SemanticVisitor
 from src.tac_generator import TACGenerator
 from src.ir_generator import IRGenerator
 from src.EvalVisitorImpl import EvalVisitor
-from src.optimizer import Optimizer  # NUEVO v4: Módulo de optimización
-from src.binary_generator import BinaryGenerator  # NUEVO v4: Generador de binarios
+from Compiladores.src.optimizer import Optimizer  # NUEVO v4: Módulo de optimización
+from Compiladores.src.binary_generator import BinaryGenerator  # NUEVO v4: Generador de binarios
 
 
 class FaseResultado:
@@ -187,7 +187,7 @@ def ejecutar_pipeline(
     if optimizar and resultado.ir:
         t0 = time.perf_counter()
         try:
-            from src.optimizer import Optimizer
+            from Compiladores.src.optimizer import Optimizer
             optimizer = Optimizer()
             
             # Aplicar optimización O3
@@ -245,7 +245,7 @@ def ejecutar_pipeline(
         
         t0 = time.perf_counter()
         try:
-            from src.binary_generator import BinaryGenerator
+            from Compiladores.src.binary_generator import BinaryGenerator
             binary_gen = BinaryGenerator()
             
             for plataforma in plataformas:
