@@ -3,13 +3,29 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.so
+*.dll
+*.exe
+*.o
+ 
 
 # Entorno virtual
 .venv/
+venv/
+env/
+.env/
 
 # ANTLR generados (opcional, si prefieres regenerarlos en cada clon)
 gen/
 !gen/__init__.py
+gen/grammar/*.py
+gen/grammar/*.tokens
+gen/grammar/*.interp
+grammar/*.py
+grammar/*.tokens
+grammar/*.interp
+*.tokens
+*.interp
 
 # VSCode
 .vscode/
@@ -20,6 +36,12 @@ tools/antlr-4.13.1-complete.jar
 # Archivos generados por el pipeline
 *.tac
 *.ll
+*.opt.ll
+*.bc
+*.obj
+*.exe
+binarios/
+output/
 
 # Otros
 .DS_Store
