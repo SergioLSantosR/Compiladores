@@ -1,4 +1,4 @@
-// Generated from /home/sergio/Compiladores/grammar/gramatica_v3.g4 by ANTLR 4.13.1
+// Generated from /home/sergio/Compiladores/grammar/gramatica_v4.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
@@ -115,7 +115,7 @@ public class gramatica_v4Lexer extends Lexer {
 	}
 
 	@Override
-	public String getGrammarFileName() { return "gramatica_v3.g4"; }
+	public String getGrammarFileName() { return "gramatica_v4.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }

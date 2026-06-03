@@ -31,8 +31,8 @@ from src.semantic_visitor import SemanticVisitor
 from src.tac_generator import TACGenerator
 from src.ir_generator import IRGenerator
 from src.EvalVisitorImpl import EvalVisitor
-from Compiladores.src.optimizer import Optimizer  # NUEVO v4: Módulo de optimización
-from Compiladores.src.binary_generator import BinaryGenerator  # NUEVO v4: Generador de binarios
+from src.optimizer import Optimizer  # NUEVO v4: Módulo de optimización
+from src.binary_generator import BinaryGenerator  # NUEVO v4: Generador de binarios
 
 
 class FaseResultado:

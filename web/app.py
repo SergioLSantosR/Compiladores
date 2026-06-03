@@ -10,8 +10,8 @@ from flask import Flask, render_template, request, jsonify
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from antlr4 import *
-from gen.grammar.gramatica_v3Lexer import gramatica_v3Lexer
-from gen.grammar.gramatica_v3Parser import gramatica_v3Parser
+from gen.grammar.gramatica_v4Lexer import gramatica_v4Lexer
+from gen.grammar.gramatica_v4Parser import gramatica_v4Parser
 from src.custom_errors import ColectorErrores
 from src.semantic_visitor import SemanticVisitor
 from src.EvalVisitorImpl import EvalVisitor
@@ -32,7 +32,7 @@ def ejecutar_fases(codigo):
         "salida": []
     }
 
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.ml', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.ml', delete=False, encoding='utf-8') as f:
         f.write(codigo)
         archivo_temp = f.name
 
@@ -41,7 +41,7 @@ def ejecutar_fases(codigo):
         t0 = time.perf_counter()
         input_stream = FileStream(archivo_temp, encoding='utf-8')
         colector = ColectorErrores()
-        lexer = gramatica_v3Lexer(input_stream)
+        lexer = gramatica_v4Lexer(input_stream)
         lexer.removeErrorListeners()
         lexer.addErrorListener(colector)
         token_stream = CommonTokenStream(lexer)
@@ -65,7 +65,7 @@ def ejecutar_fases(codigo):
 
         # Fase 2: Sintáctico
         t0 = time.perf_counter()
-        parser = gramatica_v3Parser(token_stream)
+        parser = gramatica_v4Parser(token_stream)
         parser.removeErrorListeners()
         parser.addErrorListener(colector)
         tree = parser.programa()
@@ -149,13 +149,15 @@ def ejecutar_fases(codigo):
         resultados["ir_output"] = _ejecutar_ll(resultados["ir"])
 
     except Exception as e:
+        import traceback
+        error_detallado = traceback.format_exc()
         resultados["fases"].append({
             "nombre": "Error de Ejecución",
             "estado": "error",
             "tiempo": "0 ms",
             "detalle": str(e)
         })
-        resultados["errores"] = [str(e)]
+        resultados["errores"] = [str(e), error_detallado]
 
     finally:
         try:
@@ -172,7 +174,7 @@ def _ejecutar_ll(ir_code: str) -> dict:
     if not ir_code:
         return resultado
     try:
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".ll", delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".ll", delete=False, encoding='utf-8') as f:
             f.write(ir_code)
             ll_path = f.name
         proc = subprocess.run(
@@ -214,5 +216,4 @@ def compilar():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
-    
+    app.run(debug=True, host='0.0.0.0', port=5000)
