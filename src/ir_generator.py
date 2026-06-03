@@ -7,6 +7,7 @@ from gen.grammar.gramatica_v3Parser import gramatica_v3Parser
 from gen.grammar.gramatica_v3Visitor import gramatica_v3Visitor
 
 # Tipos LLVM reutilizables
+INT64 = ir.IntType(64)
 INT32 = ir.IntType(32)
 INT8 = ir.IntType(8)
 INT1 = ir.IntType(1)
@@ -36,6 +37,12 @@ class IRGenerator(gramatica_v3Visitor):
         self._fmt_float: ir.GlobalVariable | None = None
         self._fmt_str: ir.GlobalVariable | None = None
 
+        # Funciones de libc para el manejo de cadenas (concatenación)
+        self._strlen: ir.Function | None = None
+        self._malloc: ir.Function | None = None
+        self._strcpy: ir.Function | None = None
+        self._strcat: ir.Function | None = None
+
     # ── Helpers ───────────────────────────────────────────────
 
     def _setup_printf(self):
@@ -45,6 +52,33 @@ class IRGenerator(gramatica_v3Visitor):
         self._fmt_int = self._global_string("%d\n", ".fmt.int")
         self._fmt_float = self._global_string("%f\n", ".fmt.float")
         self._fmt_str = self._global_string("%s\n", ".fmt.str")
+
+        self._setup_string_fns()
+
+    def _setup_string_fns(self):
+        """Declara las funciones de libc usadas para concatenar cadenas."""
+        self._strlen = ir.Function(
+            self.module, ir.FunctionType(INT64, [INT8_PTR]), name="strlen"
+        )
+        self._malloc = ir.Function(
+            self.module, ir.FunctionType(INT8_PTR, [INT64]), name="malloc"
+        )
+        self._strcpy = ir.Function(
+            self.module, ir.FunctionType(INT8_PTR, [INT8_PTR, INT8_PTR]), name="strcpy"
+        )
+        self._strcat = ir.Function(
+            self.module, ir.FunctionType(INT8_PTR, [INT8_PTR, INT8_PTR]), name="strcat"
+        )
+
+    def _concat_cadenas(self, izq: ir.Value, der: ir.Value) -> ir.Value:
+        """Genera IR que concatena dos cadenas: malloc + strcpy + strcat."""
+        len1 = self.builder.call(self._strlen, [izq])
+        len2 = self.builder.call(self._strlen, [der])
+        total = self.builder.add(self.builder.add(len1, len2), ir.Constant(INT64, 1))
+        buf = self.builder.call(self._malloc, [total])
+        self.builder.call(self._strcpy, [buf, izq])
+        self.builder.call(self._strcat, [buf, der])
+        return buf
 
     def _global_string(self, text: str, name: str) -> ir.GlobalVariable:
         encoded = bytearray((text + "\0").encode("utf8"))
@@ -538,6 +572,11 @@ class IRGenerator(gramatica_v3Visitor):
             return ir.Constant(INT32, 0)
 
         op = ctx.op.type
+
+        # Concatenación de cadenas: "a" + "b"
+        if op == gramatica_v3Parser.SUMA and izq.type == INT8_PTR and der.type == INT8_PTR:
+            return self._concat_cadenas(izq, der)
+
         if izq.type == DOUBLE or der.type == DOUBLE:
             a = self._cast_to_double(izq)
             b = self._cast_to_double(der)

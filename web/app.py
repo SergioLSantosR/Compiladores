@@ -2,7 +2,6 @@
 import sys
 import os
 import time
-import subprocess
 import tempfile
 from flask import Flask, render_template, request, jsonify
 
@@ -17,6 +16,7 @@ from src.semantic_visitor import SemanticVisitor
 from src.EvalVisitorImpl import EvalVisitor
 from src.tac_generator import TACGenerator
 from src.ir_generator import IRGenerator
+from src.ir_runner import ejecutar_ir
 
 app = Flask(__name__)
 
@@ -145,8 +145,8 @@ def ejecutar_fases(codigo):
 
         resultados["exito"] = True
 
-        # Intentar ejecutar el IR con lli
-        resultados["ir_output"] = _ejecutar_ll(resultados["ir"])
+        # Ejecutar realmente el IR generado (lli si está disponible, JIT si no)
+        resultados["ir_output"] = ejecutar_ir(resultados["ir"])
 
     except Exception as e:
         resultados["fases"].append({
@@ -164,36 +164,6 @@ def ejecutar_fases(codigo):
             pass
 
     return resultados
-
-
-def _ejecutar_ll(ir_code: str) -> dict:
-    """Escribe el IR a un archivo temporal y ejecuta con lli."""
-    resultado = {"salida": "", "error": "", "disponible": False}
-    if not ir_code:
-        return resultado
-    try:
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".ll", delete=False) as f:
-            f.write(ir_code)
-            ll_path = f.name
-        proc = subprocess.run(
-            ["lli", ll_path],
-            capture_output=True, text=True, timeout=5,
-        )
-        resultado["disponible"] = True
-        resultado["salida"] = proc.stdout
-        resultado["error"] = proc.stderr
-    except FileNotFoundError:
-        resultado["error"] = "lli no encontrado. Instala LLVM para ejecutar el IR."
-    except subprocess.TimeoutExpired:
-        resultado["error"] = "Tiempo de ejecución agotado (5s)."
-    except Exception as ex:
-        resultado["error"] = str(ex)
-    finally:
-        try:
-            os.unlink(ll_path)
-        except (OSError, NameError):
-            pass
-    return resultado
 
 
 @app.route('/')

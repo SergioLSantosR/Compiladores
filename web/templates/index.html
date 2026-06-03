@@ -430,12 +430,13 @@
                     document.getElementById('ir').innerHTML = `<pre>${escapeHtml(data.ir)}</pre>`;
                 }
 
-                // Panel ejecución IR (lli)
+                // Panel ejecución IR (lli o motor JIT de llvmlite)
                 if (data.ir_output) {
                     const iro = data.ir_output;
+                    const motor = iro.motor === 'lli' ? 'lli' : 'motor JIT de llvmlite';
                     let html = '';
                     if (iro.disponible && iro.salida) {
-                        html = `<div style="color:#2ea043;margin-bottom:8px;">✅ Ejecutado con lli</div><pre>${escapeHtml(iro.salida)}</pre>`;
+                        html = `<div style="color:#2ea043;margin-bottom:8px;">✅ Ejecutado con ${escapeHtml(motor)}</div><pre>${escapeHtml(iro.salida)}</pre>`;
                     } else if (iro.error) {
                         html = `<div style="color:#f85149;margin-bottom:8px;">⚠️ ${escapeHtml(iro.error)}</div>`;
                         if (iro.salida) html += `<pre>${escapeHtml(iro.salida)}</pre>`;

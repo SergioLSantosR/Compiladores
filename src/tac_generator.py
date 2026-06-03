@@ -254,68 +254,79 @@ class TACGenerator(gramatica_v3Visitor):
     
     def visitCondicionalSi(self, ctx: gramatica_v3Parser.CondicionalSiContext):
         condicion = self.visit(ctx.expresion())
-        
-        etiqueta_else = self.nueva_etiqueta()
+
+        etiqueta_then = self.nueva_etiqueta()
         etiqueta_fin = self.nueva_etiqueta()
-        
-        self.emitir(f"if {condicion} == false goto {etiqueta_else}")
-        
-        # Bloque if
-        self.visit(ctx.bloque(0))
-        self.emitir(f"goto {etiqueta_fin}")
-        
-        # Bloque else
-        self.emitir(f"{etiqueta_else}:")
+
+        # Salto condicional positivo: si la condición es verdadera, ir al bloque "then".
+        self.emitir(f"if {condicion} goto {etiqueta_then}")
+
+        # El bloque "else" cae por defecto (cuando la condición es falsa).
         if ctx.SINO():
             self.visit(ctx.bloque(1))
-        
+        self.emitir(f"goto {etiqueta_fin}")
+
+        # Bloque "then".
+        self.emitir(f"{etiqueta_then}:")
+        self.visit(ctx.bloque(0))
+
         self.emitir(f"{etiqueta_fin}:")
         return None
     
     # ========== Ciclos ==========
     
     def visitCicloMientras(self, ctx: gramatica_v3Parser.CicloMientrasContext):
-        etiqueta_inicio = self.nueva_etiqueta()
+        etiqueta_cond = self.nueva_etiqueta()
+        etiqueta_body = self.nueva_etiqueta()
         etiqueta_fin = self.nueva_etiqueta()
-        
-        self.emitir(f"{etiqueta_inicio}:")
-        condicion = self.visit(ctx.expresion())
-        self.emitir(f"if {condicion} == false goto {etiqueta_fin}")
-        
-        self.pila_ciclos.append((etiqueta_inicio, etiqueta_fin))
+
+        # La condición se evalúa al final y se salta al cuerpo con un salto positivo.
+        self.emitir(f"goto {etiqueta_cond}")
+        self.emitir(f"{etiqueta_body}:")
+
+        # continue → reevaluar condición; break → salir del ciclo.
+        self.pila_ciclos.append((etiqueta_cond, etiqueta_fin))
         self.visit(ctx.bloque())
         self.pila_ciclos.pop()
-        self.emitir(f"goto {etiqueta_inicio}")
+
+        self.emitir(f"{etiqueta_cond}:")
+        condicion = self.visit(ctx.expresion())
+        self.emitir(f"if {condicion} goto {etiqueta_body}")
         self.emitir(f"{etiqueta_fin}:")
         return None
     
     def visitCicloPara(self, ctx: gramatica_v3Parser.CicloParaContext):
-        etiqueta_inicio = self.nueva_etiqueta()
+        etiqueta_cond = self.nueva_etiqueta()
+        etiqueta_body = self.nueva_etiqueta()
+        etiqueta_step = self.nueva_etiqueta()
         etiqueta_fin = self.nueva_etiqueta()
-        
+
         # Inicialización
         if ctx.inicializacionPara():
             self.visit(ctx.inicializacionPara())
         elif ctx.asignacionPara():
             self.visit(ctx.asignacionPara())
-        
-        self.emitir(f"{etiqueta_inicio}:")
-        
-        # Condición
-        if ctx.cond:
-            condicion = self.visit(ctx.cond)
-            self.emitir(f"if {condicion} == false goto {etiqueta_fin}")
-        
-        # Cuerpo
-        self.pila_ciclos.append((etiqueta_inicio, etiqueta_fin))
+
+        self.emitir(f"goto {etiqueta_cond}")
+        self.emitir(f"{etiqueta_body}:")
+
+        # continue → ejecutar actualización y reevaluar; break → salir.
+        self.pila_ciclos.append((etiqueta_step, etiqueta_fin))
         self.visit(ctx.bloque())
         self.pila_ciclos.pop()
-        
+
         # Actualización
+        self.emitir(f"{etiqueta_step}:")
         if ctx.actualizacionPara():
             self.visit(ctx.actualizacionPara())
-        
-        self.emitir(f"goto {etiqueta_inicio}")
+
+        # Condición con salto positivo al cuerpo.
+        self.emitir(f"{etiqueta_cond}:")
+        if ctx.cond:
+            condicion = self.visit(ctx.cond)
+            self.emitir(f"if {condicion} goto {etiqueta_body}")
+        else:
+            self.emitir(f"goto {etiqueta_body}")
         self.emitir(f"{etiqueta_fin}:")
         return None
     
