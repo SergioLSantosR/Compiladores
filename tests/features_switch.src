@@ -1,0 +1,18 @@
+// Demostración aislada: switch/case con default (sentencia 'segun')
+
+programa {
+    entero dia = 3;
+    segun (dia) {
+        caso 1: imprimir("lunes"); romper;
+        caso 2: imprimir("martes"); romper;
+        caso 3: imprimir("miercoles"); romper;
+        defecto: imprimir("dia desconocido");
+    }
+
+    // Caso que cae al default
+    entero otro = 9;
+    segun (otro) {
+        caso 1: imprimir("uno"); romper;
+        defecto: imprimir("otro valor");
+    }
+}

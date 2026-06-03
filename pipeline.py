@@ -1,4 +1,4 @@
-# pipeline.py — Orquestador del compilador MiniLang v3
+# pipeline.py — Orquestador del compilador MiniLang v4
 #
 # Fases:
 #   1. Análisis Léxico   (ANTLR Lexer)
@@ -18,8 +18,8 @@ import time
 
 from antlr4 import CommonTokenStream, FileStream
 
-from gen.grammar.gramatica_v3Lexer import gramatica_v3Lexer
-from gen.grammar.gramatica_v3Parser import gramatica_v3Parser
+from gen.grammar.gramatica_v4Lexer import gramatica_v4Lexer
+from gen.grammar.gramatica_v4Parser import gramatica_v4Parser
 from src.custom_errors import ColectorErrores
 from src.semantic_visitor import SemanticVisitor
 from src.tac_generator import TACGenerator
@@ -69,7 +69,7 @@ def ejecutar_pipeline(
     input_stream = FileStream(ruta_archivo, encoding="utf-8")
     colector = ColectorErrores()
 
-    lexer = gramatica_v3Lexer(input_stream)
+    lexer = gramatica_v4Lexer(input_stream)
     lexer.removeErrorListeners()
     lexer.addErrorListener(colector)
 
@@ -84,7 +84,7 @@ def ejecutar_pipeline(
 
     # ── Fase 2: Sintáctico ─────────────────────────────────────
     t0 = time.perf_counter()
-    parser = gramatica_v3Parser(token_stream)
+    parser = gramatica_v4Parser(token_stream)
     parser.removeErrorListeners()
     parser.addErrorListener(colector)
     tree = parser.programa()
@@ -158,7 +158,7 @@ def ejecutar_pipeline(
 
 def _imprimir_fases(resultado: ResultadoPipeline) -> None:
     print("\n╔══════════════════════════════════════════╗", file=sys.stderr)
-    print("║       Pipeline MiniLang v3 — Fases       ║", file=sys.stderr)
+    print("║       Pipeline MiniLang v4 — Fases       ║", file=sys.stderr)
     print("╠══════════════════════════════════════════╣", file=sys.stderr)
     for fase in resultado.fases:
         print(f"║ {fase}", file=sys.stderr)
@@ -170,7 +170,7 @@ def main():
     import argparse
 
     ap = argparse.ArgumentParser(
-        description="MiniLang v3 — Pipeline completo (léxico → sintáctico → semántico → TAC → IR → intérprete)"
+        description="MiniLang v4 — Pipeline completo (léxico → sintáctico → semántico → TAC → IR → intérprete)"
     )
     ap.add_argument("archivo", help="Ruta del archivo fuente (.ml)")
     ap.add_argument("--silencioso", action="store_true", help="No imprimir salida del programa")

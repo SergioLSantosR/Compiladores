@@ -1,0 +1,44 @@
+// Programa de ejemplo del Proyecto Final (sintaxis en español de MiniLang v4)
+// Ejercita: structs, casting explícito, operador ternario, switch/case,
+// funciones recursivas, arreglos y módulo.
+
+estructura Punto { entero x; entero y; }
+
+funcion entero fibonacci(entero n) {
+    si (n <= 1) { retorna n; }
+    retorna fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+programa {
+    // Structs y casting explícito
+    Punto p;
+    p.x = 3;
+    p.y = 4;
+    flotante dist = (flotante)(p.x * p.x + p.y * p.y);
+
+    // Operador ternario
+    cadena etiqueta = dist > 20.0 ? "lejos" : "cerca";
+    imprimir(etiqueta);
+
+    // Switch / case con default
+    entero opcion = 2;
+    segun (opcion) {
+        caso 1: imprimir("opcion uno"); romper;
+        caso 2: imprimir("opcion dos"); romper;
+        defecto: imprimir("otra opcion");
+    }
+
+    // Arreglo y módulo
+    entero[] nums = [5, 8, 13, 21, 34];
+    entero i = 0;
+    entero total = 0;
+    mientras (i < 5) {
+        entero r = nums[i] % 2;
+        si (r == 0) { total = total + nums[i]; }
+        i = i + 1;
+        si (total > 50) { romper; }
+    }
+
+    imprimir(fibonacci(10));
+    imprimir(total);
+}

@@ -9,8 +9,8 @@ from flask import Flask, render_template, request, jsonify
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from antlr4 import *
-from gen.grammar.gramatica_v3Lexer import gramatica_v3Lexer
-from gen.grammar.gramatica_v3Parser import gramatica_v3Parser
+from gen.grammar.gramatica_v4Lexer import gramatica_v4Lexer
+from gen.grammar.gramatica_v4Parser import gramatica_v4Parser
 from src.custom_errors import ColectorErrores
 from src.semantic_visitor import SemanticVisitor
 from src.EvalVisitorImpl import EvalVisitor
@@ -41,7 +41,7 @@ def ejecutar_fases(codigo):
         t0 = time.perf_counter()
         input_stream = FileStream(archivo_temp, encoding='utf-8')
         colector = ColectorErrores()
-        lexer = gramatica_v3Lexer(input_stream)
+        lexer = gramatica_v4Lexer(input_stream)
         lexer.removeErrorListeners()
         lexer.addErrorListener(colector)
         token_stream = CommonTokenStream(lexer)
@@ -65,7 +65,7 @@ def ejecutar_fases(codigo):
 
         # Fase 2: Sintáctico
         t0 = time.perf_counter()
-        parser = gramatica_v3Parser(token_stream)
+        parser = gramatica_v4Parser(token_stream)
         parser.removeErrorListeners()
         parser.addErrorListener(colector)
         tree = parser.programa()
