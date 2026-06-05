@@ -341,6 +341,158 @@
             color: #c9d1d9;
         }
 
+        .ir-manual-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .passes-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 8px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .pass-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .pass-checkbox:hover {
+            background: #21262d;
+        }
+
+        .pass-checkbox input {
+            margin-top: 3px;
+            accent-color: #667eea;
+        }
+
+        .pass-checkbox-label {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .pass-checkbox-nombre {
+            font-weight: 600;
+            font-size: 13px;
+            color: #e6edf3;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        .pass-checkbox-desc {
+            font-size: 11px;
+            color: #8b949e;
+        }
+
+        .ir-manual-acciones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn-secundario {
+            background: #21262d;
+            border: 1px solid #30363d;
+        }
+
+        .btn-secundario:hover {
+            background: #30363d;
+        }
+
+        .diff-resumen {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 13px;
+        }
+
+        .diff-badge {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .diff-badge.agregada { background: rgba(46, 160, 67, 0.2); color: #3fb950; }
+        .diff-badge.eliminada { background: rgba(248, 81, 73, 0.2); color: #f85149; }
+        .diff-badge.modificada { background: rgba(210, 153, 34, 0.2); color: #d29922; }
+        .diff-badge.igual { background: rgba(139, 148, 158, 0.2); color: #8b949e; }
+
+        .diff-lado-a-lado {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            flex: 1;
+            min-height: 280px;
+        }
+
+        .diff-columna {
+            background: #0b0f14;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .diff-columna-titulo {
+            background: #161b22;
+            padding: 8px 12px;
+            border-bottom: 1px solid #30363d;
+            font-weight: 600;
+            font-size: 13px;
+            color: #c9d1d9;
+        }
+
+        .diff-lineas {
+            padding: 10px;
+            overflow-y: auto;
+            flex: 1;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .diff-linea {
+            padding: 1px 6px;
+            border-radius: 3px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .diff-linea.agregada { background: rgba(46, 160, 67, 0.15); color: #3fb950; }
+        .diff-linea.eliminada { background: rgba(248, 81, 73, 0.15); color: #f85149; }
+        .diff-linea.modificada { background: rgba(210, 153, 34, 0.15); color: #d29922; }
+        .diff-linea.igual { color: #8b949e; }
+
+        .resultado-por-pass {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 12px;
+        }
+
+        .resultado-por-pass ul {
+            margin-top: 8px;
+            padding-left: 18px;
+        }
+
+        .resultado-por-pass li.ok { color: #3fb950; }
+        .resultado-por-pass li.error { color: #f85149; }
+
         @media (max-width: 1100px) {
             .main-panel {
                 grid-template-columns: 1fr;
@@ -405,6 +557,7 @@
                     <button class="tab" data-tab="ir_original">⚙️ IR original</button>
                     <button class="tab" data-tab="ir_optimizado">🚀 IR optimizado</button>
                     <button class="tab" data-tab="metricas_o3">📈 Métricas O3</button>
+                    <button class="tab" data-tab="ir_manual">🛠️ IR Manual</button>
                     <button class="tab" data-tab="ir_exec">🔧 Ejecución IR</button>
                 </div>
 
@@ -412,6 +565,21 @@
                 <div id="ir_original" class="tab-content" style="display: none;"></div>
                 <div id="ir_optimizado" class="tab-content" style="display: none;"></div>
                 <div id="metricas_o3" class="tab-content" style="display: none;"></div>
+                <div id="ir_manual" class="tab-content" style="display: none;">
+                    <div class="ir-manual-panel">
+                        <div id="passesSelector" class="passes-selector">
+                            <div style="color:#8b949e;grid-column:1/-1;">Compila un programa para habilitar la optimización manual.</div>
+                        </div>
+                        <div class="ir-manual-acciones">
+                            <button id="aplicarPassesBtn" onclick="aplicarPassesManual()" disabled>⚡ Aplicar passes</button>
+                            <button class="btn-secundario" id="reejecutarManualBtn" onclick="reejecutarIRManual()" disabled>▶️ Re-ejecutar IR</button>
+                            <button class="btn-secundario" id="exportarManualBtn" onclick="exportarIRManual()" disabled>💾 Exportar .ll</button>
+                        </div>
+                        <div id="diffResumen" class="diff-resumen"></div>
+                        <div id="diffLadoALado" class="diff-lado-a-lado"></div>
+                        <div id="resultadoPorPass" class="resultado-por-pass" style="display:none;"></div>
+                    </div>
+                </div>
                 <div id="ir_exec" class="tab-content" style="display: none;">Compila un programa para ver la ejecución del IR original y del IR optimizado.</div>
             </div>
         </div>
@@ -435,6 +603,10 @@
     </div>
 
     <script>
+        let irOriginalActual = '';
+        let irManualOptimizado = '';
+        let passesDisponibles = [];
+
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 const target = tab.dataset.tab;
@@ -489,6 +661,201 @@
             return tituloPorDefecto;
         }
 
+        function renderizarPassesSelector() {
+            const contenedor = document.getElementById('passesSelector');
+            if (!passesDisponibles.length) {
+                contenedor.innerHTML = '<div style="color:#8b949e;grid-column:1/-1;">Compila un programa para habilitar la optimización manual.</div>';
+                return;
+            }
+
+            contenedor.innerHTML = passesDisponibles.map(pass => `
+                <label class="pass-checkbox">
+                    <input type="checkbox" name="pass" value="${escapeHtml(pass.id)}" data-pass-id="${escapeHtml(pass.id)}">
+                    <span class="pass-checkbox-label">
+                        <span class="pass-checkbox-nombre">${escapeHtml(pass.nombre)}</span>
+                        <span class="pass-checkbox-desc">${escapeHtml(pass.descripcion)}</span>
+                    </span>
+                </label>
+            `).join('');
+        }
+
+        function obtenerPassesSeleccionados() {
+            return Array.from(document.querySelectorAll('#passesSelector input[name="pass"]:checked'))
+                .map(input => input.value);
+        }
+
+        function habilitarControlesManual(habilitar) {
+            document.getElementById('aplicarPassesBtn').disabled = !habilitar;
+            document.getElementById('reejecutarManualBtn').disabled = !irManualOptimizado;
+            document.getElementById('exportarManualBtn').disabled = !irManualOptimizado;
+        }
+
+        function renderizarDiffManual(data) {
+            const diff = data.diff || {};
+            const resumen = diff.resumen || {};
+
+            document.getElementById('diffResumen').innerHTML = `
+                <span class="diff-badge agregada">+ ${resumen.agregadas ?? 0} agregadas</span>
+                <span class="diff-badge eliminada">− ${resumen.eliminadas ?? 0} eliminadas</span>
+                <span class="diff-badge modificada">~ ${resumen.modificadas ?? 0} modificadas</span>
+                <span class="diff-badge igual">${resumen.sin_cambios ?? 0} sin cambios</span>
+            `;
+
+            const lineasOrig = (data.ir_original || '').split('\n');
+            const lineasOpt = (data.ir_optimizado || '').split('\n');
+
+            const eliminadasSet = new Set((diff.eliminadas || []).map(l => l.linea));
+            const agregadasSet = new Set((diff.agregadas || []).map(l => l.linea));
+            const modificadasAntes = new Map(
+                (diff.modificadas || []).map(m => [m.linea_antes, m])
+            );
+            const modificadasDespues = new Map(
+                (diff.modificadas || []).map(m => [m.linea_despues, m])
+            );
+
+            const htmlIzq = lineasOrig.map((texto, idx) => {
+                const num = idx + 1;
+                let clase = 'igual';
+                if (eliminadasSet.has(num) || modificadasAntes.has(num)) {
+                    clase = modificadasAntes.has(num) ? 'modificada' : 'eliminada';
+                }
+                return `<div class="diff-linea ${clase}">${num.toString().padStart(4)} | ${escapeHtml(texto)}</div>`;
+            }).join('');
+
+            const htmlDer = lineasOpt.map((texto, idx) => {
+                const num = idx + 1;
+                let clase = 'igual';
+                if (agregadasSet.has(num) || modificadasDespues.has(num)) {
+                    clase = modificadasDespues.has(num) ? 'modificada' : 'agregada';
+                }
+                return `<div class="diff-linea ${clase}">${num.toString().padStart(4)} | ${escapeHtml(texto)}</div>`;
+            }).join('');
+
+            document.getElementById('diffLadoALado').innerHTML = `
+                <div class="diff-columna">
+                    <div class="diff-columna-titulo">IR original</div>
+                    <div class="diff-lineas">${htmlIzq || '<div class="diff-linea igual">(vacío)</div>'}</div>
+                </div>
+                <div class="diff-columna">
+                    <div class="diff-columna-titulo">IR optimizado (manual)</div>
+                    <div class="diff-lineas">${htmlDer || '<div class="diff-linea igual">(vacío)</div>'}</div>
+                </div>
+            `;
+
+            const resultadoPorPass = data.resultado_por_pass || {};
+            const claves = Object.keys(resultadoPorPass);
+            const panel = document.getElementById('resultadoPorPass');
+
+            if (claves.length > 0) {
+                panel.style.display = 'block';
+                panel.innerHTML = `
+                    <strong>Resultado por pass</strong>
+                    <ul>
+                        ${claves.map(nombre => {
+                            const info = resultadoPorPass[nombre];
+                            const clase = info.aplicado ? 'ok' : 'error';
+                            const detalle = info.aplicado
+                                ? `✓ aplicado (${info.metricas?.total_instrucciones ?? '?'} instr.)`
+                                : `✗ ${escapeHtml(info.error || 'error')}`;
+                            return `<li class="${clase}"><code>${escapeHtml(nombre)}</code>: ${detalle}</li>`;
+                        }).join('')}
+                    </ul>
+                `;
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+
+        async function aplicarPassesManual() {
+            const passes = obtenerPassesSeleccionados();
+            if (!irOriginalActual) {
+                alert('Compila un programa primero para obtener el IR original.');
+                return;
+            }
+            if (!passes.length) {
+                alert('Selecciona al menos un pass.');
+                return;
+            }
+
+            const btn = document.getElementById('aplicarPassesBtn');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Aplicando...';
+
+            try {
+                const response = await fetch('/ir_manual', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ir: irOriginalActual,
+                        passes: passes,
+                        ejecutar: true,
+                    }),
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Error al aplicar passes');
+                }
+
+                irManualOptimizado = data.ir_optimizado || '';
+                renderizarDiffManual(data);
+                habilitarControlesManual(true);
+
+                if (data.salida_ejecucion) {
+                    const salida = obtenerTextoSalidaIR(data.salida_ejecucion);
+                    const motor = data.salida_ejecucion.motor ? ` (${data.salida_ejecucion.motor})` : '';
+                    document.getElementById('consoleContent').innerHTML =
+                        `<div class="console-line">🛠️ IR Manual ejecutado${motor}:</div>` +
+                        `<div class="console-line"><pre>${escapeHtml(salida)}</pre></div>`;
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            } finally {
+                btn.innerHTML = '⚡ Aplicar passes';
+                btn.disabled = false;
+            }
+        }
+
+        async function reejecutarIRManual() {
+            if (!irManualOptimizado) {
+                alert('Aplica passes primero para obtener IR optimizado.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/ir_manual/ejecutar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ir: irManualOptimizado }),
+                });
+                const data = await response.json();
+                const salida = obtenerTextoSalidaIR(data);
+                const motor = data.motor ? ` (${data.motor})` : '';
+                document.getElementById('consoleContent').innerHTML =
+                    `<div class="console-line">▶️ Re-ejecución IR Manual${motor}:</div>` +
+                    `<div class="console-line"><pre>${escapeHtml(salida)}</pre></div>`;
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        function exportarIRManual() {
+            if (!irManualOptimizado) {
+                alert('Aplica passes primero para exportar.');
+                return;
+            }
+
+            const blob = new Blob([irManualOptimizado], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'optimizado.manual.ll';
+            document.body.appendChild(enlace);
+            enlace.click();
+            document.body.removeChild(enlace);
+            URL.revokeObjectURL(url);
+        }
+
         async function compilar() {
             const codigo = document.getElementById('codigo').value;
             const compilarBtn = document.getElementById('compilarBtn');
@@ -505,6 +872,11 @@
             document.getElementById('ir_optimizado').innerHTML = '⏳ Generando IR optimizado...';
             document.getElementById('metricas_o3').innerHTML = '⏳ Calculando métricas de optimización...';
             document.getElementById('ir_exec').innerHTML = '⏳ Ejecutando IR...';
+            document.getElementById('diffResumen').innerHTML = '';
+            document.getElementById('diffLadoALado').innerHTML = '';
+            document.getElementById('resultadoPorPass').style.display = 'none';
+            irManualOptimizado = '';
+            habilitarControlesManual(false);
 
             try {
                 const response = await fetch('/compilar', {
@@ -542,10 +914,18 @@
                 }
 
                 if (data.ir) {
+                    irOriginalActual = data.ir;
                     document.getElementById('ir_original').innerHTML = `<pre>${escapeHtml(data.ir)}</pre>`;
                 } else {
+                    irOriginalActual = '';
                     document.getElementById('ir_original').innerHTML = '<div style="color:#8b949e;">No se generó IR original.</div>';
                 }
+
+                if (data.passes_disponibles && data.passes_disponibles.length) {
+                    passesDisponibles = data.passes_disponibles;
+                }
+                renderizarPassesSelector();
+                habilitarControlesManual(!!irOriginalActual);
 
                 if (data.ir_optimizado) {
                     document.getElementById('ir_optimizado').innerHTML = `<pre>${escapeHtml(data.ir_optimizado)}</pre>`;

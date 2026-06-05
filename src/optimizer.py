@@ -429,17 +429,37 @@ class Optimizer:
         try:
             cmd = ['opt', flag, '-S', input_file, '-o', output_file]
             subprocess.run(cmd, check=True, capture_output=True, text=True)
-            
+
             with open(output_file, 'r', encoding='utf-8') as f:
                 ir_optimizado = f.read()
-            
+
             metricas = self._analizar_ir(ir_optimizado)
             return ir_optimizado, metricas
-            
+
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            ir_optimizado = self._fallback_pass_manual(ir_code, pass_name)
+            metricas = self._analizar_ir(ir_optimizado)
+            metricas["motor"] = "fallback-manual"
+            return ir_optimizado, metricas
+
         finally:
             for f in [input_file, output_file]:
                 if os.path.exists(f):
                     os.unlink(f)
+
+    def _fallback_pass_manual(self, ir_code: str, pass_name: str) -> str:
+        """Aplica optimizaciones básicas cuando `opt` no está disponible."""
+        if pass_name in ("constprop", "instcombine"):
+            return self._aplicar_constant_folding(ir_code)
+        if pass_name == "dce":
+            return self._aplicar_dead_code_elimination(ir_code)
+        if pass_name == "simplifycfg":
+            return self._simplificar_cfg(ir_code)
+        if pass_name == "mem2reg":
+            return self._aplicar_dead_code_elimination(
+                self._aplicar_constant_folding(ir_code)
+            )
+        return ir_code
 
 
 # Función helper para uso directo desde la interfaz

@@ -7,6 +7,11 @@ from flask import Flask, render_template, request, jsonify
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from pipeline import ejecutar_pipeline
+from src.ir_manual import (
+    aplicar_optimizacion_manual,
+    listar_passes,
+    reejecutar_ir,
+)
 
 app = Flask(__name__)
 
@@ -73,7 +78,62 @@ def compilar():
         return jsonify({"error": "El código está vacío"}), 400
 
     resultados = ejecutar_fases(codigo)
+    resultados["passes_disponibles"] = listar_passes()
     return jsonify(resultados)
+
+
+@app.route("/ir_manual", methods=["POST"])
+def ir_manual():
+    datos = request.get_json() or {}
+    codigo_ir = datos.get("ir", "")
+    passes = datos.get("passes", [])
+    ejecutar = bool(datos.get("ejecutar", True))
+    exportar = bool(datos.get("exportar", False))
+    nombre_base = datos.get("nombre_base")
+
+    if not codigo_ir.strip():
+        return jsonify({"error": "No hay IR para optimizar. Compila primero."}), 400
+
+    if not passes:
+        return jsonify({"error": "Selecciona al menos un pass."}), 400
+
+    ruta_exportacion = None
+    if exportar:
+        with tempfile.NamedTemporaryFile(suffix=".manual.ll", delete=False) as tmp:
+            ruta_exportacion = tmp.name
+
+    try:
+        resultado = aplicar_optimizacion_manual(
+            codigo_ir,
+            passes,
+            nombre_base=nombre_base,
+            ejecutar=ejecutar,
+            exportar=exportar,
+            ruta_exportacion=ruta_exportacion,
+        )
+        respuesta = resultado.a_dict()
+        if exportar and respuesta.get("archivo_exportado"):
+            with open(respuesta["archivo_exportado"], "r", encoding="utf-8") as f:
+                respuesta["ir_exportado_contenido"] = f.read()
+        return jsonify(respuesta)
+    except Exception as ex:
+        return jsonify({"error": str(ex)}), 500
+
+
+@app.route("/ir_manual/ejecutar", methods=["POST"])
+def ir_manual_ejecutar():
+    datos = request.get_json() or {}
+    codigo_ir = datos.get("ir", "")
+
+    if not codigo_ir.strip():
+        return jsonify({"error": "No hay IR para ejecutar."}), 400
+
+    return jsonify(reejecutar_ir(codigo_ir))
+
+
+@app.route("/passes", methods=["GET"])
+def obtener_passes():
+    return jsonify({"passes": listar_passes()})
 
 
 if __name__ == "__main__":
