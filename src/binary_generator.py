@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import os
 import sys
+import time
 import shutil
 import subprocess
 import tempfile
@@ -397,6 +398,7 @@ def generar_binarios(
             salida["binarios"][plataforma] = {
                 "ok": False,
                 "error": f"Plataforma no soportada: {plataforma}",
+                "tiempo_ms": 0.0,
             }
             continue
 
@@ -407,19 +409,28 @@ def generar_binarios(
                     f"Faltan herramientas para '{plataforma}' "
                     f"(se requiere llc y el linker correspondiente)."
                 ),
+                "tiempo_ms": 0.0,
             }
             continue
 
+        t0 = time.perf_counter()
         try:
             ruta = generador.generate_binary(ir_code, plataforma, output_name=nombre_base)
         except Exception as ex:  # pragma: no cover - defensivo
-            salida["binarios"][plataforma] = {"ok": False, "error": str(ex)}
+            salida["binarios"][plataforma] = {
+                "ok": False,
+                "error": str(ex),
+                "tiempo_ms": (time.perf_counter() - t0) * 1000,
+            }
             continue
+
+        tiempo_ms = (time.perf_counter() - t0) * 1000
 
         if not ruta or not os.path.exists(ruta):
             salida["binarios"][plataforma] = {
                 "ok": False,
                 "error": "La generación del binario falló (revise los logs).",
+                "tiempo_ms": tiempo_ms,
             }
             continue
 
@@ -427,6 +438,7 @@ def generar_binarios(
             "ok": True,
             "ruta": os.path.abspath(ruta),
             "tamano_bytes": os.path.getsize(ruta),
+            "tiempo_ms": tiempo_ms,
         }
 
         if ejecutar and plataforma == "linux":

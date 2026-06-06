@@ -15,14 +15,23 @@ DOUBLE = ir.DoubleType()
 VOID = ir.VoidType()
 INT8_PTR = ir.PointerType(INT8)
 
+# Target triples soportados según la plataforma de compilación destino.
+# El IR de LLVM es independiente de plataforma; el triple solo informa al
+# backend (llc) el objetivo por defecto, que puede sobreescribirse en la Fase 8.
+TRIPLES = {
+    "linux": "x86_64-unknown-linux-gnu",
+    "windows": "x86_64-pc-windows-gnu",
+}
+
 
 class IRGenerator(gramatica_v4Visitor):
     """Genera LLVM IR ejecutable a partir del AST de MiniLang usando llvmlite."""
 
-    def __init__(self):
+    def __init__(self, triple: str = "linux"):
         super().__init__()
         self.module = ir.Module(name="MiniLang")
-        self.module.triple = "x86_64-unknown-linux-gnu"
+        # Acepta un nombre de plataforma ('linux'/'windows') o un triple literal
+        self.module.triple = TRIPLES.get(triple, triple)
 
         self.builder: ir.IRBuilder | None = None
         self.variables: dict[str, ir.AllocaInstr] = {}

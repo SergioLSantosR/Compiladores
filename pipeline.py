@@ -73,6 +73,7 @@ def ejecutar_pipeline(
     generar_archivos: bool = True,
     generar_binario: bool = False,
     plataformas: list[str] | None = None,
+    triple_ir: str = "linux",
 ) -> ResultadoPipeline:
     resultado = ResultadoPipeline()
     base = os.path.splitext(ruta_archivo)[0]
@@ -138,7 +139,7 @@ def ejecutar_pipeline(
     # ── Fase 5: Generación LLVM IR ─────────────────────────────
     t0 = time.perf_counter()
     try:
-        ir_gen = IRGenerator()
+        ir_gen = IRGenerator(triple=triple_ir)
         resultado.ir = ir_gen.visit(tree) or ""
         t_ir = (time.perf_counter() - t0) * 1000
         resultado.fases.append(FaseResultado("Generación LLVM IR", "ok", t_ir))

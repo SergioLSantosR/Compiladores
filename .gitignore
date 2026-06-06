@@ -20,6 +20,20 @@ tools/antlr-4.13.1-complete.jar
 # Archivos generados por el pipeline
 *.tac
 *.ll
+*.opt.ll
+*.manual.ll
+
+# Artefactos de compilación / binarios nativos
+*.o
+*.obj
+*.exe
+*_linux
+*_windows
+programa_*
+
+# Caché de llvmlite
+.llvmlite_cache/
+*.llvmlite
 
 # Otros
 .DS_Store

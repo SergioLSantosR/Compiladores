@@ -787,6 +787,29 @@
                 .map(input => input.value);
         }
 
+        function agregarFaseBinario(plataforma, info, tiempo) {
+            const phasesGrid = document.getElementById('phasesGrid');
+            if (!phasesGrid) {
+                return;
+            }
+            const estado = info.ok ? 'ok' : 'error';
+            const id = `fase8-${plataforma}`;
+            let card = document.getElementById(id);
+            if (!card) {
+                card = document.createElement('div');
+                card.id = id;
+                phasesGrid.appendChild(card);
+            }
+            card.className = `phase-card ${estado}`;
+            card.innerHTML = `
+                <div class="phase-name">Fase 8 · Binario ${escapeHtml(plataforma)}</div>
+                <div class="phase-time">⏱️ ${tiempo || '—'}</div>
+                <div class="phase-status ${estado}">
+                    ${info.ok ? '✅ Generado' : '❌ No generado'}
+                </div>
+            `;
+        }
+
         async function generarBinarios() {
             if (!irOriginalActual) {
                 return;
@@ -819,11 +842,12 @@
                 let html = '';
                 Object.keys(binarios).forEach(plat => {
                     const info = binarios[plat];
+                    const tiempo = info.tiempo_ms !== undefined ? `${Number(info.tiempo_ms).toFixed(2)} ms` : '';
                     if (info.ok) {
                         const kb = (info.tamano_bytes / 1024).toFixed(1);
                         html += `
                             <div class="binario-card ok">
-                                <div class="binario-titulo">✅ ${escapeHtml(plat)} — ${kb} KB</div>
+                                <div class="binario-titulo">✅ ${escapeHtml(plat)} — ${kb} KB ${tiempo ? '· ' + tiempo : ''}</div>
                                 <a class="binario-descarga" href="/binarios/descargar/${encodeURIComponent(info.archivo)}">⬇️ Descargar</a>
                             </div>`;
                     } else {
@@ -833,6 +857,7 @@
                                 <div class="binario-error">${escapeHtml(info.error || 'Error desconocido')}</div>
                             </div>`;
                     }
+                    agregarFaseBinario(plat, info, tiempo);
                 });
                 contenedor.innerHTML = html || '<div style="color:#8b949e;">Sin resultados.</div>';
             } catch (err) {
