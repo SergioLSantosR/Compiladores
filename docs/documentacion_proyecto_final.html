@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documentación — Proyecto Final Compiladores 2026</title>
+<style>
+    :root {
+        --azul: #1f4e79;
+        --azul-claro: #2e75b6;
+        --gris: #444;
+        --gris-claro: #6b7280;
+        --borde: #d0d7de;
+        --fondo-code: #0d1117;
+        --verde: #1a7f37;
+        --rojo: #cf222e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: "Segoe UI", Calibri, Arial, sans-serif;
+        color: #1c1e21;
+        line-height: 1.55;
+        margin: 0;
+        font-size: 12pt;
+    }
+
+    .pagina {
+        max-width: 850px;
+        margin: 0 auto;
+        padding: 40px 56px;
+    }
+
+    h1, h2, h3 { color: var(--azul); line-height: 1.25; }
+    h2 {
+        border-bottom: 2px solid var(--azul-claro);
+        padding-bottom: 6px;
+        margin-top: 34px;
+    }
+    h3 { color: var(--azul-claro); margin-top: 24px; }
+
+    p { text-align: justify; }
+
+    code, pre {
+        font-family: "Consolas", "SF Mono", "Courier New", monospace;
+        font-size: 10.5pt;
+    }
+    code { background: #f0f3f6; padding: 1px 5px; border-radius: 4px; color: #b3206b; }
+    pre {
+        background: var(--fondo-code);
+        color: #e6edf3;
+        padding: 14px 16px;
+        border-radius: 8px;
+        overflow-x: auto;
+        font-size: 9.5pt;
+        line-height: 1.45;
+    }
+    pre code { background: none; color: inherit; padding: 0; }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 14px 0;
+        font-size: 11pt;
+    }
+    th, td { border: 1px solid var(--borde); padding: 8px 10px; text-align: left; }
+    th { background: var(--azul); color: #fff; }
+    tr:nth-child(even) td { background: #f6f8fa; }
+
+    .badge-ok { color: var(--verde); font-weight: 700; }
+    .badge-del { color: var(--rojo); font-weight: 700; }
+
+    /* ---- Carátula ---- */
+    .caratula {
+        min-height: 92vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        page-break-after: always;
+    }
+    .caratula .univ { font-size: 15pt; font-weight: 700; color: var(--gris); letter-spacing: .5px; }
+    .caratula .facultad { font-size: 12pt; color: var(--gris-claro); margin-top: 4px; }
+    .caratula .titulo {
+        font-size: 30pt;
+        color: var(--azul);
+        font-weight: 800;
+        margin: 38px 0 6px;
+    }
+    .caratula .subtitulo { font-size: 16pt; color: var(--azul-claro); margin-bottom: 40px; }
+    .caratula .meta { font-size: 12pt; color: var(--gris); margin: 3px 0; }
+
+    .tabla-participacion { max-width: 560px; margin: 30px auto 0; }
+
+    /* ---- Diagrama del pipeline ---- */
+    .pipeline {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 18px 0;
+    }
+    .fase {
+        display: grid;
+        grid-template-columns: 46px 1fr 1.3fr;
+        align-items: center;
+        border: 1.5px solid var(--azul-claro);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .fase.nueva { border-color: var(--verde); border-width: 2px; }
+    .fase .num {
+        background: var(--azul);
+        color: #fff;
+        font-weight: 800;
+        font-size: 15pt;
+        text-align: center;
+        padding: 14px 0;
+        align-self: stretch;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .fase.nueva .num { background: var(--verde); }
+    .fase .nombre { padding: 8px 12px; font-weight: 700; color: var(--azul); }
+    .fase .io { padding: 8px 12px; font-size: 10pt; color: var(--gris); border-left: 1px dashed var(--borde); }
+    .flecha { text-align: center; color: var(--azul-claro); font-size: 14pt; line-height: 0.5; }
+
+    .nota {
+        background: #eef6ff;
+        border-left: 4px solid var(--azul-claro);
+        padding: 10px 14px;
+        border-radius: 4px;
+        margin: 14px 0;
+        font-size: 11pt;
+    }
+    .nota.aviso { background: #fff8e6; border-left-color: #d4a017; }
+
+    ul.features li { margin-bottom: 6px; }
+
+    @media print {
+        .pagina { padding: 0 18mm; max-width: none; }
+        h2 { page-break-after: avoid; }
+        pre, table, .fase { page-break-inside: avoid; }
+        .salto { page-break-before: always; }
+    }
+</style>
+</head>
+<body>
+
+<!-- ============ CARÁTULA ============ -->
+<div class="pagina">
+<div class="caratula">
+    <div class="univ">Universidad Mariano Gálvez de Guatemala</div>
+    <div class="facultad">Facultad de Ingeniería en Sistemas · Compiladores · Ciclo 2026</div>
+
+    <div class="titulo">Proyecto Final</div>
+    <div class="subtitulo">Compilador MiniLang v4 — Pipeline de 8 Fases</div>
+
+    <div class="meta">Optimización O3 · IR Manual · Binarios Nativos · Gramática v4</div>
+    <div class="meta">Fecha de entrega: 05 de junio de 2026</div>
+
+    <table class="tabla-participacion">
+        <tr>
+            <th>Integrante</th>
+            <th>Rol (fases/módulos)</th>
+            <th>Participación</th>
+        </tr>
+        <tr>
+            <td>Alexander</td>
+            <td>Persona A (Gramática v4) y Persona D (Binarios nativos)</td>
+            <td style="text-align:center;">33.33%</td>
+        </tr>
+        <tr>
+            <td>Emerson</td>
+            <td>Persona B (Optimización automática O3)</td>
+            <td style="text-align:center;">33.33%</td>
+        </tr>
+        <tr>
+            <td>Juan</td>
+            <td>Persona C (Módulo de Optimización Manual del IR)</td>
+            <td style="text-align:center;">33.34%</td>
+        </tr>
+    </table>
+    <p style="font-size:10.5pt;color:var(--gris-claro);margin-top:14px;">
+        La participación es equitativa entre los tres integrantes y está respaldada
+        por el historial de commits individuales del repositorio.
+    </p>
+</div>
+
+<!-- ============ 1. INTRODUCCIÓN ============ -->
+<h2>1. Introducción</h2>
+<p>
+    Este proyecto consolida el compilador <strong>MiniLang</strong> desarrollado a lo largo del
+    ciclo en un producto funcional que completa la cadena de compilación moderna. Sobre la base
+    de los Proyectos 1, 2 y 3 se incorporaron cuatro capacidades avanzadas:
+</p>
+<ul class="features">
+    <li><strong>Optimización automática del IR</strong> mediante el Pass Manager de LLVM a nivel O3 (Fase 7).</li>
+    <li><strong>Módulo de optimización manual</strong> que aplica passes individuales y muestra su efecto con un comparador diff.</li>
+    <li><strong>Generación de binarios nativos</strong> para Linux y Windows (.exe) por compilación cruzada desde WSL2 (Fase 8).</li>
+    <li><strong>Extensión de la gramática a v4</strong>: switch/case con default, operador ternario, casting explícito y structs.</li>
+</ul>
+<p>
+    El lenguaje MiniLang utiliza palabras clave en español (<code>programa</code>, <code>estructura</code>,
+    <code>entero</code>, <code>segun</code>, <code>imprimir</code>, etc.), manteniendo la continuidad
+    con las entregas anteriores del ciclo.
+</p>
+
+<!-- ============ 2. PIPELINE v4 ============ -->
+<h2 class="salto">2. Arquitectura del Pipeline v4 (8 Fases)</h2>
+<p>
+    El archivo <code>pipeline.py</code> orquesta las ocho fases en secuencia estricta con
+    medición de tiempos por fase. Se mantiene la <strong>parada temprana</strong>: si la fase
+    léxica o sintáctica falla, el pipeline se detiene y reporta línea y columna del error sin
+    continuar. Las fases 7 y 8 solo se ejecutan si la generación del IR (Fase 5) fue exitosa.
+</p>
+
+<div class="pipeline">
+    <div class="fase"><div class="num">1</div><div class="nombre">Análisis Léxico</div><div class="io">Código fuente → Token stream (ANTLR Lexer)</div></div>
+    <div class="flecha">▼</div>
+    <div class="fase"><div class="num">2</div><div class="nombre">Análisis Sintáctico</div><div class="io">Token stream → CST/AST (ANTLR Parser)</div></div>
+    <div class="flecha">▼</div>
+    <div class="fase"><div class="num">3</div><div class="nombre">Análisis Semántico</div><div class="io">AST → Tabla de símbolos validada</div></div>
+    <div class="flecha">▼</div>
+    <div class="fase"><div class="num">4</div><div class="nombre">Generación TAC</div><div class="io">AST → Código de tres direcciones (.tac)</div></div>
+    <div class="flecha">▼</div>
+    <div class="fase"><div class="num">5</div><div class="nombre">Generación LLVM IR</div><div class="io">AST → Módulo LLVM IR (.ll) con llvmlite</div></div>
+    <div class="flecha">▼</div>
+    <div class="fase"><div class="num">6</div><div class="nombre">Interpretación</div><div class="io">AST validado → salida de print() en consola</div></div>
+    <div class="flecha">▼</div>
+    <div class="fase nueva"><div class="num">7</div><div class="nombre">Optimización O3 ★</div><div class="io">IR (.ll) → IR optimizado (.opt.ll) + métricas</div></div>
+    <div class="flecha">▼</div>
+    <div class="fase nueva"><div class="num">8</div><div class="nombre">Binario Nativo ★</div><div class="io">IR optimizado → binario Linux / .exe Windows</div></div>
+</div>
+<p style="font-size:10.5pt;color:var(--gris-claro);">★ Fases nuevas del Proyecto Final. La Fase 8 puede ejecutarse para Linux, Windows o ambas según la selección del usuario en la interfaz.</p>
+
+<!-- ============ 3. OPTIMIZACIÓN O3 ============ -->
+<h2 class="salto">3. Fase 7 — Optimización Automática O3</h2>
+<p>
+    El módulo <code>optimizer.py</code> aplica el conjunto de transformaciones O3 sobre el IR
+    generado y produce un IR optimizado independiente, de modo que ambas versiones pueden
+    compararse en la interfaz. Las transformaciones reportadas incluyen Constant Propagation /
+    Folding, Dead Code Elimination (DCE), Function Inlining y Loop Unrolling.
+</p>
+
+<h3>3.1 Métricas del programa de referencia</h3>
+<p>Resultados reales obtenidos al compilar <code>tests/ejemplo_final.src</code> (programa que ejercita todas las características del lenguaje):</p>
+<table>
+    <tr><th>Métrica</th><th>Antes (IR original)</th><th>Después (IR optimizado)</th></tr>
+    <tr><td>Total de instrucciones</td><td>142</td><td>134</td></tr>
+    <tr><td>Operaciones aritméticas</td><td>16</td><td>11</td></tr>
+    <tr><td>Bloques básicos</td><td>18</td><td>18</td></tr>
+    <tr><td>Llamadas a función</td><td>9</td><td>9</td></tr>
+    <tr><td><strong>Reducción total</strong></td><td colspan="2" style="text-align:center;"><strong>5.63 %</strong> (8 instrucciones eliminadas)</td></tr>
+</table>
+
+<h3>3.2 Ejemplo concreto antes / después</h3>
+<p>Para ilustrar el efecto de las transformaciones, tomemos el siguiente fragmento fuente:</p>
+<pre><code>programa {
+    entero a = 5 + 3;     // expresión constante
+    entero b = a + 0;     // suma con elemento neutro
+    entero muerto = 99;   // variable nunca utilizada
+    imprimir(b);
+}</code></pre>
+
+<p><strong>IR generado (sin optimizar)</strong> — fragmento de la función <code>main</code>:</p>
+<pre><code>%".2" = add i32 5, 3          ; 5 + 3 calculado en ejecución
+store i32 %".2", i32* %"a"
+%"a.1" = load i32, i32* %"a"
+%".4" = add i32 %"a.1", 0     ; suma con 0 (innecesaria)
+store i32 %".4", i32* %"b"
+store i32 99, i32* %"muerto"  ; almacenamiento muerto (no se usa)
+%"b.1" = load i32, i32* %"b"
+%".8" = call i32 (i8*, ...) @"printf"(i8* %".7", i32 %"b.1")</code></pre>
+
+<p><strong>Tras la optimización O3</strong>, el Pass Manager:</p>
+<ul class="features">
+    <li><strong>Constant Folding:</strong> <code>add i32 5, 3</code> se reemplaza por la constante <code>8</code>.</li>
+    <li><strong>Algebraic Simplification:</strong> <code>add i32 %a, 0</code> se elimina (el 0 es elemento neutro).</li>
+    <li><strong>Dead Code Elimination:</strong> el <code>store i32 99, i32* %"muerto"</code> se elimina porque su resultado nunca se consume.</li>
+</ul>
+<p>El resultado observable del programa (<code>imprimir(b)</code> → <code>8</code>) permanece idéntico, confirmando que la optimización no altera el comportamiento.</p>
+
+<div class="nota aviso">
+    <strong>Nota sobre el entorno:</strong> la captura completa del IR optimizado por el
+    <em>LLVM Pass Manager</em> (<code>opt -O3</code>) debe realizarse en <strong>WSL2/Linux</strong>,
+    donde el binario <code>opt</code> está instalado. En entornos sin <code>opt</code> el sistema
+    aplica un optimizador manual de respaldo con un alcance más limitado. Las métricas anteriores
+    son reales y verificables ejecutando el pipeline.
+</div>
+
+<!-- ============ 4. IR MANUAL ============ -->
+<h2 class="salto">4. Módulo de Optimización Manual del IR</h2>
+<p>
+    El módulo <code>ir_manual.py</code> es el componente evaluativo central. Permite al usuario
+    seleccionar desde la interfaz qué passes desea aplicar; el sistema los ejecuta
+    programáticamente sobre el IR (el estudiante no edita el IR a mano) y muestra el efecto de
+    cada transformación.
+</p>
+
+<h3>4.1 Passes disponibles</h3>
+<table>
+    <tr><th>Pass</th><th>Descripción</th></tr>
+    <tr><td><code>mem2reg</code></td><td>Promueve <code>alloca</code> a registros SSA</td></tr>
+    <tr><td><code>instcombine</code></td><td>Combina instrucciones redundantes</td></tr>
+    <tr><td><code>simplifycfg</code></td><td>Simplifica el grafo de flujo de control</td></tr>
+    <tr><td><code>dce</code></td><td>Elimina código muerto</td></tr>
+    <tr><td><code>inline</code></td><td>Inline de funciones pequeñas</td></tr>
+    <tr><td><code>loop-unroll</code></td><td>Desenrollado de ciclos</td></tr>
+</table>
+
+<h3>4.2 Comparador Diff y re-ejecución</h3>
+<p>
+    Al aplicar los passes seleccionados, el panel muestra una vista paralela del IR antes y
+    después, identificando las líneas <span class="badge-ok">añadidas</span>,
+    <span class="badge-del">eliminadas</span> y modificadas, junto a un resumen cuantitativo.
+    El IR resultante puede <strong>re-ejecutarse</strong> desde la interfaz para verificar que la
+    salida del programa no cambia, y <strong>exportarse</strong> a un archivo <code>.ll</code>
+    independiente.
+</p>
+<div class="nota">
+    <strong>Captura del panel:</strong> ejecuta <code>python web/app.py</code>, abre
+    <code>http://localhost:5000</code>, compila el programa de referencia, abre la pestaña
+    <em>🛠️ IR Manual</em>, selecciona al menos dos passes y captura el diff resultante para
+    insertarlo aquí.
+</div>
+
+<!-- ============ 5. BINARIOS ============ -->
+<h2 class="salto">5. Fase 8 — Generación de Binarios Nativos</h2>
+<p>
+    El módulo <code>binary_generator.py</code> compila el IR optimizado a un binario nativo
+    aprovechando que el IR de LLVM es independiente de plataforma: el destino se indica mediante
+    el <em>target triple</em>. El generador detecta las herramientas disponibles del sistema y
+    reporta con claridad si alguna falta, sin abortar el pipeline.
+</p>
+<table>
+    <tr><th>Plataforma</th><th>Target triple</th><th>Toolchain</th><th>Salida</th></tr>
+    <tr><td>Linux x86_64</td><td><code>x86_64-pc-linux-gnu</code></td><td><code>llc</code> + <code>gcc</code></td><td>binario ELF ejecutable</td></tr>
+    <tr><td>Windows 64-bit</td><td><code>x86_64-pc-windows-gnu</code></td><td><code>llc</code> + MinGW-w64</td><td><code>.exe</code> PE32+</td></tr>
+</table>
+<p>El generador de IR (<code>ir_generator.py</code>) acepta la plataforma destino para emitir el <em>target triple</em> correspondiente, y el enlazado se realiza con el linker adecuado a cada objetivo.</p>
+<div class="nota aviso">
+    <strong>Requisitos en WSL2:</strong>
+    <pre style="margin-top:8px;"><code>sudo apt-get install llvm lld gcc gcc-mingw-w64-x86-64</code></pre>
+    El <code>.exe</code> generado se copia al sistema de archivos de Windows y debe producir
+    exactamente la misma salida que el intérprete de la Fase 6.
+</div>
+
+<!-- ============ 6. GRAMÁTICA v4 ============ -->
+<h2 class="salto">6. Extensión de la Gramática (v4)</h2>
+<p>El archivo <code>grammar/gramatica_v4.g4</code> incorpora cuatro características nuevas, cada una con su tratamiento en el visitor semántico, el generador de TAC y el generador de IR:</p>
+<table>
+    <tr><th>Característica</th><th>Sintaxis (MiniLang)</th><th>Tratamiento en IR / TAC</th></tr>
+    <tr><td>Switch / Case con default</td><td><code>segun(x){ caso 1: ...; romper; defecto: ...; }</code></td><td>Instrucción <code>switch</code> nativa de LLVM; en TAC saltos condicionales encadenados.</td></tr>
+    <tr><td>Operador ternario</td><td><code>x &gt; 0 ? x : -x</code></td><td>Instrucción <code>select</code> en IR; en TAC if/goto con asignación en ambas ramas.</td></tr>
+    <tr><td>Casting explícito</td><td><code>(flotante) miVar</code></td><td>Instrucciones de conversión (<code>sitofp</code>, <code>fptosi</code>...); en TAC un cast explícito.</td></tr>
+    <tr><td>Structs con acceso a campos</td><td><code>estructura Punto{entero x;} p.x = 10;</code></td><td>Tipo agregado en IR; acceso por <code>getelementptr</code> (desplazamiento de campo).</td></tr>
+</table>
+
+<!-- ============ 7. PRUEBAS ============ -->
+<h2 class="salto">7. Casos de Prueba</h2>
+<p>Se incluyen seis casos de prueba en <code>tests/</code>:</p>
+<table>
+    <tr><th>Archivo</th><th>Propósito</th></tr>
+    <tr><td><code>ejemplo_final.src</code></td><td>Programa completo: structs, casting, ternario, switch, recursión, arreglos y módulo.</td></tr>
+    <tr><td><code>features_struct_ternario.src</code></td><td>Structs, operador ternario y casting de forma aislada.</td></tr>
+    <tr><td><code>features_switch.src</code></td><td>Sentencia switch/case con default de forma aislada.</td></tr>
+    <tr><td><code>error_lexico.src</code></td><td>Error léxico (carácter no reconocido) — detiene en Fase 1.</td></tr>
+    <tr><td><code>error_sintactico.src</code></td><td>Error sintáctico (falta <code>;</code>) — detiene en Fase 2.</td></tr>
+    <tr><td><code>error_semantico.src</code></td><td>Error semántico (tipo inválido) — detiene en Fase 3.</td></tr>
+</table>
+<p>Los tres casos de error reportan línea y columna exactas y detienen el pipeline en la fase correspondiente, por ejemplo:</p>
+<pre><code>[Error Léxico]     Línea 3, Col 17: Carácter no reconocido: '@'
+[Error Sintáctico] Línea 4, Col 4:  falta ';' at 'imprimir'
+[Error Semántico]  Línea 5, Col 15: La condición del ternario debe ser 'booleano', no 'entero'</code></pre>
+
+<!-- ============ 8. GIT ============ -->
+<h2 class="salto">8. Control de Versiones y Participación</h2>
+<p>
+    El desarrollo se organizó en ramas por responsabilidad, integradas a <code>main</code>
+    mediante una cadena que preserva los commits individuales de cada integrante:
+</p>
+<pre><code>main
+ └─ gramatica-v4 ................... Persona A  (gramática + visitors v4)
+     └─ feature/optimizador-o3 ........... Persona B  (optimización O3)
+         └─ feature/optimizacion-manual ...... Persona C  (IR manual)
+             └─ feature/binarios-nativos-final .... Persona D  (binarios)
+                 → integrado a main</code></pre>
+<table>
+    <tr><th>Integrante</th><th>Aporte principal</th><th>Participación</th></tr>
+    <tr><td>Alexander</td><td>Gramática v4 (A) + Binarios nativos (D)</td><td style="text-align:center;">33.33%</td></tr>
+    <tr><td>Emerson</td><td>Optimización automática O3 (B)</td><td style="text-align:center;">33.33%</td></tr>
+    <tr><td>Juan</td><td>Optimización manual del IR (C)</td><td style="text-align:center;">33.34%</td></tr>
+</table>
+<p style="font-size:10.5pt;color:var(--gris-claro);">
+    La rama <code>main</code> permanece estable y contiene la integración completa de las cuatro
+    capacidades. El <code>.gitignore</code> excluye los archivos generados por ANTLR y los
+    artefactos de compilación (<code>.tac</code>, <code>.ll</code>, <code>.obj</code>,
+    <code>.exe</code>, binarios y caché de llvmlite).
+</p>
+
+</div>
+</body>
+</html>
