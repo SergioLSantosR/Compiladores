@@ -35,5 +35,8 @@ programa_*
 .llvmlite_cache/
 *.llvmlite
 
+# Documentación local (no versionada)
+docs/
+
 # Otros
 .DS_Store
