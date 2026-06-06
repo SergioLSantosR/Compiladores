@@ -8,6 +8,7 @@
 #   5. Generación LLVM IR  (IRGenerator → archivo .ll)
 #   6. Interpretación      (EvalVisitor)
 #   7. Optimización O3     (passes → archivo .opt.ll)
+#   8. Binario nativo      (BinaryGenerator, opcional con --binario)
 #
 # Si alguna fase detecta errores se detiene y reporta sin continuar.
 
@@ -28,6 +29,7 @@ from src.ir_generator import IRGenerator
 from src.EvalVisitorImpl import EvalVisitor
 from src.ir_runner import ejecutar_ir
 from src.passes import aplicar_optimizacion_o3
+from src.binary_generator import generar_binarios
 
 
 class FaseResultado:
@@ -61,6 +63,7 @@ class ResultadoPipeline:
         self.archivo_tac: str | None = None
         self.archivo_ll: str | None = None
         self.archivo_ll_optimizado: str | None = None
+        self.binarios: dict = {}
 
 
 def ejecutar_pipeline(
@@ -68,6 +71,8 @@ def ejecutar_pipeline(
     *,
     stdout_print: bool = True,
     generar_archivos: bool = True,
+    generar_binario: bool = False,
+    plataformas: list[str] | None = None,
 ) -> ResultadoPipeline:
     resultado = ResultadoPipeline()
     base = os.path.splitext(ruta_archivo)[0]
@@ -201,13 +206,45 @@ def ejecutar_pipeline(
     except Exception as ex:
         resultado.salida_ir_optimizado = f"Error al ejecutar IR optimizado: {ex}"
 
+    # ── Fase 8: Generación de binario nativo (opcional) ────────
+    # No condiciona el éxito de la compilación: si faltan herramientas
+    # (llc/gcc/mingw) se reporta sin abortar el pipeline.
+    if generar_binario:
+        t0 = time.perf_counter()
+        objetivo = plataformas or ["linux"]
+        ir_para_binario = resultado.ir_optimizado or resultado.ir
+        nombre_base = base if generar_archivos else "programa"
+        try:
+            resultado.binarios = generar_binarios(
+                ir_para_binario,
+                objetivo,
+                nombre_base=nombre_base,
+            )
+            t_bin = (time.perf_counter() - t0) * 1000
+
+            generados = [
+                p for p, v in resultado.binarios.get("binarios", {}).items() if v.get("ok")
+            ]
+            if generados:
+                detalle = "Binarios generados: " + ", ".join(generados)
+            else:
+                detalle = "Sin binarios (faltan herramientas: llc/gcc/mingw)"
+            resultado.fases.append(
+                FaseResultado("Generación de binario nativo", "ok", t_bin, detalle)
+            )
+        except Exception as ex:
+            t_bin = (time.perf_counter() - t0) * 1000
+            resultado.fases.append(
+                FaseResultado("Generación de binario nativo", "error", t_bin, str(ex))
+            )
+
     resultado.exito = True
     return resultado
 
 
 def _imprimir_fases(resultado: ResultadoPipeline) -> None:
     print("\n╔══════════════════════════════════════════╗", file=sys.stderr)
-    print("║       Pipeline MiniLang v4 — 7 fases     ║", file=sys.stderr)
+    print("║         Pipeline MiniLang v4 — Fases     ║", file=sys.stderr)
     print("╠══════════════════════════════════════════╣", file=sys.stderr)
     for fase in resultado.fases:
         print(f"║ {fase}", file=sys.stderr)
@@ -218,17 +255,27 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="MiniLang v4 — Pipeline completo con optimización O3"
+        description="MiniLang v4 — Pipeline completo con optimización O3 y binarios nativos"
     )
     parser.add_argument("archivo", help="Ruta del archivo fuente (.ml)")
     parser.add_argument("--silencioso", action="store_true", help="No imprimir salida del programa")
     parser.add_argument("--sin-archivos", action="store_true", help="No generar archivos .tac, .ll y .opt.ll")
+    parser.add_argument("--binario", action="store_true", help="Generar binario nativo a partir del IR optimizado")
+    parser.add_argument(
+        "--plataformas",
+        nargs="+",
+        choices=["linux", "windows"],
+        default=["linux"],
+        help="Plataformas para el binario nativo (por defecto: linux)",
+    )
     args = parser.parse_args()
 
     resultado = ejecutar_pipeline(
         args.archivo,
         stdout_print=(not args.silencioso),
         generar_archivos=(not args.sin_archivos),
+        generar_binario=args.binario,
+        plataformas=args.plataformas,
     )
 
     _imprimir_fases(resultado)
@@ -241,6 +288,11 @@ def main():
             print(f"  LLVM IR generado: {resultado.archivo_ll}")
         if resultado.archivo_ll_optimizado:
             print(f"  LLVM IR optimizado generado: {resultado.archivo_ll_optimizado}")
+        for plataforma, info in resultado.binarios.get("binarios", {}).items():
+            if info.get("ok"):
+                print(f"  Binario {plataforma}: {info['ruta']}")
+            else:
+                print(f"  Binario {plataforma}: no generado ({info.get('error', 'desconocido')})")
         sys.exit(0)
 
     sys.exit(1)

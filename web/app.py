@@ -1,7 +1,8 @@
 import sys
 import os
+import uuid
 import tempfile
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 
 # Agregar el directorio raíz al path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -12,8 +13,13 @@ from src.ir_manual import (
     listar_passes,
     reejecutar_ir,
 )
+from src.binary_generator import generar_binarios, herramientas_disponibles
 
 app = Flask(__name__)
+
+# Carpeta temporal donde se guardan los binarios generados para descarga
+BINARIOS_DIR = os.path.join(tempfile.gettempdir(), "minilang_binarios")
+os.makedirs(BINARIOS_DIR, exist_ok=True)
 
 
 def ejecutar_fases(codigo: str) -> dict:
@@ -79,6 +85,7 @@ def compilar():
 
     resultados = ejecutar_fases(codigo)
     resultados["passes_disponibles"] = listar_passes()
+    resultados["binarios_herramientas"] = herramientas_disponibles()
     return jsonify(resultados)
 
 
@@ -134,6 +141,50 @@ def ir_manual_ejecutar():
 @app.route("/passes", methods=["GET"])
 def obtener_passes():
     return jsonify({"passes": listar_passes()})
+
+
+@app.route("/binarios/herramientas", methods=["GET"])
+def binarios_herramientas():
+    return jsonify(herramientas_disponibles())
+
+
+@app.route("/generar_binario", methods=["POST"])
+def generar_binario_route():
+    datos = request.get_json() or {}
+    codigo_ir = datos.get("ir", "")
+    plataformas = datos.get("plataformas") or ["linux"]
+    ejecutar = bool(datos.get("ejecutar", False))
+
+    if not codigo_ir.strip():
+        return jsonify({"error": "No hay IR para compilar. Compila primero."}), 400
+
+    nombre_base = os.path.join(BINARIOS_DIR, f"programa_{uuid.uuid4().hex[:8]}")
+    try:
+        resultado = generar_binarios(
+            codigo_ir,
+            plataformas,
+            nombre_base=nombre_base,
+            ejecutar=ejecutar,
+        )
+    except Exception as ex:
+        return jsonify({"error": str(ex)}), 500
+
+    # Exponer solo el nombre del archivo para la descarga
+    for info in resultado.get("binarios", {}).values():
+        if info.get("ok") and info.get("ruta"):
+            info["archivo"] = os.path.basename(info["ruta"])
+    return jsonify(resultado)
+
+
+@app.route("/binarios/descargar/<nombre>", methods=["GET"])
+def descargar_binario(nombre: str):
+    ruta = os.path.abspath(os.path.join(BINARIOS_DIR, nombre))
+    # Evitar path traversal: el archivo debe vivir dentro de BINARIOS_DIR
+    if not ruta.startswith(os.path.abspath(BINARIOS_DIR) + os.sep):
+        return jsonify({"error": "Ruta inválida"}), 400
+    if not os.path.isfile(ruta):
+        return jsonify({"error": "Binario no encontrado"}), 404
+    return send_file(ruta, as_attachment=True, download_name=nombre)
 
 
 if __name__ == "__main__":

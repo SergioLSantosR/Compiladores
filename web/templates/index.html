@@ -407,6 +407,53 @@
             border: 1px solid #30363d;
         }
 
+        .binarios-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .binarios-plataformas {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .binarios-resultado {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .binario-card {
+            background: #0b0f14;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .binario-card.ok { border-color: rgba(46, 160, 67, 0.5); }
+        .binario-card.error { border-color: rgba(248, 81, 73, 0.5); }
+        .binario-titulo { font-weight: 600; }
+        .binario-error { color: #f85149; font-size: 13px; }
+
+        .binario-descarga {
+            background: #238636;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .binario-descarga:hover { background: #2ea043; }
+
         .btn-secundario:hover {
             background: #30363d;
         }
@@ -558,6 +605,7 @@
                     <button class="tab" data-tab="ir_optimizado">🚀 IR optimizado</button>
                     <button class="tab" data-tab="metricas_o3">📈 Métricas O3</button>
                     <button class="tab" data-tab="ir_manual">🛠️ IR Manual</button>
+                    <button class="tab" data-tab="binarios">📦 Binarios</button>
                     <button class="tab" data-tab="ir_exec">🔧 Ejecución IR</button>
                 </div>
 
@@ -578,6 +626,33 @@
                         <div id="diffResumen" class="diff-resumen"></div>
                         <div id="diffLadoALado" class="diff-lado-a-lado"></div>
                         <div id="resultadoPorPass" class="resultado-por-pass" style="display:none;"></div>
+                    </div>
+                </div>
+                <div id="binarios" class="tab-content" style="display: none;">
+                    <div class="binarios-panel">
+                        <div id="binariosHerramientas" style="color:#8b949e;margin-bottom:12px;">
+                            Compila un programa para habilitar la generación de binarios nativos.
+                        </div>
+                        <div class="binarios-plataformas">
+                            <label class="pass-checkbox">
+                                <input type="checkbox" name="plataforma" value="linux" checked>
+                                <span class="pass-checkbox-label">
+                                    <span class="pass-checkbox-nombre">Linux x86_64</span>
+                                    <span class="pass-checkbox-desc">Ejecutable nativo (llc + gcc)</span>
+                                </span>
+                            </label>
+                            <label class="pass-checkbox">
+                                <input type="checkbox" name="plataforma" value="windows">
+                                <span class="pass-checkbox-label">
+                                    <span class="pass-checkbox-nombre">Windows 64-bit</span>
+                                    <span class="pass-checkbox-desc">.exe vía MinGW-w64 (llc + mingw)</span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="ir-manual-acciones">
+                            <button id="generarBinarioBtn" onclick="generarBinarios()" disabled>🛠️ Generar binario(s)</button>
+                        </div>
+                        <div id="binariosResultado" class="binarios-resultado"></div>
                     </div>
                 </div>
                 <div id="ir_exec" class="tab-content" style="display: none;">Compila un programa para ver la ejecución del IR original y del IR optimizado.</div>
@@ -606,6 +681,7 @@
         let irOriginalActual = '';
         let irManualOptimizado = '';
         let passesDisponibles = [];
+        let binariosHerramientas = null;
 
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -682,6 +758,88 @@
         function obtenerPassesSeleccionados() {
             return Array.from(document.querySelectorAll('#passesSelector input[name="pass"]:checked'))
                 .map(input => input.value);
+        }
+
+        function renderizarBinariosHerramientas() {
+            const contenedor = document.getElementById('binariosHerramientas');
+            if (!binariosHerramientas) {
+                contenedor.innerHTML = 'Compila un programa para habilitar la generación de binarios nativos.';
+                return;
+            }
+            const marca = (ok) => ok
+                ? '<span style="color:#3fb950;">disponible</span>'
+                : '<span style="color:#f85149;">no instalado</span>';
+            contenedor.innerHTML = `
+                <div style="font-weight:600;margin-bottom:6px;">Herramientas del sistema</div>
+                <div style="display:flex;flex-wrap:wrap;gap:14px;">
+                    <span>llc: ${marca(binariosHerramientas.llc)}</span>
+                    <span>gcc: ${marca(binariosHerramientas.gcc)}</span>
+                    <span>MinGW-w64: ${marca(binariosHerramientas.mingw)}</span>
+                </div>
+                <div style="margin-top:8px;">
+                    Linux: ${marca(binariosHerramientas.linux)} &nbsp;·&nbsp; Windows: ${marca(binariosHerramientas.windows)}
+                </div>
+            `;
+        }
+
+        function obtenerPlataformasSeleccionadas() {
+            return Array.from(document.querySelectorAll('#binarios input[name="plataforma"]:checked'))
+                .map(input => input.value);
+        }
+
+        async function generarBinarios() {
+            if (!irOriginalActual) {
+                return;
+            }
+            const plataformas = obtenerPlataformasSeleccionadas();
+            const contenedor = document.getElementById('binariosResultado');
+            if (!plataformas.length) {
+                contenedor.innerHTML = '<div style="color:#f85149;">Selecciona al menos una plataforma.</div>';
+                return;
+            }
+
+            const boton = document.getElementById('generarBinarioBtn');
+            boton.disabled = true;
+            contenedor.innerHTML = '<div style="color:#8b949e;">Generando binario(s)...</div>';
+
+            try {
+                const response = await fetch('/generar_binario', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ir: irOriginalActual, plataformas: plataformas })
+                });
+                const data = await response.json();
+
+                if (data.error) {
+                    contenedor.innerHTML = `<div style="color:#f85149;">${escapeHtml(data.error)}</div>`;
+                    return;
+                }
+
+                const binarios = data.binarios || {};
+                let html = '';
+                Object.keys(binarios).forEach(plat => {
+                    const info = binarios[plat];
+                    if (info.ok) {
+                        const kb = (info.tamano_bytes / 1024).toFixed(1);
+                        html += `
+                            <div class="binario-card ok">
+                                <div class="binario-titulo">✅ ${escapeHtml(plat)} — ${kb} KB</div>
+                                <a class="binario-descarga" href="/binarios/descargar/${encodeURIComponent(info.archivo)}">⬇️ Descargar</a>
+                            </div>`;
+                    } else {
+                        html += `
+                            <div class="binario-card error">
+                                <div class="binario-titulo">❌ ${escapeHtml(plat)}</div>
+                                <div class="binario-error">${escapeHtml(info.error || 'Error desconocido')}</div>
+                            </div>`;
+                    }
+                });
+                contenedor.innerHTML = html || '<div style="color:#8b949e;">Sin resultados.</div>';
+            } catch (err) {
+                contenedor.innerHTML = `<div style="color:#f85149;">Error: ${escapeHtml(err.message)}</div>`;
+            } finally {
+                boton.disabled = false;
+            }
         }
 
         function habilitarControlesManual(habilitar) {
@@ -926,6 +1084,12 @@
                 }
                 renderizarPassesSelector();
                 habilitarControlesManual(!!irOriginalActual);
+
+                if (data.binarios_herramientas) {
+                    binariosHerramientas = data.binarios_herramientas;
+                }
+                renderizarBinariosHerramientas();
+                document.getElementById('generarBinarioBtn').disabled = !irOriginalActual;
 
                 if (data.ir_optimizado) {
                     document.getElementById('ir_optimizado').innerHTML = `<pre>${escapeHtml(data.ir_optimizado)}</pre>`;
