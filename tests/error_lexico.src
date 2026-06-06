@@ -1,0 +1,5 @@
+// Error léxico: carácter '@' no pertenece al alfabeto del lenguaje
+programa {
+    entero x = 5 @ 3;
+    imprimir(x);
+}

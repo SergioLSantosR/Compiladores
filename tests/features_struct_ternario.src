@@ -1,0 +1,17 @@
+// Demostración aislada: structs (acceso a campos) + operador ternario + casting
+
+estructura Rectangulo { entero ancho; entero alto; }
+
+programa {
+    Rectangulo r;
+    r.ancho = 6;
+    r.alto = 4;
+
+    entero area = r.ancho * r.alto;
+    cadena tamano = area > 20 ? "grande" : "pequeno";
+    imprimir(tamano);
+
+    // Casting explícito de entero a flotante
+    flotante promedio = (flotante)(r.ancho + r.alto) / 2.0;
+    imprimir(promedio);
+}

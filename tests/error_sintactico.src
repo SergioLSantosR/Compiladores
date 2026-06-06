@@ -1,0 +1,5 @@
+// Error sintáctico: falta el punto y coma al final de la asignación
+programa {
+    entero x = 5
+    imprimir(x);
+}

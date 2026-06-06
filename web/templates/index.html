@@ -41,7 +41,6 @@
             margin-bottom: 30px;
         }
 
-        /* Panel principal */
         .main-panel {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -49,7 +48,6 @@
             margin-bottom: 20px;
         }
 
-        /* Editor de código */
         .code-editor {
             background: #0d1117;
             border-radius: 12px;
@@ -98,7 +96,6 @@
             opacity: 0.9;
         }
 
-        /* Panel de resultados */
         .results-panel {
             background: #0d1117;
             border-radius: 12px;
@@ -108,6 +105,7 @@
 
         .tabs {
             display: flex;
+            flex-wrap: wrap;
             background: #161b22;
             border-bottom: 1px solid #30363d;
         }
@@ -143,7 +141,6 @@
             word-wrap: break-word;
         }
 
-        /* Panel de fases */
         .phases-panel {
             background: #0d1117;
             border-radius: 12px;
@@ -205,7 +202,6 @@
             color: #f85149;
         }
 
-        /* Panel de errores */
         .errors-panel {
             background: #0d1117;
             border-radius: 12px;
@@ -230,7 +226,6 @@
             color: #f85149;
         }
 
-        /* Panel de consola */
         .console-panel {
             background: #0d1117;
             border-radius: 12px;
@@ -246,7 +241,7 @@
 
         .console-content {
             padding: 16px;
-            max-height: 200px;
+            max-height: 220px;
             overflow-y: auto;
             font-family: monospace;
             font-size: 13px;
@@ -257,7 +252,6 @@
             padding: 2px 0;
         }
 
-        /* Botón de ejemplo */
         .example-btn {
             background: #21262d;
             margin-left: 10px;
@@ -267,25 +261,301 @@
             background: #30363d;
         }
 
-        /* Loading */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #fff;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
+        .comparacion-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            height: 100%;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .comparacion-bloque {
+            background: #0b0f14;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            overflow: hidden;
         }
 
-        @media (max-width: 1000px) {
+        .comparacion-titulo {
+            background: #161b22;
+            padding: 10px 14px;
+            border-bottom: 1px solid #30363d;
+            font-weight: 600;
+            color: #c9d1d9;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .comparacion-contenido {
+            padding: 14px;
+            height: 430px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .metricas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .metrica-card {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .metrica-titulo {
+            font-size: 13px;
+            color: #8b949e;
+            margin-bottom: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .metrica-valor {
+            font-size: 20px;
+            font-weight: 700;
+            color: #e6edf3;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .lista-passes {
+            margin-top: 18px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .lista-passes ul {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .lista-passes li {
+            margin-bottom: 6px;
+            color: #c9d1d9;
+        }
+
+        .ir-manual-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .passes-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 8px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .pass-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .pass-checkbox:hover {
+            background: #21262d;
+        }
+
+        .pass-checkbox input {
+            margin-top: 3px;
+            accent-color: #667eea;
+        }
+
+        .pass-checkbox-label {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .pass-checkbox-nombre {
+            font-weight: 600;
+            font-size: 13px;
+            color: #e6edf3;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        .pass-checkbox-desc {
+            font-size: 11px;
+            color: #8b949e;
+        }
+
+        .ir-manual-acciones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn-secundario {
+            background: #21262d;
+            border: 1px solid #30363d;
+        }
+
+        .binarios-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .binarios-plataformas {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .binarios-resultado {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .binario-card {
+            background: #0b0f14;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .binario-card.ok { border-color: rgba(46, 160, 67, 0.5); }
+        .binario-card.error { border-color: rgba(248, 81, 73, 0.5); }
+        .binario-titulo { font-weight: 600; }
+        .binario-error { color: #f85149; font-size: 13px; }
+
+        .binario-descarga {
+            background: #238636;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .binario-descarga:hover { background: #2ea043; }
+
+        .btn-secundario:hover {
+            background: #30363d;
+        }
+
+        .diff-resumen {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 13px;
+        }
+
+        .diff-badge {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .diff-badge.agregada { background: rgba(46, 160, 67, 0.2); color: #3fb950; }
+        .diff-badge.eliminada { background: rgba(248, 81, 73, 0.2); color: #f85149; }
+        .diff-badge.modificada { background: rgba(210, 153, 34, 0.2); color: #d29922; }
+        .diff-badge.igual { background: rgba(139, 148, 158, 0.2); color: #8b949e; }
+
+        .diff-lado-a-lado {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            flex: 1;
+            min-height: 280px;
+        }
+
+        .diff-columna {
+            background: #0b0f14;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .diff-columna-titulo {
+            background: #161b22;
+            padding: 8px 12px;
+            border-bottom: 1px solid #30363d;
+            font-weight: 600;
+            font-size: 13px;
+            color: #c9d1d9;
+        }
+
+        .diff-lineas {
+            padding: 10px;
+            overflow-y: auto;
+            flex: 1;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .diff-linea {
+            padding: 1px 6px;
+            border-radius: 3px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .diff-linea.agregada { background: rgba(46, 160, 67, 0.15); color: #3fb950; }
+        .diff-linea.eliminada { background: rgba(248, 81, 73, 0.15); color: #f85149; }
+        .diff-linea.modificada { background: rgba(210, 153, 34, 0.15); color: #d29922; }
+        .diff-linea.igual { color: #8b949e; }
+
+        .resultado-por-pass {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 12px;
+        }
+
+        .resultado-por-pass ul {
+            margin-top: 8px;
+            padding-left: 18px;
+        }
+
+        .resultado-por-pass li.ok { color: #3fb950; }
+        .resultado-por-pass li.error { color: #f85149; }
+
+        @media (max-width: 1100px) {
             .main-panel {
                 grid-template-columns: 1fr;
+            }
+
+            .comparacion-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-content {
+                height: auto;
+                min-height: 420px;
+            }
+
+            .comparacion-contenido {
+                height: 300px;
             }
         }
     </style>
@@ -293,10 +563,9 @@
 <body>
     <div class="container">
         <h1>🚀 MiniLang Compiler</h1>
-        <p class="subtitle">Compilador interactivo con soporte para TAC y LLVM IR</p>
+        <p class="subtitle">Compilador interactivo con soporte para TAC, LLVM IR y optimización O3</p>
 
         <div class="main-panel">
-            <!-- Editor de código -->
             <div class="code-editor">
                 <div class="code-header">
                     <span>📝 Editor de código</span>
@@ -309,18 +578,18 @@
     entero x = 10;
     entero y = 20;
     entero z;
-    
+
     z = x + y * 2;
     imprimir(z);
-    
+
     si (x > 10 || y < 20) {
         z = x / 2;
     } sino {
         z = y - 5;
     }
-    
+
     imprimir(z);
-    
+
     entero i = 0;
     mientras (i < 5) {
         imprimir(i);
@@ -329,34 +598,77 @@
 }</textarea>
             </div>
 
-            <!-- Panel de resultados (Tabs) -->
             <div class="results-panel">
                 <div class="tabs">
                     <button class="tab active" data-tab="tac">📊 Código TAC</button>
-                    <button class="tab" data-tab="ir">⚙️ LLVM IR</button>
+                    <button class="tab" data-tab="ir_original">⚙️ IR original</button>
+                    <button class="tab" data-tab="ir_optimizado">🚀 IR optimizado</button>
+                    <button class="tab" data-tab="metricas_o3">📈 Métricas O3</button>
+                    <button class="tab" data-tab="ir_manual">🛠️ IR Manual</button>
+                    <button class="tab" data-tab="binarios">📦 Binarios</button>
                     <button class="tab" data-tab="ir_exec">🔧 Ejecución IR</button>
                 </div>
+
                 <div id="tac" class="tab-content" style="display: block;"></div>
-                <div id="ir" class="tab-content" style="display: none;"></div>
-                <div id="ir_exec" class="tab-content" style="display: none;">Compila un programa para ver la ejecución del archivo .ll con lli</div>
+                <div id="ir_original" class="tab-content" style="display: none;"></div>
+                <div id="ir_optimizado" class="tab-content" style="display: none;"></div>
+                <div id="metricas_o3" class="tab-content" style="display: none;"></div>
+                <div id="ir_manual" class="tab-content" style="display: none;">
+                    <div class="ir-manual-panel">
+                        <div id="passesSelector" class="passes-selector">
+                            <div style="color:#8b949e;grid-column:1/-1;">Compila un programa para habilitar la optimización manual.</div>
+                        </div>
+                        <div class="ir-manual-acciones">
+                            <button id="aplicarPassesBtn" onclick="aplicarPassesManual()" disabled>⚡ Aplicar passes</button>
+                            <button class="btn-secundario" id="reejecutarManualBtn" onclick="reejecutarIRManual()" disabled>▶️ Re-ejecutar IR</button>
+                            <button class="btn-secundario" id="exportarManualBtn" onclick="exportarIRManual()" disabled>💾 Exportar .ll</button>
+                        </div>
+                        <div id="diffResumen" class="diff-resumen"></div>
+                        <div id="diffLadoALado" class="diff-lado-a-lado"></div>
+                        <div id="resultadoPorPass" class="resultado-por-pass" style="display:none;"></div>
+                    </div>
+                </div>
+                <div id="binarios" class="tab-content" style="display: none;">
+                    <div class="binarios-panel">
+                        <div id="binariosHerramientas" style="color:#8b949e;margin-bottom:12px;">
+                            Compila un programa para habilitar la generación de binarios nativos.
+                        </div>
+                        <div class="binarios-plataformas">
+                            <label class="pass-checkbox">
+                                <input type="checkbox" name="plataforma" value="linux" checked>
+                                <span class="pass-checkbox-label">
+                                    <span class="pass-checkbox-nombre">Linux x86_64</span>
+                                    <span class="pass-checkbox-desc">Ejecutable nativo (llc + gcc)</span>
+                                </span>
+                            </label>
+                            <label class="pass-checkbox">
+                                <input type="checkbox" name="plataforma" value="windows">
+                                <span class="pass-checkbox-label">
+                                    <span class="pass-checkbox-nombre">Windows 64-bit</span>
+                                    <span class="pass-checkbox-desc">.exe vía MinGW-w64 (llc + mingw)</span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="ir-manual-acciones">
+                            <button id="generarBinarioBtn" onclick="generarBinarios()" disabled>🛠️ Generar binario(s)</button>
+                        </div>
+                        <div id="binariosResultado" class="binarios-resultado"></div>
+                    </div>
+                </div>
+                <div id="ir_exec" class="tab-content" style="display: none;">Compila un programa para ver la ejecución del IR original y del IR optimizado.</div>
             </div>
         </div>
 
-        <!-- Panel de fases -->
         <div class="phases-panel">
             <div class="phases-header">📈 Fases del Compilador</div>
-            <div id="phasesGrid" class="phases-grid">
-                <!-- Las fases se generan dinámicamente -->
-            </div>
+            <div id="phasesGrid" class="phases-grid"></div>
         </div>
 
-        <!-- Panel de errores -->
         <div class="errors-panel" id="errorsPanel" style="display: none;">
             <div class="errors-header">❌ Errores de Compilación</div>
             <div id="errorsContent" class="errors-content"></div>
         </div>
 
-        <!-- Panel de consola -->
         <div class="console-panel">
             <div class="console-header">🖥️ Consola de Salida</div>
             <div id="consoleContent" class="console-content">
@@ -366,7 +678,11 @@
     </div>
 
     <script>
-        // Cambiar entre pestañas
+        let irOriginalActual = '';
+        let irManualOptimizado = '';
+        let passesDisponibles = [];
+        let binariosHerramientas = null;
+
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 const target = tab.dataset.tab;
@@ -379,21 +695,371 @@
             });
         });
 
+        function escapeHtml(texto) {
+            if (texto === null || texto === undefined) {
+                return '';
+            }
+            const div = document.createElement('div');
+            div.textContent = String(texto);
+            return div.innerHTML;
+        }
+
+        function obtenerTextoSalidaIR(resultadoIR) {
+            if (!resultadoIR) {
+                return 'Sin salida';
+            }
+
+            if (typeof resultadoIR === 'string') {
+                return resultadoIR || 'Sin salida';
+            }
+
+            if (typeof resultadoIR === 'object') {
+                if (resultadoIR.salida) {
+                    return resultadoIR.salida;
+                }
+                if (resultadoIR.error) {
+                    return `Error: ${resultadoIR.error}`;
+                }
+            }
+
+            return 'Sin salida';
+        }
+
+        function obtenerEncabezadoSalidaIR(resultadoIR, tituloPorDefecto) {
+            if (!resultadoIR) {
+                return tituloPorDefecto;
+            }
+
+            if (typeof resultadoIR === 'object' && resultadoIR.motor) {
+                return `${tituloPorDefecto} (${resultadoIR.motor})`;
+            }
+
+            return tituloPorDefecto;
+        }
+
+        function renderizarPassesSelector() {
+            const contenedor = document.getElementById('passesSelector');
+            if (!passesDisponibles.length) {
+                contenedor.innerHTML = '<div style="color:#8b949e;grid-column:1/-1;">Compila un programa para habilitar la optimización manual.</div>';
+                return;
+            }
+
+            contenedor.innerHTML = passesDisponibles.map(pass => `
+                <label class="pass-checkbox">
+                    <input type="checkbox" name="pass" value="${escapeHtml(pass.id)}" data-pass-id="${escapeHtml(pass.id)}">
+                    <span class="pass-checkbox-label">
+                        <span class="pass-checkbox-nombre">${escapeHtml(pass.nombre)}</span>
+                        <span class="pass-checkbox-desc">${escapeHtml(pass.descripcion)}</span>
+                    </span>
+                </label>
+            `).join('');
+        }
+
+        function obtenerPassesSeleccionados() {
+            return Array.from(document.querySelectorAll('#passesSelector input[name="pass"]:checked'))
+                .map(input => input.value);
+        }
+
+        function renderizarBinariosHerramientas() {
+            const contenedor = document.getElementById('binariosHerramientas');
+            if (!binariosHerramientas) {
+                contenedor.innerHTML = 'Compila un programa para habilitar la generación de binarios nativos.';
+                return;
+            }
+            const marca = (ok) => ok
+                ? '<span style="color:#3fb950;">disponible</span>'
+                : '<span style="color:#f85149;">no instalado</span>';
+            contenedor.innerHTML = `
+                <div style="font-weight:600;margin-bottom:6px;">Herramientas del sistema</div>
+                <div style="display:flex;flex-wrap:wrap;gap:14px;">
+                    <span>llc: ${marca(binariosHerramientas.llc)}</span>
+                    <span>gcc: ${marca(binariosHerramientas.gcc)}</span>
+                    <span>MinGW-w64: ${marca(binariosHerramientas.mingw)}</span>
+                </div>
+                <div style="margin-top:8px;">
+                    Linux: ${marca(binariosHerramientas.linux)} &nbsp;·&nbsp; Windows: ${marca(binariosHerramientas.windows)}
+                </div>
+            `;
+        }
+
+        function obtenerPlataformasSeleccionadas() {
+            return Array.from(document.querySelectorAll('#binarios input[name="plataforma"]:checked'))
+                .map(input => input.value);
+        }
+
+        function agregarFaseBinario(plataforma, info, tiempo) {
+            const phasesGrid = document.getElementById('phasesGrid');
+            if (!phasesGrid) {
+                return;
+            }
+            const estado = info.ok ? 'ok' : 'error';
+            const id = `fase8-${plataforma}`;
+            let card = document.getElementById(id);
+            if (!card) {
+                card = document.createElement('div');
+                card.id = id;
+                phasesGrid.appendChild(card);
+            }
+            card.className = `phase-card ${estado}`;
+            card.innerHTML = `
+                <div class="phase-name">Fase 8 · Binario ${escapeHtml(plataforma)}</div>
+                <div class="phase-time">⏱️ ${tiempo || '—'}</div>
+                <div class="phase-status ${estado}">
+                    ${info.ok ? '✅ Generado' : '❌ No generado'}
+                </div>
+            `;
+        }
+
+        async function generarBinarios() {
+            if (!irOriginalActual) {
+                return;
+            }
+            const plataformas = obtenerPlataformasSeleccionadas();
+            const contenedor = document.getElementById('binariosResultado');
+            if (!plataformas.length) {
+                contenedor.innerHTML = '<div style="color:#f85149;">Selecciona al menos una plataforma.</div>';
+                return;
+            }
+
+            const boton = document.getElementById('generarBinarioBtn');
+            boton.disabled = true;
+            contenedor.innerHTML = '<div style="color:#8b949e;">Generando binario(s)...</div>';
+
+            try {
+                const response = await fetch('/generar_binario', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ir: irOriginalActual, plataformas: plataformas })
+                });
+                const data = await response.json();
+
+                if (data.error) {
+                    contenedor.innerHTML = `<div style="color:#f85149;">${escapeHtml(data.error)}</div>`;
+                    return;
+                }
+
+                const binarios = data.binarios || {};
+                let html = '';
+                Object.keys(binarios).forEach(plat => {
+                    const info = binarios[plat];
+                    const tiempo = info.tiempo_ms !== undefined ? `${Number(info.tiempo_ms).toFixed(2)} ms` : '';
+                    if (info.ok) {
+                        const kb = (info.tamano_bytes / 1024).toFixed(1);
+                        html += `
+                            <div class="binario-card ok">
+                                <div class="binario-titulo">✅ ${escapeHtml(plat)} — ${kb} KB ${tiempo ? '· ' + tiempo : ''}</div>
+                                <a class="binario-descarga" href="/binarios/descargar/${encodeURIComponent(info.archivo)}">⬇️ Descargar</a>
+                            </div>`;
+                    } else {
+                        html += `
+                            <div class="binario-card error">
+                                <div class="binario-titulo">❌ ${escapeHtml(plat)}</div>
+                                <div class="binario-error">${escapeHtml(info.error || 'Error desconocido')}</div>
+                            </div>`;
+                    }
+                    agregarFaseBinario(plat, info, tiempo);
+                });
+                contenedor.innerHTML = html || '<div style="color:#8b949e;">Sin resultados.</div>';
+            } catch (err) {
+                contenedor.innerHTML = `<div style="color:#f85149;">Error: ${escapeHtml(err.message)}</div>`;
+            } finally {
+                boton.disabled = false;
+            }
+        }
+
+        function habilitarControlesManual(habilitar) {
+            document.getElementById('aplicarPassesBtn').disabled = !habilitar;
+            document.getElementById('reejecutarManualBtn').disabled = !irManualOptimizado;
+            document.getElementById('exportarManualBtn').disabled = !irManualOptimizado;
+        }
+
+        function renderizarDiffManual(data) {
+            const diff = data.diff || {};
+            const resumen = diff.resumen || {};
+
+            document.getElementById('diffResumen').innerHTML = `
+                <span class="diff-badge agregada">+ ${resumen.agregadas ?? 0} agregadas</span>
+                <span class="diff-badge eliminada">− ${resumen.eliminadas ?? 0} eliminadas</span>
+                <span class="diff-badge modificada">~ ${resumen.modificadas ?? 0} modificadas</span>
+                <span class="diff-badge igual">${resumen.sin_cambios ?? 0} sin cambios</span>
+            `;
+
+            const lineasOrig = (data.ir_original || '').split('\n');
+            const lineasOpt = (data.ir_optimizado || '').split('\n');
+
+            const eliminadasSet = new Set((diff.eliminadas || []).map(l => l.linea));
+            const agregadasSet = new Set((diff.agregadas || []).map(l => l.linea));
+            const modificadasAntes = new Map(
+                (diff.modificadas || []).map(m => [m.linea_antes, m])
+            );
+            const modificadasDespues = new Map(
+                (diff.modificadas || []).map(m => [m.linea_despues, m])
+            );
+
+            const htmlIzq = lineasOrig.map((texto, idx) => {
+                const num = idx + 1;
+                let clase = 'igual';
+                if (eliminadasSet.has(num) || modificadasAntes.has(num)) {
+                    clase = modificadasAntes.has(num) ? 'modificada' : 'eliminada';
+                }
+                return `<div class="diff-linea ${clase}">${num.toString().padStart(4)} | ${escapeHtml(texto)}</div>`;
+            }).join('');
+
+            const htmlDer = lineasOpt.map((texto, idx) => {
+                const num = idx + 1;
+                let clase = 'igual';
+                if (agregadasSet.has(num) || modificadasDespues.has(num)) {
+                    clase = modificadasDespues.has(num) ? 'modificada' : 'agregada';
+                }
+                return `<div class="diff-linea ${clase}">${num.toString().padStart(4)} | ${escapeHtml(texto)}</div>`;
+            }).join('');
+
+            document.getElementById('diffLadoALado').innerHTML = `
+                <div class="diff-columna">
+                    <div class="diff-columna-titulo">IR original</div>
+                    <div class="diff-lineas">${htmlIzq || '<div class="diff-linea igual">(vacío)</div>'}</div>
+                </div>
+                <div class="diff-columna">
+                    <div class="diff-columna-titulo">IR optimizado (manual)</div>
+                    <div class="diff-lineas">${htmlDer || '<div class="diff-linea igual">(vacío)</div>'}</div>
+                </div>
+            `;
+
+            const resultadoPorPass = data.resultado_por_pass || {};
+            const claves = Object.keys(resultadoPorPass);
+            const panel = document.getElementById('resultadoPorPass');
+
+            if (claves.length > 0) {
+                panel.style.display = 'block';
+                panel.innerHTML = `
+                    <strong>Resultado por pass</strong>
+                    <ul>
+                        ${claves.map(nombre => {
+                            const info = resultadoPorPass[nombre];
+                            const clase = info.aplicado ? 'ok' : 'error';
+                            const detalle = info.aplicado
+                                ? `✓ aplicado (${info.metricas?.total_instrucciones ?? '?'} instr.)`
+                                : `✗ ${escapeHtml(info.error || 'error')}`;
+                            return `<li class="${clase}"><code>${escapeHtml(nombre)}</code>: ${detalle}</li>`;
+                        }).join('')}
+                    </ul>
+                `;
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+
+        async function aplicarPassesManual() {
+            const passes = obtenerPassesSeleccionados();
+            if (!irOriginalActual) {
+                alert('Compila un programa primero para obtener el IR original.');
+                return;
+            }
+            if (!passes.length) {
+                alert('Selecciona al menos un pass.');
+                return;
+            }
+
+            const btn = document.getElementById('aplicarPassesBtn');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Aplicando...';
+
+            try {
+                const response = await fetch('/ir_manual', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ir: irOriginalActual,
+                        passes: passes,
+                        ejecutar: true,
+                    }),
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Error al aplicar passes');
+                }
+
+                irManualOptimizado = data.ir_optimizado || '';
+                renderizarDiffManual(data);
+                habilitarControlesManual(true);
+
+                if (data.salida_ejecucion) {
+                    const salida = obtenerTextoSalidaIR(data.salida_ejecucion);
+                    const motor = data.salida_ejecucion.motor ? ` (${data.salida_ejecucion.motor})` : '';
+                    document.getElementById('consoleContent').innerHTML =
+                        `<div class="console-line">🛠️ IR Manual ejecutado${motor}:</div>` +
+                        `<div class="console-line"><pre>${escapeHtml(salida)}</pre></div>`;
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            } finally {
+                btn.innerHTML = '⚡ Aplicar passes';
+                btn.disabled = false;
+            }
+        }
+
+        async function reejecutarIRManual() {
+            if (!irManualOptimizado) {
+                alert('Aplica passes primero para obtener IR optimizado.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/ir_manual/ejecutar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ir: irManualOptimizado }),
+                });
+                const data = await response.json();
+                const salida = obtenerTextoSalidaIR(data);
+                const motor = data.motor ? ` (${data.motor})` : '';
+                document.getElementById('consoleContent').innerHTML =
+                    `<div class="console-line">▶️ Re-ejecución IR Manual${motor}:</div>` +
+                    `<div class="console-line"><pre>${escapeHtml(salida)}</pre></div>`;
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        function exportarIRManual() {
+            if (!irManualOptimizado) {
+                alert('Aplica passes primero para exportar.');
+                return;
+            }
+
+            const blob = new Blob([irManualOptimizado], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'optimizado.manual.ll';
+            document.body.appendChild(enlace);
+            enlace.click();
+            document.body.removeChild(enlace);
+            URL.revokeObjectURL(url);
+        }
+
         async function compilar() {
             const codigo = document.getElementById('codigo').value;
             const compilarBtn = document.getElementById('compilarBtn');
-            
-            // Mostrar loading
+
             compilarBtn.innerHTML = '⏳ Compilando...';
             compilarBtn.disabled = true;
-            
-            // Limpiar paneles anteriores
+
             document.getElementById('phasesGrid').innerHTML = '';
             document.getElementById('errorsPanel').style.display = 'none';
             document.getElementById('errorsContent').innerHTML = '';
             document.getElementById('consoleContent').innerHTML = '<div class="console-line">⏳ Compilando...</div>';
             document.getElementById('tac').innerHTML = '⏳ Generando TAC...';
-            document.getElementById('ir').innerHTML = '⏳ Generando IR...';
+            document.getElementById('ir_original').innerHTML = '⏳ Generando IR original...';
+            document.getElementById('ir_optimizado').innerHTML = '⏳ Generando IR optimizado...';
+            document.getElementById('metricas_o3').innerHTML = '⏳ Calculando métricas de optimización...';
+            document.getElementById('ir_exec').innerHTML = '⏳ Ejecutando IR...';
+            document.getElementById('diffResumen').innerHTML = '';
+            document.getElementById('diffLadoALado').innerHTML = '';
+            document.getElementById('resultadoPorPass').style.display = 'none';
+            irManualOptimizado = '';
+            habilitarControlesManual(false);
 
             try {
                 const response = await fetch('/compilar', {
@@ -403,100 +1069,165 @@
                     },
                     body: JSON.stringify({ codigo: codigo })
                 });
-                
+
                 const data = await response.json();
-                
-                // Actualizar fases
+
                 if (data.fases && data.fases.length > 0) {
                     const phasesGrid = document.getElementById('phasesGrid');
                     phasesGrid.innerHTML = '';
+
                     data.fases.forEach(fase => {
                         const card = document.createElement('div');
                         card.className = `phase-card ${fase.estado}`;
                         card.innerHTML = `
                             <div class="phase-name">${fase.nombre}</div>
                             <div class="phase-time">⏱️ ${fase.tiempo}</div>
-                            <div class="phase-status ${fase.estado}">${fase.estado === 'ok' ? '✅ Éxito' : '❌ Error'}</div>
+                            <div class="phase-status ${fase.estado}">
+                                ${fase.estado === 'ok' ? '✅ Éxito' : '❌ Error'}
+                            </div>
                         `;
                         phasesGrid.appendChild(card);
                     });
                 }
-                
-                // Actualizar TAC e IR
+
                 if (data.tac) {
                     document.getElementById('tac').innerHTML = `<pre>${escapeHtml(data.tac)}</pre>`;
-                }
-                if (data.ir) {
-                    document.getElementById('ir').innerHTML = `<pre>${escapeHtml(data.ir)}</pre>`;
+                } else {
+                    document.getElementById('tac').innerHTML = '<div style="color:#8b949e;">No se generó código TAC.</div>';
                 }
 
-                // Panel ejecución IR (lli o motor JIT de llvmlite)
-                if (data.ir_output) {
-                    const iro = data.ir_output;
-                    const motor = iro.motor === 'lli' ? 'lli' : 'motor JIT de llvmlite';
-                    let html = '';
-                    if (iro.disponible && iro.salida) {
-                        html = `<div style="color:#2ea043;margin-bottom:8px;">✅ Ejecutado con ${escapeHtml(motor)}</div><pre>${escapeHtml(iro.salida)}</pre>`;
-                    } else if (iro.error) {
-                        html = `<div style="color:#f85149;margin-bottom:8px;">⚠️ ${escapeHtml(iro.error)}</div>`;
-                        if (iro.salida) html += `<pre>${escapeHtml(iro.salida)}</pre>`;
-                    } else {
-                        html = '<div style="color:#8b949e;">No se pudo ejecutar el IR.</div>';
-                    }
-                    document.getElementById('ir_exec').innerHTML = html;
+                if (data.ir) {
+                    irOriginalActual = data.ir;
+                    document.getElementById('ir_original').innerHTML = `<pre>${escapeHtml(data.ir)}</pre>`;
+                } else {
+                    irOriginalActual = '';
+                    document.getElementById('ir_original').innerHTML = '<div style="color:#8b949e;">No se generó IR original.</div>';
                 }
-                
-                // Actualizar consola
+
+                if (data.passes_disponibles && data.passes_disponibles.length) {
+                    passesDisponibles = data.passes_disponibles;
+                }
+                renderizarPassesSelector();
+                habilitarControlesManual(!!irOriginalActual);
+
+                if (data.binarios_herramientas) {
+                    binariosHerramientas = data.binarios_herramientas;
+                }
+                renderizarBinariosHerramientas();
+                document.getElementById('generarBinarioBtn').disabled = !irOriginalActual;
+
+                if (data.ir_optimizado) {
+                    document.getElementById('ir_optimizado').innerHTML = `<pre>${escapeHtml(data.ir_optimizado)}</pre>`;
+                } else {
+                    document.getElementById('ir_optimizado').innerHTML = '<div style="color:#8b949e;">No se generó IR optimizado.</div>';
+                }
+
+                if (data.metricas_optimizacion && Object.keys(data.metricas_optimizacion).length > 0) {
+                    const metricas = data.metricas_optimizacion;
+                    const passes = metricas.passes_aplicados || [];
+
+                    document.getElementById('metricas_o3').innerHTML = `
+                        <div class="metricas-grid">
+                            <div class="metrica-card">
+                                <div class="metrica-titulo">Instrucciones antes</div>
+                                <div class="metrica-valor">${metricas.instrucciones_antes ?? 0}</div>
+                            </div>
+                            <div class="metrica-card">
+                                <div class="metrica-titulo">Instrucciones después</div>
+                                <div class="metrica-valor">${metricas.instrucciones_despues ?? 0}</div>
+                            </div>
+                            <div class="metrica-card">
+                                <div class="metrica-titulo">Reducción porcentual</div>
+                                <div class="metrica-valor">${Number(metricas.reduccion_porcentaje ?? 0).toFixed(2)}%</div>
+                            </div>
+                            <div class="metrica-card">
+                                <div class="metrica-titulo">Bloques básicos</div>
+                                <div class="metrica-valor">${metricas.basic_blocks_antes ?? 0} → ${metricas.basic_blocks_despues ?? 0}</div>
+                            </div>
+                            <div class="metrica-card">
+                                <div class="metrica-titulo">Llamadas a función</div>
+                                <div class="metrica-valor">${metricas.function_calls_antes ?? 0} → ${metricas.function_calls_despues ?? 0}</div>
+                            </div>
+                        </div>
+
+                        <div class="lista-passes">
+                            <strong>Transformaciones detectadas</strong>
+                            ${
+                                passes.length > 0
+                                    ? `<ul>${passes.map(pass => `<li>${escapeHtml(pass)}</li>`).join('')}</ul>`
+                                    : '<div style="margin-top:10px;color:#8b949e;">No se detectaron transformaciones específicas.</div>'
+                            }
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('metricas_o3').innerHTML = '<div style="color:#8b949e;">No hay métricas de optimización disponibles.</div>';
+                }
+
+                const salidaOriginal = obtenerTextoSalidaIR(data.ir_output);
+                const salidaOptimizada = obtenerTextoSalidaIR(data.ir_output_optimizado);
+                const tituloOriginal = obtenerEncabezadoSalidaIR(data.ir_output, 'IR original');
+                const tituloOptimizado = obtenerEncabezadoSalidaIR(data.ir_output_optimizado, 'IR optimizado');
+
+                document.getElementById('ir_exec').innerHTML = `
+                    <div class="comparacion-grid">
+                        <div class="comparacion-bloque">
+                            <div class="comparacion-titulo">${escapeHtml(tituloOriginal)}</div>
+                            <div class="comparacion-contenido"><pre>${escapeHtml(salidaOriginal)}</pre></div>
+                        </div>
+                        <div class="comparacion-bloque">
+                            <div class="comparacion-titulo">${escapeHtml(tituloOptimizado)}</div>
+                            <div class="comparacion-contenido"><pre>${escapeHtml(salidaOptimizada)}</pre></div>
+                        </div>
+                    </div>
+                `;
+
                 if (data.salida && data.salida.length > 0) {
-                    const consoleHtml = data.salida.map(line => `<div class="console-line">${escapeHtml(line)}</div>`).join('');
+                    const consoleHtml = data.salida
+                        .map(linea => `<div class="console-line">${escapeHtml(linea)}</div>`)
+                        .join('');
                     document.getElementById('consoleContent').innerHTML = consoleHtml;
                 } else if (data.exito) {
-                    document.getElementById('consoleContent').innerHTML = '<div class="console-line">✅ Programa compilado y ejecutado correctamente (sin salida)</div>';
+                    document.getElementById('consoleContent').innerHTML = '<div class="console-line">✅ Programa compilado y ejecutado correctamente.</div>';
                 }
-                
-                // Mostrar errores si los hay
+
                 if (data.errores && data.errores.length > 0) {
                     document.getElementById('errorsPanel').style.display = 'block';
-                    document.getElementById('errorsContent').innerHTML = data.errores.map(e => `<pre>${escapeHtml(e)}</pre>`).join('');
+                    document.getElementById('errorsContent').innerHTML = data.errores
+                        .map(error => `<pre>${escapeHtml(error)}</pre>`)
+                        .join('');
                     document.getElementById('consoleContent').innerHTML = '<div class="console-line">❌ La compilación falló. Revisa los errores.</div>';
                 } else {
                     document.getElementById('errorsPanel').style.display = 'none';
                 }
-                
+
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('consoleContent').innerHTML = `<div class="console-line">❌ Error de conexión: ${error.message}</div>`;
+                document.getElementById('consoleContent').innerHTML = `<div class="console-line">❌ Error de conexión: ${escapeHtml(error.message)}</div>`;
                 document.getElementById('errorsPanel').style.display = 'block';
-                document.getElementById('errorsContent').innerHTML = `<pre>Error de conexión: ${error.message}</pre>`;
+                document.getElementById('errorsContent').innerHTML = `<pre>Error de conexión: ${escapeHtml(error.message)}</pre>`;
             } finally {
                 compilarBtn.innerHTML = '▶️ Compilar';
                 compilarBtn.disabled = false;
             }
         }
-        
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
+
         function cargarEjemplo() {
             const ejemplo = `programa {
     entero x = 10;
     entero y = 20;
     entero z;
-    
+
     z = x + y * 2;
     imprimir(z);
-    
+
     si (x > 10 || y < 20) {
         z = x / 2;
     } sino {
         z = y - 5;
     }
-    
+
     imprimir(z);
-    
+
     entero i = 0;
     mientras (i < 5) {
         imprimir(i);

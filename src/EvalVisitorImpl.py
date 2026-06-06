@@ -1,7 +1,7 @@
 # src/EvalVisitorImpl.py
 from antlr4 import *
-from gen.grammar.gramatica_v3Parser import gramatica_v3Parser
-from gen.grammar.gramatica_v3Visitor import gramatica_v3Visitor
+from gen.grammar.gramatica_v4Parser import gramatica_v4Parser
+from gen.grammar.gramatica_v4Visitor import gramatica_v4Visitor
 
 # ===== EXCEPCIONES PARA CONTROL DE FLUJO =====
 class ExcepcionRetorno(Exception):
@@ -15,7 +15,7 @@ class ContinueException(Exception):
     pass
 
 
-class EvalVisitor(gramatica_v3Visitor):
+class EvalVisitor(gramatica_v4Visitor):
     def __init__(self, stdout_print=True):
         super().__init__()
         self.memoria_global = {}
@@ -26,6 +26,7 @@ class EvalVisitor(gramatica_v3Visitor):
         self.valor_retorno = None
         self.stdout_print = stdout_print
         self.salida = []
+        self.estructuras = {}  # nombre_struct -> {campo: tipo}
 
     # ---- Manejo de ámbitos ----
     def entrar_ambito(self):
@@ -122,7 +123,9 @@ class EvalVisitor(gramatica_v3Visitor):
         self.salida.append(str(texto))
 
     # ---- Programa y funciones ----
-    def visitPrograma(self, ctx: gramatica_v3Parser.ProgramaContext):
+    def visitPrograma(self, ctx: gramatica_v4Parser.ProgramaContext):
+        for est_ctx in ctx.declaracionEstructura():
+            self.visit(est_ctx)
         for func_ctx in ctx.funcionDeclaracion():
             self.visit(func_ctx)
         self.entrar_ambito()
@@ -130,7 +133,62 @@ class EvalVisitor(gramatica_v3Visitor):
         self.salir_ambito()
         return None
 
-    def visitFuncionDeclaracion(self, ctx: gramatica_v3Parser.FuncionDeclaracionContext):
+    # ---- Structs (Proyecto Final) ----
+    def visitDeclaracionEstructura(self, ctx: gramatica_v4Parser.DeclaracionEstructuraContext):
+        nombre = ctx.IDENTIFICADOR().getText()
+        campos = {}
+        for campo_ctx in ctx.campoEstructura():
+            campos[campo_ctx.IDENTIFICADOR().getText()] = campo_ctx.tipo().getText()
+        self.estructuras[nombre] = campos
+        return None
+
+    def _valor_por_defecto(self, tipo):
+        if tipo == "entero":
+            return 0
+        if tipo == "flotante":
+            return 0.0
+        if tipo == "booleano":
+            return False
+        if tipo == "cadena":
+            return ""
+        return None
+
+    def visitDeclaracionVariableEstructura(self, ctx: gramatica_v4Parser.DeclaracionVariableEstructuraContext):
+        tipo_struct = ctx.IDENTIFICADOR(0).getText()
+        nombre = ctx.IDENTIFICADOR(1).getText()
+        if tipo_struct not in self.estructuras:
+            raise RuntimeError(f"Estructura '{tipo_struct}' no definida (línea {ctx.start.line})")
+        # La instancia del struct se representa como un diccionario campo -> valor.
+        instancia = {c: self._valor_por_defecto(t) for c, t in self.estructuras[tipo_struct].items()}
+        tipos = self.tipos_actual()
+        if nombre in tipos:
+            raise RuntimeError(f"Variable '{nombre}' ya declarada en este ámbito (línea {ctx.start.line})")
+        tipos[nombre] = tipo_struct
+        self.memoria_actual()[nombre] = instancia
+        return None
+
+    def visitAsignacionCampo(self, ctx: gramatica_v4Parser.AsignacionCampoContext):
+        acceso = ctx.accesoCampo()
+        nombre_var = acceso.IDENTIFICADOR(0).getText()
+        nombre_campo = acceso.IDENTIFICADOR(1).getText()
+        valor = self.visit(ctx.expresion())
+        instancia = self.obtener_variable(nombre_var, ctx)
+        if not isinstance(instancia, dict) or nombre_campo not in instancia:
+            raise RuntimeError(f"Campo '{nombre_campo}' inválido en '{nombre_var}' (línea {ctx.start.line})")
+        instancia[nombre_campo] = valor
+        self.asignar_variable(nombre_var, instancia, ctx)
+        return None
+
+    def visitAccesoCampoExpr(self, ctx: gramatica_v4Parser.AccesoCampoExprContext):
+        acceso = ctx.accesoCampo()
+        nombre_var = acceso.IDENTIFICADOR(0).getText()
+        nombre_campo = acceso.IDENTIFICADOR(1).getText()
+        instancia = self.obtener_variable(nombre_var, ctx)
+        if not isinstance(instancia, dict) or nombre_campo not in instancia:
+            raise RuntimeError(f"Campo '{nombre_campo}' inválido en '{nombre_var}' (línea {ctx.start.line})")
+        return instancia[nombre_campo]
+
+    def visitFuncionDeclaracion(self, ctx: gramatica_v4Parser.FuncionDeclaracionContext):
         nombre = ctx.IDENTIFICADOR().getText()
         tipo_retorno = "vacio"
         if ctx.tipo():
@@ -146,7 +204,7 @@ class EvalVisitor(gramatica_v3Visitor):
         self.funciones[nombre] = (params, ctx.bloque(), tipo_retorno)
         return None
 
-    def visitLlamadaFuncionExpr(self, ctx: gramatica_v3Parser.LlamadaFuncionExprContext):
+    def visitLlamadaFuncionExpr(self, ctx: gramatica_v4Parser.LlamadaFuncionExprContext):
         nombre = ctx.IDENTIFICADOR().getText()
         if nombre not in self.funciones:
             raise RuntimeError(f"Función '{nombre}' no definida (línea {ctx.start.line})")
@@ -157,18 +215,20 @@ class EvalVisitor(gramatica_v3Visitor):
         for (pnombre, ptipo), arg_val in zip(params, args):
             self._verificar_tipo(ptipo, arg_val, ctx, f"parámetro '{pnombre}'")
         self.entrar_ambito()
-        for (pnombre, ptipo), arg_val in zip(params, args):
-            self.declarar_variable(pnombre, ptipo, ctx)
-            self.asignar_variable(pnombre, arg_val, ctx)
         func_anterior = self.funcion_actual
         self.funcion_actual = nombre
         self.valor_retorno = None
         try:
-            self.visit(cuerpo)
-        except ExcepcionRetorno as e:
-            self.valor_retorno = e.valor
-        self.funcion_actual = func_anterior
-        self.salir_ambito()
+            for (pnombre, ptipo), arg_val in zip(params, args):
+                self.declarar_variable(pnombre, ptipo, ctx)
+                self.asignar_variable(pnombre, arg_val, ctx)
+            try:
+                self.visit(cuerpo)
+            except ExcepcionRetorno as e:
+                self.valor_retorno = e.valor
+        finally:
+            self.funcion_actual = func_anterior
+            self.salir_ambito()
         if tipo_ret != "vacio":
             if self.valor_retorno is None:
                 raise RuntimeError(f"Función '{nombre}' debe retornar un valor")
@@ -176,7 +236,7 @@ class EvalVisitor(gramatica_v3Visitor):
             return self.valor_retorno
         return None
 
-    def visitSentenciaRetorna(self, ctx: gramatica_v3Parser.SentenciaRetornaContext):
+    def visitSentenciaRetorna(self, ctx: gramatica_v4Parser.SentenciaRetornaContext):
         if self.funcion_actual is None:
             raise RuntimeError(f"retorna fuera de función (línea {ctx.start.line})")
         valor = None
@@ -185,14 +245,18 @@ class EvalVisitor(gramatica_v3Visitor):
         raise ExcepcionRetorno(valor)
 
     # ---- Bloque y sentencias ----
-    def visitBloque(self, ctx: gramatica_v3Parser.BloqueContext):
+    def visitBloque(self, ctx: gramatica_v4Parser.BloqueContext):
         self.entrar_ambito()
-        for s in ctx.sentencia():
-            self.visit(s)
-        self.salir_ambito()
+        try:
+            for s in ctx.sentencia():
+                self.visit(s)
+        finally:
+            # Garantiza liberar el ámbito incluso cuando 'retorna'/'romper'
+            # propagan una excepción de control de flujo.
+            self.salir_ambito()
         return None
 
-    def visitDeclaracionVariable(self, ctx: gramatica_v3Parser.DeclaracionVariableContext):
+    def visitDeclaracionVariable(self, ctx: gramatica_v4Parser.DeclaracionVariableContext):
         tipo = ctx.tipo().getText()
         nombre = ctx.IDENTIFICADOR().getText()
         
@@ -210,7 +274,7 @@ class EvalVisitor(gramatica_v3Visitor):
             hay_inicializacion = True
         else:
             for child in ctx.getChildren():
-                if isinstance(child, gramatica_v3Parser.LiteralArregloContext):
+                if isinstance(child, gramatica_v4Parser.LiteralArregloContext):
                     valor = self.visit(child)
                     hay_inicializacion = True
                     break
@@ -230,7 +294,7 @@ class EvalVisitor(gramatica_v3Visitor):
         
         return None
 
-    def visitAsignacion(self, ctx: gramatica_v3Parser.AsignacionContext):
+    def visitAsignacion(self, ctx: gramatica_v4Parser.AsignacionContext):
         nombre = ctx.IDENTIFICADOR().getText()
         valor = self.visit(ctx.expresion())
         tipo_var = self.obtener_tipo(nombre)
@@ -240,7 +304,7 @@ class EvalVisitor(gramatica_v3Visitor):
         self.asignar_variable(nombre, valor, ctx)
         return None
 
-    def visitCondicionalSi(self, ctx: gramatica_v3Parser.CondicionalSiContext):
+    def visitCondicionalSi(self, ctx: gramatica_v4Parser.CondicionalSiContext):
         condicion = self.visit(ctx.expresion())
         self._verificar_tipo("booleano", condicion, ctx, "condición si")
         if condicion:
@@ -249,7 +313,32 @@ class EvalVisitor(gramatica_v3Visitor):
             self.visit(ctx.bloque(1))
         return None
 
-    def visitImpresion(self, ctx: gramatica_v3Parser.ImpresionContext):
+    def visitSentenciaSegun(self, ctx: gramatica_v4Parser.SentenciaSegunContext):
+        valor = self.visit(ctx.expresion())
+        casos = ctx.casoSegun()
+        idx_match = None
+        for i, caso in enumerate(casos):
+            if self.visit(caso.expresion()) == valor:
+                idx_match = i
+                break
+        try:
+            if idx_match is not None:
+                # Comportamiento tipo C: fall-through desde el caso encontrado
+                # hasta encontrar 'romper' o terminar el switch.
+                for caso in casos[idx_match:]:
+                    for s in caso.sentencia():
+                        self.visit(s)
+                if ctx.casoDefecto():
+                    for s in ctx.casoDefecto().sentencia():
+                        self.visit(s)
+            elif ctx.casoDefecto():
+                for s in ctx.casoDefecto().sentencia():
+                    self.visit(s)
+        except BreakException:
+            pass
+        return None
+
+    def visitImpresion(self, ctx: gramatica_v4Parser.ImpresionContext):
         valor = self.visit(ctx.expresion())
         if isinstance(valor, list):
             self._imprimir(str(valor))
@@ -258,7 +347,7 @@ class EvalVisitor(gramatica_v3Visitor):
         return None
 
     # ---- Ciclos ----
-    def visitCicloMientras(self, ctx: gramatica_v3Parser.CicloMientrasContext):
+    def visitCicloMientras(self, ctx: gramatica_v4Parser.CicloMientrasContext):
         while True:
             try:
                 condicion = self.visit(ctx.expresion())
@@ -272,7 +361,7 @@ class EvalVisitor(gramatica_v3Visitor):
                 continue
         return None
 
-    def visitInicializacionPara(self, ctx: gramatica_v3Parser.InicializacionParaContext):
+    def visitInicializacionPara(self, ctx: gramatica_v4Parser.InicializacionParaContext):
         tipo = ctx.tipo().getText()
         nombre = ctx.IDENTIFICADOR().getText()
         valor = self.visit(ctx.expresion())
@@ -280,7 +369,7 @@ class EvalVisitor(gramatica_v3Visitor):
         self.asignar_variable(nombre, valor, ctx)
         return None
 
-    def visitAsignacionPara(self, ctx: gramatica_v3Parser.AsignacionParaContext):
+    def visitAsignacionPara(self, ctx: gramatica_v4Parser.AsignacionParaContext):
         nombre = ctx.IDENTIFICADOR().getText()
         valor = self.visit(ctx.expresion())
         tipo_var = self.obtener_tipo(nombre)
@@ -290,7 +379,7 @@ class EvalVisitor(gramatica_v3Visitor):
         self.asignar_variable(nombre, valor, ctx)
         return None
 
-    def visitActualizacionPara(self, ctx: gramatica_v3Parser.ActualizacionParaContext):
+    def visitActualizacionPara(self, ctx: gramatica_v4Parser.ActualizacionParaContext):
         nombre = ctx.IDENTIFICADOR().getText()
         valor = self.visit(ctx.expresion())
         tipo_var = self.obtener_tipo(nombre)
@@ -300,7 +389,7 @@ class EvalVisitor(gramatica_v3Visitor):
         self.asignar_variable(nombre, valor, ctx)
         return None
 
-    def visitCicloPara(self, ctx: gramatica_v3Parser.CicloParaContext):
+    def visitCicloPara(self, ctx: gramatica_v4Parser.CicloParaContext):
         if ctx.inicializacionPara():
             self.visit(ctx.inicializacionPara())
         elif ctx.asignacionPara():
@@ -324,7 +413,7 @@ class EvalVisitor(gramatica_v3Visitor):
                 continue
         return None
 
-    def visitLlamadaFuncion(self, ctx: gramatica_v3Parser.LlamadaFuncionContext):
+    def visitLlamadaFuncion(self, ctx: gramatica_v4Parser.LlamadaFuncionContext):
         nombre = ctx.IDENTIFICADOR().getText()
         if nombre not in self.funciones:
             raise RuntimeError(f"Función '{nombre}' no definida (línea {ctx.start.line})")
@@ -335,29 +424,31 @@ class EvalVisitor(gramatica_v3Visitor):
         for (pnombre, ptipo), arg_val in zip(params, args):
             self._verificar_tipo(ptipo, arg_val, ctx, f"parámetro '{pnombre}'")
         self.entrar_ambito()
-        for (pnombre, ptipo), arg_val in zip(params, args):
-            self.declarar_variable(pnombre, ptipo, ctx)
-            self.asignar_variable(pnombre, arg_val, ctx)
         func_anterior = self.funcion_actual
         self.funcion_actual = nombre
         self.valor_retorno = None
         try:
-            self.visit(cuerpo)
-        except ExcepcionRetorno as e:
-            self.valor_retorno = e.valor
-        self.funcion_actual = func_anterior
-        self.salir_ambito()
+            for (pnombre, ptipo), arg_val in zip(params, args):
+                self.declarar_variable(pnombre, ptipo, ctx)
+                self.asignar_variable(pnombre, arg_val, ctx)
+            try:
+                self.visit(cuerpo)
+            except ExcepcionRetorno as e:
+                self.valor_retorno = e.valor
+        finally:
+            self.funcion_actual = func_anterior
+            self.salir_ambito()
         return None
 
     # ---- Sentencias break/continue ----
-    def visitSentenciaBreak(self, ctx: gramatica_v3Parser.SentenciaBreakContext):
+    def visitSentenciaBreak(self, ctx: gramatica_v4Parser.SentenciaBreakContext):
         raise BreakException()
 
-    def visitSentenciaContinue(self, ctx: gramatica_v3Parser.SentenciaContinueContext):
+    def visitSentenciaContinue(self, ctx: gramatica_v4Parser.SentenciaContinueContext):
         raise ContinueException()
 
     # ---- Import ----
-    def visitSentenciaImportar(self, ctx: gramatica_v3Parser.SentenciaImportarContext):
+    def visitSentenciaImportar(self, ctx: gramatica_v4Parser.SentenciaImportarContext):
         nombre_archivo = ctx.CADENA().getText()[1:-1]
         self._imprimir(f"[Importando] {nombre_archivo}")
         return None
@@ -378,13 +469,33 @@ class EvalVisitor(gramatica_v3Visitor):
     def visitParentesis(self, ctx):
         return self.visit(ctx.expresion())
 
+    def visitCasting(self, ctx):
+        tipo_destino = ctx.tipo().getText()
+        valor = self.visit(ctx.expresion())
+        if tipo_destino == "entero":
+            if isinstance(valor, bool):
+                return 1 if valor else 0
+            return int(valor)
+        if tipo_destino == "flotante":
+            return float(valor)
+        if tipo_destino == "booleano":
+            return bool(valor)
+        if tipo_destino == "cadena":
+            return str(valor)
+        return valor
+
+    def visitTernario(self, ctx):
+        cond = self.visit(ctx.cond)
+        self._verificar_tipo("booleano", cond, ctx, "condición ternario")
+        return self.visit(ctx.ent) if cond else self.visit(ctx.sino)
+
     def visitMultiplicacionDivisionModulo(self, ctx):
         izq = self.visit(ctx.izq)
         der = self.visit(ctx.der)
         t1 = self._tipo_de(izq)
         t2 = self._tipo_de(der)
         
-        if ctx.op.type == gramatica_v3Parser.MODULO:
+        if ctx.op.type == gramatica_v4Parser.MODULO:
             if t1 != "entero" or t2 != "entero":
                 raise RuntimeError(f"El operador % solo funciona con enteros, no con {t1} y {t2}")
             if der == 0:
@@ -392,7 +503,7 @@ class EvalVisitor(gramatica_v3Visitor):
             return izq % der
         
         if t1 == "entero" and t2 == "entero":
-            if ctx.op.type == gramatica_v3Parser.MULTIPLICACION:
+            if ctx.op.type == gramatica_v4Parser.MULTIPLICACION:
                 return izq * der
             else:
                 if der == 0:
@@ -401,7 +512,7 @@ class EvalVisitor(gramatica_v3Visitor):
         if {t1, t2} <= {"entero", "flotante"}:
             lf = float(izq) if t1 == "entero" else izq
             rf = float(der) if t2 == "entero" else der
-            if ctx.op.type == gramatica_v3Parser.MULTIPLICACION:
+            if ctx.op.type == gramatica_v4Parser.MULTIPLICACION:
                 return lf * rf
             else:
                 if rf == 0.0:
@@ -415,12 +526,12 @@ class EvalVisitor(gramatica_v3Visitor):
         t1 = self._tipo_de(izq)
         t2 = self._tipo_de(der)
         if t1 == "entero" and t2 == "entero":
-            return izq + der if ctx.op.type == gramatica_v3Parser.SUMA else izq - der
+            return izq + der if ctx.op.type == gramatica_v4Parser.SUMA else izq - der
         if {t1, t2} <= {"entero", "flotante"}:
             lf = float(izq)
             rf = float(der)
-            return lf + rf if ctx.op.type == gramatica_v3Parser.SUMA else lf - rf
-        if t1 == "cadena" and t2 == "cadena" and ctx.op.type == gramatica_v3Parser.SUMA:
+            return lf + rf if ctx.op.type == gramatica_v4Parser.SUMA else lf - rf
+        if t1 == "cadena" and t2 == "cadena" and ctx.op.type == gramatica_v4Parser.SUMA:
             return izq + der
         raise RuntimeError(f"Tipos incompatibles para + o -: {t1} y {t2}")
 
@@ -430,15 +541,15 @@ class EvalVisitor(gramatica_v3Visitor):
         t1 = self._tipo_de(izq)
         t2 = self._tipo_de(der)
         op = ctx.op.type
-        if op in (gramatica_v3Parser.IGUAL, gramatica_v3Parser.DIFERENTE):
-            return (izq == der) if op == gramatica_v3Parser.IGUAL else (izq != der)
+        if op in (gramatica_v4Parser.IGUAL, gramatica_v4Parser.DIFERENTE):
+            return (izq == der) if op == gramatica_v4Parser.IGUAL else (izq != der)
         if {t1, t2} <= {"entero", "flotante"}:
             lf = float(izq)
             rf = float(der)
-            if op == gramatica_v3Parser.MENOR_QUE: return lf < rf
-            if op == gramatica_v3Parser.MENOR_IGUAL: return lf <= rf
-            if op == gramatica_v3Parser.MAYOR_QUE: return lf > rf
-            if op == gramatica_v3Parser.MAYOR_IGUAL: return lf >= rf
+            if op == gramatica_v4Parser.MENOR_QUE: return lf < rf
+            if op == gramatica_v4Parser.MENOR_IGUAL: return lf <= rf
+            if op == gramatica_v4Parser.MAYOR_QUE: return lf > rf
+            if op == gramatica_v4Parser.MAYOR_IGUAL: return lf >= rf
         raise RuntimeError(f"Operadores relacionales solo para números: {t1} y {t2}")
 
     def visitLogica(self, ctx):
@@ -446,7 +557,7 @@ class EvalVisitor(gramatica_v3Visitor):
         der = self.visit(ctx.der)
         self._verificar_tipo("booleano", izq, ctx, "operación lógica")
         self._verificar_tipo("booleano", der, ctx, "operación lógica")
-        if ctx.op.type == gramatica_v3Parser.Y_LOGICO:
+        if ctx.op.type == gramatica_v4Parser.Y_LOGICO:
             return izq and der
         return izq or der
 

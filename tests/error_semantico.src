@@ -1,0 +1,7 @@
+// Error semántico: condición del ternario no es booleana y tipos incompatibles
+programa {
+    entero x = 5;
+    // 'x' es entero, no booleano, por lo que no puede ser condición del ternario
+    entero r = x ? 1 : 2;
+    imprimir(r);
+}

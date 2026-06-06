@@ -1,9 +1,9 @@
 # src/tac_generator.py
-from gen.grammar.gramatica_v3Parser import gramatica_v3Parser
-from gen.grammar.gramatica_v3Visitor import gramatica_v3Visitor
+from gen.grammar.gramatica_v4Parser import gramatica_v4Parser
+from gen.grammar.gramatica_v4Visitor import gramatica_v4Visitor
 
 
-class TACGenerator(gramatica_v3Visitor):
+class TACGenerator(gramatica_v4Visitor):
     """
     Generador de Código de Tres Direcciones (TAC)
     Emite instrucciones como:
@@ -41,12 +41,16 @@ class TACGenerator(gramatica_v3Visitor):
     
     # ========== Programa y funciones ==========
     
-    def visitPrograma(self, ctx: gramatica_v3Parser.ProgramaContext):
+    def visitPrograma(self, ctx: gramatica_v4Parser.ProgramaContext):
         # Reiniciar contadores
         self.temp_counter = 0
         self.label_counter = 0
         self.instrucciones = []
         
+        # Declaraciones de estructuras (a nivel de programa)
+        for est_ctx in ctx.declaracionEstructura():
+            self.visit(est_ctx)
+
         # Registrar funciones primero
         for func_ctx in ctx.funcionDeclaracion():
             self.visit(func_ctx)
@@ -59,7 +63,7 @@ class TACGenerator(gramatica_v3Visitor):
         
         return self.get_tac()
     
-    def visitFuncionDeclaracion(self, ctx: gramatica_v3Parser.FuncionDeclaracionContext):
+    def visitFuncionDeclaracion(self, ctx: gramatica_v4Parser.FuncionDeclaracionContext):
         nombre = ctx.IDENTIFICADOR().getText()
         self.funcion_actual = nombre
         
@@ -91,14 +95,14 @@ class TACGenerator(gramatica_v3Visitor):
     
     # ========== Bloque ==========
     
-    def visitBloque(self, ctx: gramatica_v3Parser.BloqueContext):
+    def visitBloque(self, ctx: gramatica_v4Parser.BloqueContext):
         for sentencia in ctx.sentencia():
             self.visit(sentencia)
         return None
     
     # ========== Declaraciones y asignaciones ==========
     
-    def visitDeclaracionVariable(self, ctx: gramatica_v3Parser.DeclaracionVariableContext):
+    def visitDeclaracionVariable(self, ctx: gramatica_v4Parser.DeclaracionVariableContext):
         tipo = ctx.tipo().getText()
         nombre = ctx.IDENTIFICADOR().getText()
         
@@ -111,7 +115,7 @@ class TACGenerator(gramatica_v3Visitor):
         else:
             # Buscar literalArreglo
             for child in ctx.getChildren():
-                if isinstance(child, gramatica_v3Parser.LiteralArregloContext):
+                if isinstance(child, gramatica_v4Parser.LiteralArregloContext):
                     valor = self.visit(child)
                     break
         
@@ -140,19 +144,50 @@ class TACGenerator(gramatica_v3Visitor):
         
         return None
     
-    def visitAsignacion(self, ctx: gramatica_v3Parser.AsignacionContext):
+    def visitAsignacion(self, ctx: gramatica_v4Parser.AsignacionContext):
         nombre = ctx.IDENTIFICADOR().getText()
         valor = self.visit(ctx.expresion())
         self.emitir(f"{nombre} = {valor}")
         return None
     
-    def visitAsignacionArreglo(self, ctx: gramatica_v3Parser.AsignacionArregloContext):
+    def visitAsignacionArreglo(self, ctx: gramatica_v4Parser.AsignacionArregloContext):
         acceso = ctx.accesoArreglo()
         nombre = acceso.IDENTIFICADOR().getText()
         indice = self.visit(acceso.expresion())
         valor = self.visit(ctx.expresion())
         self.emitir(f"{nombre}[{indice}] = {valor}")
         return None
+
+    # ========== Structs (Proyecto Final) ==========
+
+    def visitDeclaracionEstructura(self, ctx):
+        nombre = ctx.IDENTIFICADOR().getText()
+        campos = ", ".join(c.IDENTIFICADOR().getText() for c in ctx.campoEstructura())
+        self.emitir(f"; estructura {nombre} {{ {campos} }}")
+        return None
+
+    def visitDeclaracionVariableEstructura(self, ctx):
+        tipo_struct = ctx.IDENTIFICADOR(0).getText()
+        nombre = ctx.IDENTIFICADOR(1).getText()
+        self.emitir(f"; {tipo_struct} {nombre}")
+        return None
+
+    def visitAsignacionCampo(self, ctx):
+        acceso = ctx.accesoCampo()
+        var = acceso.IDENTIFICADOR(0).getText()
+        campo = acceso.IDENTIFICADOR(1).getText()
+        valor = self.visit(ctx.expresion())
+        # En TAC el acceso a campo se expresa como acceso indexado al struct.
+        self.emitir(f"{var}.{campo} = {valor}")
+        return None
+
+    def visitAccesoCampoExpr(self, ctx):
+        acceso = ctx.accesoCampo()
+        var = acceso.IDENTIFICADOR(0).getText()
+        campo = acceso.IDENTIFICADOR(1).getText()
+        temp = self.nuevo_temporal()
+        self.emitir(f"{temp} = {var}.{campo}")
+        return temp
     
     # ========== Literales ==========
     
@@ -213,6 +248,33 @@ class TACGenerator(gramatica_v3Visitor):
     
     def visitParentesis(self, ctx):
         return self.visit(ctx.expresion())
+
+    # ========== Casting y ternario (Proyecto Final) ==========
+
+    def visitCasting(self, ctx):
+        val = self.visit(ctx.expresion())
+        tipo = ctx.tipo().getText()
+        temp = self.nuevo_temporal()
+        self.emitir(f"{temp} = ({tipo}) {val}")
+        return temp
+
+    def visitTernario(self, ctx):
+        cond = self.visit(ctx.cond)
+        temp = self.nuevo_temporal()
+        etiqueta_true = self.nueva_etiqueta()
+        etiqueta_fin = self.nueva_etiqueta()
+
+        self.emitir(f"if {cond} goto {etiqueta_true}")
+        # Rama falsa
+        val_sino = self.visit(ctx.sino)
+        self.emitir(f"{temp} = {val_sino}")
+        self.emitir(f"goto {etiqueta_fin}")
+        # Rama verdadera
+        self.emitir(f"{etiqueta_true}:")
+        val_ent = self.visit(ctx.ent)
+        self.emitir(f"{temp} = {val_ent}")
+        self.emitir(f"{etiqueta_fin}:")
+        return temp
     
     # ========== Expresiones relacionales y lógicas ==========
     
@@ -252,7 +314,7 @@ class TACGenerator(gramatica_v3Visitor):
     
     # ========== Condicionales ==========
     
-    def visitCondicionalSi(self, ctx: gramatica_v3Parser.CondicionalSiContext):
+    def visitCondicionalSi(self, ctx: gramatica_v4Parser.CondicionalSiContext):
         condicion = self.visit(ctx.expresion())
 
         etiqueta_then = self.nueva_etiqueta()
@@ -275,7 +337,7 @@ class TACGenerator(gramatica_v3Visitor):
     
     # ========== Ciclos ==========
     
-    def visitCicloMientras(self, ctx: gramatica_v3Parser.CicloMientrasContext):
+    def visitCicloMientras(self, ctx: gramatica_v4Parser.CicloMientrasContext):
         etiqueta_cond = self.nueva_etiqueta()
         etiqueta_body = self.nueva_etiqueta()
         etiqueta_fin = self.nueva_etiqueta()
@@ -295,7 +357,7 @@ class TACGenerator(gramatica_v3Visitor):
         self.emitir(f"{etiqueta_fin}:")
         return None
     
-    def visitCicloPara(self, ctx: gramatica_v3Parser.CicloParaContext):
+    def visitCicloPara(self, ctx: gramatica_v4Parser.CicloParaContext):
         etiqueta_cond = self.nueva_etiqueta()
         etiqueta_body = self.nueva_etiqueta()
         etiqueta_step = self.nueva_etiqueta()
@@ -330,20 +392,50 @@ class TACGenerator(gramatica_v3Visitor):
         self.emitir(f"{etiqueta_fin}:")
         return None
     
-    def visitInicializacionPara(self, ctx: gramatica_v3Parser.InicializacionParaContext):
+    # ========== Switch / segun (Proyecto Final) ==========
+
+    def visitSentenciaSegun(self, ctx: gramatica_v4Parser.SentenciaSegunContext):
+        control = self.visit(ctx.expresion())
+        etiqueta_fin = self.nueva_etiqueta()
+        casos = ctx.casoSegun()
+        etiquetas_caso = [self.nueva_etiqueta() for _ in casos]
+        etiqueta_def = self.nueva_etiqueta() if ctx.casoDefecto() else etiqueta_fin
+
+        # Saltos condicionales encadenados sobre el valor de control.
+        for caso, etq in zip(casos, etiquetas_caso):
+            val = self.visit(caso.expresion())
+            self.emitir(f"if {control} == {val} goto {etq}")
+        self.emitir(f"goto {etiqueta_def}")
+
+        # Cuerpos de los casos (break → goto fin; fall-through si no hay break).
+        self.pila_ciclos.append((etiqueta_fin, etiqueta_fin))
+        for caso, etq in zip(casos, etiquetas_caso):
+            self.emitir(f"{etq}:")
+            for s in caso.sentencia():
+                self.visit(s)
+        if ctx.casoDefecto():
+            self.emitir(f"{etiqueta_def}:")
+            for s in ctx.casoDefecto().sentencia():
+                self.visit(s)
+        self.pila_ciclos.pop()
+
+        self.emitir(f"{etiqueta_fin}:")
+        return None
+
+    def visitInicializacionPara(self, ctx: gramatica_v4Parser.InicializacionParaContext):
         tipo = ctx.tipo().getText()
         nombre = ctx.IDENTIFICADOR().getText()
         valor = self.visit(ctx.expresion())
         self.emitir(f"{nombre} = {valor}")
         return None
     
-    def visitAsignacionPara(self, ctx: gramatica_v3Parser.AsignacionParaContext):
+    def visitAsignacionPara(self, ctx: gramatica_v4Parser.AsignacionParaContext):
         nombre = ctx.IDENTIFICADOR().getText()
         valor = self.visit(ctx.expresion())
         self.emitir(f"{nombre} = {valor}")
         return None
     
-    def visitActualizacionPara(self, ctx: gramatica_v3Parser.ActualizacionParaContext):
+    def visitActualizacionPara(self, ctx: gramatica_v4Parser.ActualizacionParaContext):
         nombre = ctx.IDENTIFICADOR().getText()
         valor = self.visit(ctx.expresion())
         self.emitir(f"{nombre} = {valor}")
@@ -351,7 +443,7 @@ class TACGenerator(gramatica_v3Visitor):
     
     # ========== Funciones ==========
     
-    def visitLlamadaFuncion(self, ctx: gramatica_v3Parser.LlamadaFuncionContext):
+    def visitLlamadaFuncion(self, ctx: gramatica_v4Parser.LlamadaFuncionContext):
         nombre = ctx.IDENTIFICADOR().getText()
         args = []
         if ctx.expresion():
@@ -363,7 +455,7 @@ class TACGenerator(gramatica_v3Visitor):
         self.emitir(f"{temp} = call {nombre}, {args_str}")
         return temp
     
-    def visitLlamadaFuncionExpr(self, ctx: gramatica_v3Parser.LlamadaFuncionExprContext):
+    def visitLlamadaFuncionExpr(self, ctx: gramatica_v4Parser.LlamadaFuncionExprContext):
         nombre = ctx.IDENTIFICADOR().getText()
         args = []
         if ctx.expresion():
@@ -375,7 +467,7 @@ class TACGenerator(gramatica_v3Visitor):
         self.emitir(f"{temp} = call {nombre}, {args_str}")
         return temp
     
-    def visitSentenciaRetorna(self, ctx: gramatica_v3Parser.SentenciaRetornaContext):
+    def visitSentenciaRetorna(self, ctx: gramatica_v4Parser.SentenciaRetornaContext):
         if ctx.expresion():
             valor = self.visit(ctx.expresion())
             self.emitir(f"return {valor}")
@@ -385,20 +477,20 @@ class TACGenerator(gramatica_v3Visitor):
     
     # ========== Impresión ==========
     
-    def visitImpresion(self, ctx: gramatica_v3Parser.ImpresionContext):
+    def visitImpresion(self, ctx: gramatica_v4Parser.ImpresionContext):
         valor = self.visit(ctx.expresion())
         self.emitir(f"print {valor}")
         return None
     
     # ========== Break y Continue ==========
     
-    def visitSentenciaBreak(self, ctx: gramatica_v3Parser.SentenciaBreakContext):
+    def visitSentenciaBreak(self, ctx: gramatica_v4Parser.SentenciaBreakContext):
         if self.pila_ciclos:
             _, etiqueta_fin = self.pila_ciclos[-1]
             self.emitir(f"goto {etiqueta_fin}")
         return None
     
-    def visitSentenciaContinue(self, ctx: gramatica_v3Parser.SentenciaContinueContext):
+    def visitSentenciaContinue(self, ctx: gramatica_v4Parser.SentenciaContinueContext):
         if self.pila_ciclos:
             etiqueta_inicio, _ = self.pila_ciclos[-1]
             self.emitir(f"goto {etiqueta_inicio}")
@@ -406,7 +498,7 @@ class TACGenerator(gramatica_v3Visitor):
     
     # ========== Import ==========
     
-    def visitSentenciaImportar(self, ctx: gramatica_v3Parser.SentenciaImportarContext):
+    def visitSentenciaImportar(self, ctx: gramatica_v4Parser.SentenciaImportarContext):
         nombre_archivo = ctx.CADENA().getText()
         self.emitir(f"import {nombre_archivo}")
         return None

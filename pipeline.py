@@ -1,12 +1,14 @@
-# pipeline.py — Orquestador del compilador MiniLang v3
+# pipeline.py — Orquestador del compilador MiniLang v4
 #
 # Fases:
-#   1. Análisis Léxico   (ANTLR Lexer)
+#   1. Análisis Léxico     (ANTLR Lexer)
 #   2. Análisis Sintáctico (ANTLR Parser)
 #   3. Análisis Semántico  (SemanticVisitor + TablaSimbolos)
 #   4. Generación TAC      (TACGenerator → archivo .tac)
 #   5. Generación LLVM IR  (IRGenerator → archivo .ll)
 #   6. Interpretación      (EvalVisitor)
+#   7. Optimización O3     (passes → archivo .opt.ll)
+#   8. Binario nativo      (BinaryGenerator, opcional con --binario)
 #
 # Si alguna fase detecta errores se detiene y reporta sin continuar.
 
@@ -18,13 +20,16 @@ import time
 
 from antlr4 import CommonTokenStream, FileStream
 
-from gen.grammar.gramatica_v3Lexer import gramatica_v3Lexer
-from gen.grammar.gramatica_v3Parser import gramatica_v3Parser
+from gen.grammar.gramatica_v4Lexer import gramatica_v4Lexer
+from gen.grammar.gramatica_v4Parser import gramatica_v4Parser
 from src.custom_errors import ColectorErrores
 from src.semantic_visitor import SemanticVisitor
 from src.tac_generator import TACGenerator
 from src.ir_generator import IRGenerator
 from src.EvalVisitorImpl import EvalVisitor
+from src.ir_runner import ejecutar_ir
+from src.passes import aplicar_optimizacion_o3
+from src.binary_generator import generar_binarios
 
 
 class FaseResultado:
@@ -50,9 +55,15 @@ class ResultadoPipeline:
         self.fases: list[FaseResultado] = []
         self.tac: str = ""
         self.ir: str = ""
+        self.ir_optimizado: str = ""
+        self.metricas_optimizacion: dict = {}
         self.salida: list[str] = []
+        self.salida_ir: str = ""
+        self.salida_ir_optimizado: str = ""
         self.archivo_tac: str | None = None
         self.archivo_ll: str | None = None
+        self.archivo_ll_optimizado: str | None = None
+        self.binarios: dict = {}
 
 
 def ejecutar_pipeline(
@@ -60,6 +71,9 @@ def ejecutar_pipeline(
     *,
     stdout_print: bool = True,
     generar_archivos: bool = True,
+    generar_binario: bool = False,
+    plataformas: list[str] | None = None,
+    triple_ir: str = "linux",
 ) -> ResultadoPipeline:
     resultado = ResultadoPipeline()
     base = os.path.splitext(ruta_archivo)[0]
@@ -69,7 +83,7 @@ def ejecutar_pipeline(
     input_stream = FileStream(ruta_archivo, encoding="utf-8")
     colector = ColectorErrores()
 
-    lexer = gramatica_v3Lexer(input_stream)
+    lexer = gramatica_v4Lexer(input_stream)
     lexer.removeErrorListeners()
     lexer.addErrorListener(colector)
 
@@ -84,7 +98,7 @@ def ejecutar_pipeline(
 
     # ── Fase 2: Sintáctico ─────────────────────────────────────
     t0 = time.perf_counter()
-    parser = gramatica_v3Parser(token_stream)
+    parser = gramatica_v4Parser(token_stream)
     parser.removeErrorListeners()
     parser.addErrorListener(colector)
     tree = parser.programa()
@@ -115,8 +129,8 @@ def ejecutar_pipeline(
         resultado.fases.append(FaseResultado("Generación TAC", "ok", t_tac))
         if generar_archivos:
             resultado.archivo_tac = base + ".tac"
-            with open(resultado.archivo_tac, "w", encoding="utf-8") as f:
-                f.write(resultado.tac)
+            with open(resultado.archivo_tac, "w", encoding="utf-8") as archivo:
+                archivo.write(resultado.tac)
     except Exception as ex:
         t_tac = (time.perf_counter() - t0) * 1000
         resultado.fases.append(FaseResultado("Generación TAC", "error", t_tac, str(ex)))
@@ -125,75 +139,164 @@ def ejecutar_pipeline(
     # ── Fase 5: Generación LLVM IR ─────────────────────────────
     t0 = time.perf_counter()
     try:
-        ir_gen = IRGenerator()
+        ir_gen = IRGenerator(triple=triple_ir)
         resultado.ir = ir_gen.visit(tree) or ""
         t_ir = (time.perf_counter() - t0) * 1000
         resultado.fases.append(FaseResultado("Generación LLVM IR", "ok", t_ir))
         if generar_archivos:
             resultado.archivo_ll = base + ".ll"
-            with open(resultado.archivo_ll, "w", encoding="utf-8") as f:
-                f.write(resultado.ir)
+            with open(resultado.archivo_ll, "w", encoding="utf-8") as archivo:
+                archivo.write(resultado.ir)
     except Exception as ex:
         t_ir = (time.perf_counter() - t0) * 1000
         resultado.fases.append(FaseResultado("Generación LLVM IR", "error", t_ir, str(ex)))
         return resultado
 
-    # ── Fase 6: Interpretación ─────────────────────────────────
+    # ── Fase 6: Ejecución (Intérprete) ─────────────────────────
     t0 = time.perf_counter()
     interprete = EvalVisitor(stdout_print=stdout_print)
     try:
         interprete.visit(tree)
         t_ejecucion = (time.perf_counter() - t0) * 1000
         resultado.fases.append(FaseResultado("Ejecución (Intérprete)", "ok", t_ejecucion))
+        resultado.salida = interprete.salida
     except Exception as ex:
         t_ejecucion = (time.perf_counter() - t0) * 1000
         resultado.fases.append(FaseResultado("Ejecución (Intérprete)", "error", t_ejecucion, str(ex)))
         resultado.salida = interprete.salida
         return resultado
 
+    # ── Fase 7: Optimización O3 ────────────────────────────────
+    t0 = time.perf_counter()
+    try:
+        nombre_base = base if generar_archivos else None
+        resultado.ir_optimizado, resultado.metricas_optimizacion = aplicar_optimizacion_o3(
+            resultado.ir,
+            nombre_base,
+        )
+        t_opt = (time.perf_counter() - t0) * 1000
+
+        antes = resultado.metricas_optimizacion.get("instrucciones_antes", 0)
+        despues = resultado.metricas_optimizacion.get("instrucciones_despues", 0)
+        reduccion = resultado.metricas_optimizacion.get("reduccion_porcentaje", 0.0)
+
+        detalle = (
+            f"Instrucciones: {antes} → {despues} | "
+            f"Reducción: {reduccion:.2f}%"
+        )
+
+        resultado.fases.append(FaseResultado("Optimización O3", "ok", t_opt, detalle))
+
+        if generar_archivos:
+            resultado.archivo_ll_optimizado = base + ".opt.ll"
+    except Exception as ex:
+        t_opt = (time.perf_counter() - t0) * 1000
+        resultado.fases.append(FaseResultado("Optimización O3", "error", t_opt, str(ex)))
+        return resultado
+
+    # Salida del IR original
+    try:
+        resultado.salida_ir = ejecutar_ir(resultado.ir)
+    except Exception as ex:
+        resultado.salida_ir = f"Error al ejecutar IR original: {ex}"
+
+    # Salida del IR optimizado
+    try:
+        if resultado.ir_optimizado:
+            resultado.salida_ir_optimizado = ejecutar_ir(resultado.ir_optimizado)
+    except Exception as ex:
+        resultado.salida_ir_optimizado = f"Error al ejecutar IR optimizado: {ex}"
+
+    # ── Fase 8: Generación de binario nativo (opcional) ────────
+    # No condiciona el éxito de la compilación: si faltan herramientas
+    # (llc/gcc/mingw) se reporta sin abortar el pipeline.
+    if generar_binario:
+        t0 = time.perf_counter()
+        objetivo = plataformas or ["linux"]
+        ir_para_binario = resultado.ir_optimizado or resultado.ir
+        nombre_base = base if generar_archivos else "programa"
+        try:
+            resultado.binarios = generar_binarios(
+                ir_para_binario,
+                objetivo,
+                nombre_base=nombre_base,
+            )
+            t_bin = (time.perf_counter() - t0) * 1000
+
+            generados = [
+                p for p, v in resultado.binarios.get("binarios", {}).items() if v.get("ok")
+            ]
+            if generados:
+                detalle = "Binarios generados: " + ", ".join(generados)
+            else:
+                detalle = "Sin binarios (faltan herramientas: llc/gcc/mingw)"
+            resultado.fases.append(
+                FaseResultado("Generación de binario nativo", "ok", t_bin, detalle)
+            )
+        except Exception as ex:
+            t_bin = (time.perf_counter() - t0) * 1000
+            resultado.fases.append(
+                FaseResultado("Generación de binario nativo", "error", t_bin, str(ex))
+            )
+
     resultado.exito = True
-    resultado.salida = interprete.salida
     return resultado
 
 
 def _imprimir_fases(resultado: ResultadoPipeline) -> None:
     print("\n╔══════════════════════════════════════════╗", file=sys.stderr)
-    print("║       Pipeline MiniLang v3 — Fases       ║", file=sys.stderr)
+    print("║         Pipeline MiniLang v4 — Fases     ║", file=sys.stderr)
     print("╠══════════════════════════════════════════╣", file=sys.stderr)
     for fase in resultado.fases:
         print(f"║ {fase}", file=sys.stderr)
     print("╚══════════════════════════════════════════╝", file=sys.stderr)
 
 
-# ── CLI ────────────────────────────────────────────────────────
 def main():
     import argparse
 
-    ap = argparse.ArgumentParser(
-        description="MiniLang v3 — Pipeline completo (léxico → sintáctico → semántico → TAC → IR → intérprete)"
+    parser = argparse.ArgumentParser(
+        description="MiniLang v4 — Pipeline completo con optimización O3 y binarios nativos"
     )
-    ap.add_argument("archivo", help="Ruta del archivo fuente (.ml)")
-    ap.add_argument("--silencioso", action="store_true", help="No imprimir salida del programa")
-    ap.add_argument("--sin-archivos", action="store_true", help="No generar archivos .tac y .ll")
-    args = ap.parse_args()
+    parser.add_argument("archivo", help="Ruta del archivo fuente (.ml)")
+    parser.add_argument("--silencioso", action="store_true", help="No imprimir salida del programa")
+    parser.add_argument("--sin-archivos", action="store_true", help="No generar archivos .tac, .ll y .opt.ll")
+    parser.add_argument("--binario", action="store_true", help="Generar binario nativo a partir del IR optimizado")
+    parser.add_argument(
+        "--plataformas",
+        nargs="+",
+        choices=["linux", "windows"],
+        default=["linux"],
+        help="Plataformas para el binario nativo (por defecto: linux)",
+    )
+    args = parser.parse_args()
 
     resultado = ejecutar_pipeline(
         args.archivo,
         stdout_print=(not args.silencioso),
         generar_archivos=(not args.sin_archivos),
+        generar_binario=args.binario,
+        plataformas=args.plataformas,
     )
 
     _imprimir_fases(resultado)
 
     if resultado.exito:
-        print(f"\nPrograma ejecutado correctamente ✔️")
+        print("\nPrograma ejecutado correctamente")
         if resultado.archivo_tac:
             print(f"  TAC generado: {resultado.archivo_tac}")
         if resultado.archivo_ll:
             print(f"  LLVM IR generado: {resultado.archivo_ll}")
+        if resultado.archivo_ll_optimizado:
+            print(f"  LLVM IR optimizado generado: {resultado.archivo_ll_optimizado}")
+        for plataforma, info in resultado.binarios.get("binarios", {}).items():
+            if info.get("ok"):
+                print(f"  Binario {plataforma}: {info['ruta']}")
+            else:
+                print(f"  Binario {plataforma}: no generado ({info.get('error', 'desconocido')})")
         sys.exit(0)
-    else:
-        sys.exit(1)
+
+    sys.exit(1)
 
 
 if __name__ == "__main__":
